@@ -106,6 +106,9 @@ set cursorline
 " Line numbers
 set number
 
+" Rofi theme highlighting
+au BufRead,BufNewFile *.rasi setfiletype rasi
+
 " File Browser setup
 lua require('nvim-tree-config')
 nnoremap <C-n> :NvimTreeToggle<Cr>

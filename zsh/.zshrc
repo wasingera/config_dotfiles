@@ -10,7 +10,7 @@ autoload -U promptinit; promptinit
 prompt pure
 
 ## Aliases ##
-alias ls="ls -G"
+alias ls="ls -G --color"
 alias ll="ls -l"
 alias rm="rm -v"
 alias cp="cp -v"

@@ -10,13 +10,14 @@ autoload -U promptinit; promptinit
 prompt pure
 
 ## Aliases ##
-alias ls="ls -G --color"
+alias ls="ls --color"
 alias ll="ls -l"
 alias rm="rm -v"
 alias cp="cp -v"
 alias mv="mv -v"
 alias vim="nvim"
 alias arduino="arduino-cli"
+alias dc="docker container"
 # alias gcc="gcc -Wall -Wconversion -Wextra -std=gnu99"
 # alias g++="g++ -Wall -Wconversion -Wextra -Werror -Wshadow -std=c++11 -Weffc++ -m64"
 alias g++="g++ -std=c++17"

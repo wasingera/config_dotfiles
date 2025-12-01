@@ -1,6 +1,14 @@
 ## Enable Extended Globbing ##
 setopt extended_glob
 
+## Set History File and Max Entries ##
+export HISTFILE="$HOME/.local/state/zsh/.zsh_history"
+export SAVEHIST=10000
+export HISTSIZE=10000
+
+## Share Command History Across Shell Instances ##
+setopt SHARE_HISTORY
+
 ## Load Plugins ##
 fpath+=($ZDOTDIR/plugins/pure)
 source $ZDOTDIR/plugins/load-plugins.zsh

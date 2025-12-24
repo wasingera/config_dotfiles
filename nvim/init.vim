@@ -143,7 +143,7 @@ lua require('nvim-autopairs').setup()
 lua require('gitsigns').setup()
 
 " Search setup
-lua require('leap').add_default_mappings()
+lua require('leap-config')
 
 " FZF enable for file searcher
 lua require('telescope').load_extension('fzf')

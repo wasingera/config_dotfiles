@@ -80,8 +80,8 @@ cmp.setup({
                 cmp.select_next_item()
             elseif luasnip.expand_or_jumpable() then
                 luasnip.expand_or_jump()
-            -- elseif has_words_before() then
-            --     cmp.complete()
+                -- elseif has_words_before() then
+                --     cmp.complete()
             else
                 fallback()
             end
@@ -107,39 +107,49 @@ cmp.setup({
 
 local defaults = require('cmp_nvim_lsp').default_capabilities()
 
-local lspconfig = require('lspconfig')
-
-lspconfig.clangd.setup{
+vim.lsp.config('*', {
     capabilities = defaults
-}
-
-lspconfig.pyright.setup{
-    capabilities = defaults
-}
-
-lspconfig.jdtls.setup{
-    capabilities = defaults
-}
-
-lspconfig.arduino_language_server.setup{
-    capabilities = defaults
-}
-
-require("rust-tools").setup({
-    server = {
-        capabilities = defaults,
-    }
 })
 
--- local rt = require("rust-tools")
---
--- rt.setup({
---     server = {
---         on_attach = function(_, bufnr)
---             -- Hover actions
---             vim.keymap.set("n", "<C-space>", rt.hover_actions.hover_actions, { buffer = bufnr })
---             -- Code action groups
---             vim.keymap.set("n", "<Leader>a", rt.code_action_group.code_action_group, { buffer = bufnr })
---         end,
---     },
--- })
+vim.diagnostic.config({
+    virtual_text = true,
+    signs = true,
+    update_in_insert = false,
+    underline = true,
+    severity_sort = true,
+    float = {
+        focusable = false,
+        style = 'minimal',
+        border = 'rounded',
+        source = 'always',
+        header = '',
+        prefix = '',
+    },
+})
+
+-- lspconfig.jdtls.setup{
+    --     capabilities = defaults
+    -- }
+    --
+    -- lspconfig.arduino_language_server.setup{
+        --     capabilities = defaults
+        -- }
+        --
+        -- require("rust-tools").setup({
+            --     server = {
+                --         capabilities = defaults,
+                --     }
+                -- })
+
+                -- local rt = require("rust-tools")
+                --
+                -- rt.setup({
+                    --     server = {
+                        --         on_attach = function(_, bufnr)
+                            --             -- Hover actions
+                            --             vim.keymap.set("n", "<C-space>", rt.hover_actions.hover_actions, { buffer = bufnr })
+                            --             -- Code action groups
+                            --             vim.keymap.set("n", "<Leader>a", rt.code_action_group.code_action_group, { buffer = bufnr })
+                            --         end,
+                            --     },
+                            -- })

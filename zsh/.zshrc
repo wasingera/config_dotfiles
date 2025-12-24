@@ -31,8 +31,12 @@ alias dc="docker container"
 alias g++="g++ -std=c++17"
 
 ## Functions ## 
+function venv() {
+    source "$HOME/venv/$1/bin/activate"
+}
 
 ## Path Variables ##
+export PATH="$HOME/scripts:$PATH"
 
 ## NVM Setup ##
 export NVM_DIR="$HOME/.nvm"

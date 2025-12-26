@@ -19,8 +19,10 @@ return {
         'nvim-treesitter/nvim-treesitter',
         lazy = false,
         build = ':TSUpdate',
-        opt = {},
-        config = function()
+        opts = {},
+        config = function(_, opts)
+            require'nvim-treesitter'.setup(opts)
+
             require'nvim-treesitter'.install({
                 'bash',
                 'c',

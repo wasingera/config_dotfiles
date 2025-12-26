@@ -13,7 +13,9 @@ return {
         keys = {
             { [[<C-p>]], [[<cmd>Telescope find_files<cr>]], desc="Telescope File Browser" }
         },
-        config = function()
+        config = function(_, opts)
+            require('telescope').setup(opts)
+
             require('telescope').load_extension('fzf')
         end
     }

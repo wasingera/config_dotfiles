@@ -17,8 +17,6 @@ return {
         -- optional: provides snippets for the snippet source
         dependencies = { 'rafamadriz/friendly-snippets' },
 
-        lazy = false,
-
         -- use a release tag to download pre-built binaries
         version = '1.8.0',
         -- AND/OR build from source, requires nightly: https://rust-lang.github.io/rustup/concepts/channels.html#working-with-nightly-rust
@@ -71,11 +69,57 @@ return {
             fuzzy = { implementation = "prefer_rust_with_warning" }
         },
         opts_extend = { "sources.default" },
-        keys = {
-            { 'K', [[<cmd>lua vim.lsp.buf.hover()<cr>]], mode='n', desc="Display hover information about the symbol under the cursor"},
-            { 'gd', [[<cmd>lua vim.lsp.buf.definition()<cr>]], mode='n', desc="Jump to definition"},
-            { 'gD', [[<cmd>lua vim.lsp.buf.declaration()<cr>]], mode='n', desc="Jump to declaration"},
-        },
+        config = function(_, opts)
+            require('blink.cmp').setup(opts)
+
+            -- Setup some navigation keymappings when an LSP is attached
+            vim.api.nvim_create_autocmd('LspAttach', {
+                desc = 'LSP actions',
+                callback = function()
+                    local bufmap = function(mode, lhs, rhs)
+                        local opts = {buffer = true}
+                        vim.keymap.set(mode, lhs, rhs, opts)
+                    end
+
+                    -- Displays hover information about the symbol under the cursor
+                    bufmap('n', 'K', '<cmd>lua vim.lsp.buf.hover()<cr>')
+
+                    -- Jump to the definition
+                    bufmap('n', 'gd', '<cmd>lua vim.lsp.buf.definition()<cr>')
+
+                    -- Jump to declaration
+                    bufmap('n', 'gD', '<cmd>lua vim.lsp.buf.declaration()<cr>')
+
+                    -- Lists all the implementations for the symbol under the cursor
+                    bufmap('n', 'gi', '<cmd>lua vim.lsp.buf.implementation()<cr>')
+
+                    -- Jumps to the definition of the type symbol
+                    bufmap('n', 'go', '<cmd>lua vim.lsp.buf.type_definition()<cr>')
+
+                    -- Lists all the references 
+                    bufmap('n', 'gr', '<cmd>lua vim.lsp.buf.references()<cr>')
+
+                    -- Displays a function's signature information
+                    bufmap('n', '<C-k>', '<cmd>lua vim.lsp.buf.signature_help()<cr>')
+
+                    -- Renames all references to the symbol under the cursor
+                    bufmap('n', '<F2>', '<cmd>lua vim.lsp.buf.rename()<cr>')
+
+                    -- Selects a code action available at the current cursor position
+                    bufmap('n', '<F4>', '<cmd>lua vim.lsp.buf.code_action()<cr>')
+                    bufmap('x', '<F4>', '<cmd>lua vim.lsp.buf.range_code_action()<cr>')
+
+                    -- Show diagnostics in a floating window
+                    bufmap('n', 'gl', '<cmd>lua vim.diagnostic.open_float()<cr>')
+
+                    -- Move to the previous diagnostic
+                    bufmap('n', '[d', '<cmd>lua vim.diagnostic.goto_prev()<cr>')
+
+                    -- Move to the next diagnostic
+                    bufmap('n', ']d', '<cmd>lua vim.diagnostic.goto_next()<cr>')
+                end
+            })
+        end
     }
 }
 

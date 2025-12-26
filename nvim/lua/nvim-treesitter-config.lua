@@ -1,18 +1,28 @@
-local parser_config = require "nvim-treesitter.parsers".get_parser_configs()
--- parser_config.bminor = {
---     install_info = {
---         url = "~/projects/tree-sitter-bminor", -- local path or git repo
---         files = {"src/parser.c"},
---         -- optional entries:
---         -- branch = "main", -- default branch in case of git repo if different from master
---         -- generate_requires_npm = false, -- if stand-alone parser without npm dependencies
---         -- requires_generate_from_grammar = false, -- if folder contains pre-generated src/parser.c
---     },
---     filetype = "bminor", -- if filetype does not match the parser name
--- }
---
--- vim.filetype.add({
---     extension = {
---         bminor = 'bminor'
---     }
--- })
+-- Only uncomment this line if wanting to use non-default values
+require'nvim-treesitter'.setup()
+
+require'nvim-treesitter'.install({
+    'bash',
+    'c',
+    'cpp',
+    'cuda',
+    'html',
+    'lua',
+    'python',
+    'rust',
+    'sql',
+    'zsh'
+})
+
+vim.api.nvim_create_autocmd('FileType', {
+    pattern = {
+        '*'
+    },
+    callback = function()
+        local hasStarted = pcall(vim.treesitter.start)
+
+        if not hasStarted then
+            vim.notify('No treesitter parser installed for this language!', vim.log.levels.INFO)
+        end
+    end
+})

@@ -47,7 +47,7 @@ Plug 'numToStr/Comment.nvim'
 Plug 'mattn/emmet-vim'
 
 " Treesitter
-Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
+Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate', 'branch': 'main'}
 
 " LSP Support
 Plug 'neovim/nvim-lspconfig'
@@ -127,8 +127,8 @@ imap <silent><script><expr> <C-J> copilot#Accept("\<CR>")
 let g:copilot_no_tab_map = v:true
 
 " Treesitter setup
-lua require'nvim-treesitter.configs'.setup{highlight={enable=true}}
-" lua require('nvim-treesitter-config')
+" lua require'nvim-treesitter.configs'.setup{highlight={enable=true}}
+lua require('nvim-treesitter-config')
 
 " Lualine setup -- use default config
 lua require('lualine').setup()

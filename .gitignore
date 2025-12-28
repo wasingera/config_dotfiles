@@ -3,3 +3,4 @@
 !.gitignore
 !zsh/**
 !nvim/**
+!clangd/**

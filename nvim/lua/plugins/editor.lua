@@ -1,12 +1,19 @@
+local utils = require('utils')
+
 return {
     { -- The catppuccin colorscheme
         "catppuccin/nvim",
         name = "catppuccin",
         lazy = false, -- load the colorscheme before runtime
         config = function()
-            -- vim.cmd([[colorscheme catppuccin-latte]])
+            if not utils.is_dark_mode() then
+                vim.cmd([[colorscheme catppuccin-latte]])
+            else
+                vim.cmd([[colorscheme catppuccin-mocha]])
+            end
+
             -- vim.cmd([[colorscheme catppuccin-frappe]])
-            vim.cmd([[colorscheme catppuccin-macchiato]])
+            -- vim.cmd([[colorscheme catppuccin-macchiato]])
             -- vim.cmd([[colorscheme catppuccin-mocha]])
         end
     },
@@ -61,30 +68,9 @@ return {
             })
         end
     },
-    -- { -- Align around symbols/regex/etc.
-    --     'junegunn/vim-easy-align',
-    --     config = false,
-    --     keys = {
-    --         -- Visual mode alignment
-    --         {
-    --             "ga",
-    --             "<expr>EasyAlign",
-    --             desc = "EasyAlign (Visual)",
-    --             mode = "v",
-    --             expr = true
-    --         },
-    --         -- Operator mode alignment (requires an extra motion, e.g., `gaip`)
-    --         {
-    --             "ga",
-    --             function()
-    --                 vim.api.nvim_command("EasyAlign")
-    --             end,
-    --             desc = "EasyAlign (Operator)",
-    --             mode = "n",
-    --             expr = true
-    --         },
-    --     }
-    -- },
+    {
+        'tpope/vim-eunuch'
+    },
     { -- Bottom bar
         'nvim-lualine/lualine.nvim',
         dependencies = { 'nvim-tree/nvim-web-devicons' },

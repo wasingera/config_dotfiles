@@ -15,4 +15,5 @@ CLAUDE.md
 .config/gtk-4.0
 .config/satty
 .config/chromium-flags.conf
+.local/bin/colorscheme
 {{ end }}

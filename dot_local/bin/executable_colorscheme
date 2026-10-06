@@ -1,0 +1,45 @@
+#!/usr/bin/env bash
+# Switch the desktop between its light and dark colour schemes.
+#
+#   colorscheme dark|light|toggle
+#   colorscheme                     re-apply the current mode
+#
+# chezmoi renders every mode's colour files into ~/.config/colorscheme/<mode>/
+# (from .chezmoitemplates/colors/ and the palette in .chezmoidata/). This copies
+# the chosen mode's files into ~/.local/state/colorscheme/current/, where the
+# tools' configs import them from, records the mode (nvim watches it) and
+# reloads whatever is running. colorscheme-solar calls it at sunrise/sunset.
+
+set -euo pipefail
+
+# systemd services don't have ~/.local/bin (eww) on their PATH
+PATH=$HOME/.local/bin:$PATH
+
+modes=${XDG_CONFIG_HOME:-$HOME/.config}/colorscheme
+state=${XDG_STATE_HOME:-$HOME/.local/state}/colorscheme
+current=$(cat "$state/mode" 2>/dev/null || echo dark)
+
+case ${1:-$current} in
+    dark | light) mode=${1:-$current} ;;
+    toggle) if [[ $current == dark ]]; then mode=light; else mode=dark; fi ;;
+    *)
+        echo "usage: colorscheme [dark|light|toggle]" >&2
+        exit 1
+        ;;
+esac
+
+if [[ ! -d $modes/$mode ]]; then
+    echo "colorscheme: $modes/$mode is missing; run chezmoi apply" >&2
+    exit 1
+fi
+
+# Replace each file by renaming a full copy over it, so a tool that is watching
+# (alacritty) never reads a half-written file.
+mkdir -p "$state/current"
+for file in "$modes/$mode"/*; do
+    cp "$file" "$state/current/.${file##*/}.tmp"
+    mv -f "$state/current/.${file##*/}.tmp" "$state/current/${file##*/}"
+done
+printf '%s\n' "$mode" >"$state/mode"
+
+# Reload what's running; anything that isn't is skipped quietly.

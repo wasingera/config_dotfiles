@@ -1,15 +1,10 @@
-(defpoll vpn_name
-    :interval "1s"
-    `./scripts/get_vpn_name.sh`
-)
-
 (defwidget vpn_widget []
     (box
         :class "vpn-button"
 
         (button
             :onclick `./scripts/select_vpn.sh &`
-            vpn_name
+            {network.vpn}
         )
     )
 )

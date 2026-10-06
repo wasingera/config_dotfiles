@@ -1,3 +1,7 @@
+;; {"wifi": ..., "vpn": ...}, updated on NetworkManager events
+(deflisten network :initial '{"wifi": "", "vpn": ""}'
+    `./scripts/network.sh`)
+
 (include "./vpn.yuck")
 (include "./wifi.yuck")
 

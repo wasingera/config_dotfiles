@@ -1,13 +1,8 @@
-(defpoll wifi_name
-    :interval "1s"
-    `./scripts/get_wifi_name.sh`
-)
-
 (defwidget wifi_widget []
     (box
         (button
             :onclick `./scripts/select_wifi.sh &`
-            wifi_name
+            {network.wifi}
         )
     )
 )

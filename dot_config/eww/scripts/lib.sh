@@ -19,3 +19,16 @@ nm_connections() {
             if [[ $type == "$want" ]]; then printf '%s\n' "${name//\\:/:}"; fi
         done
 }
+
+# After an event line, skip the rest of its burst (until 50ms of quiet) so a
+# listener re-renders once, on the final state rather than a half-applied one.
+drain_burst() {
+    while read -r -t 0.05 _; do :; done
+}
+
+# Print a widget's new state, unless it's the same as the last one printed.
+emit() {
+    [[ $1 == "$_last_emit" ]] && return
+    _last_emit=$1
+    printf '%s\n' "$1"
+}

@@ -1,42 +1,18 @@
 #!/usr/bin/env bash
 
-rofi_command="rofi -theme $HOME/.config/rofi/select_vpn/theme.rasi -dmenu -hover-select"
+# Pick a WireGuard VPN to connect to, or disconnect the active one.
+source "${BASH_SOURCE%/*}/lib.sh"
 
-vpn_names="$(nmcli -t connection show | awk -F: '{if ($3 == "wireguard") printf "%s\\n", $1}' | sort -u)"
+active=$(nm_connections wireguard --active | head -n1)
+chosen=$({ echo Disconnect; nm_connections wireguard | sort -u; } | rofi_menu select_vpn)
 
-# betterlockscreen -l
-options="Disconnect\n"
-options+="${vpn_names}"
+[[ -z $chosen ]] && exit 0
 
-chosen=`echo -e $options | $rofi_command -me-select-entry '' -me-accept-entry MousePrimary`
-active_vpn=$(nmcli -t connection show --active | awk -F: '/wireguard/ {print $1}')
+# Only one VPN at a time: drop the current one first
+if [[ -n $active ]]; then
+    nmcli connection down "$active" || notify-send "Failed to disconnect from $active"
+fi
 
-case "$chosen" in
-    Disconnect)
-        # if active vpn not empty
-        if [ -n "$active_vpn" ]; then
-            nmcli connection down "$active_vpn"
-            if [ $? -ne 0 ]; then
-                notify-send "Failed to disconnect from $active_vpn"
-            fi
-        fi
-        ;;
-    *)
-        # if chosen is empty, exit the script
-        if [ -z "$chosen" ]; then
-            exit 0
-        fi
-
-        # If already connected to a VPN, then disconnect
-        if [ -n "$active_vpn" ]; then
-            nmcli con down "$active_vpn"
-        fi
-        #
-        # if chosen is not empty and not "Disconnect", connect to the chosen VPN
-        nmcli connection up $chosen
-        if [ $? -ne 0 ]; then
-            notify-send "Failed to connect to $chosen"
-        fi
-        ;;
-
-esac
+if [[ $chosen != Disconnect ]]; then
+    nmcli connection up "$chosen" || notify-send "Failed to connect to $chosen"
+fi

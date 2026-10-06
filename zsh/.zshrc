@@ -18,7 +18,7 @@ autoload -U promptinit; promptinit
 prompt pure
 
 ## Aliases ##
-alias ls="ls --color"
+alias ls="ls --color -h"
 alias ll="ls -l"
 alias rm="rm -v"
 alias cp="cp -v"
@@ -36,9 +36,34 @@ function venv() {
 }
 
 ## Path Variables ##
-export PATH="$HOME/scripts:$PATH"
+export PATH="$HOME/.local/bin:$PATH"
+
+## Bun (JS Package Manager) ##
+export BUN_INSTALL="$HOME/.bun"
+export PATH="$BUN_INSTALL/bin:$PATH"
 
 ## NVM Setup ##
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
+# bun completions
+[ -s "/home/alex/.bun/_bun" ] && source "/home/alex/.bun/_bun"
+
+# yazi: hide Hyprland from it so it uses its built-in chafa previews
+# (its ueberzugpp mode puts the image mid-screen on this Hyprland)
+function yazi() {
+  env -u HYPRLAND_INSTANCE_SIGNATURE yazi "$@"
+}
+
+# yazi: cd into the last browsed directory on quit
+function y() {
+  local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
+  yazi "$@" --cwd-file="$tmp"
+  IFS= read -r -d '' cwd < "$tmp"
+  [ -n "$cwd" ] && [ "$cwd" != "$PWD" ] && builtin cd -- "$cwd"
+  command rm -f -- "$tmp"
+}
+
+# zoxide: z <dir>, zi for interactive picker (keep near end of file)
+eval "$(zoxide init zsh)"

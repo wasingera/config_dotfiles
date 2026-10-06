@@ -32,3 +32,8 @@ emit() {
     _last_emit=$1
     printf '%s\n' "$1"
 }
+
+# Stream Hyprland's events, one "event>>data" line each.
+hypr_events() {
+    socat -U - "UNIX-CONNECT:$XDG_RUNTIME_DIR/hypr/$HYPRLAND_INSTANCE_SIGNATURE/.socket2.sock"
+}

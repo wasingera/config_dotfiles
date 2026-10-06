@@ -18,7 +18,12 @@ autoload -U promptinit; promptinit
 prompt pure
 
 ## Aliases ##
-alias ls="ls --color -h"
+# macOS's BSD ls uses -G for colour; GNU ls (Linux, WSL) uses --color
+if [[ $OSTYPE == darwin* ]]; then
+    alias ls="ls -Gh"
+else
+    alias ls="ls --color -h"
+fi
 alias ll="ls -l"
 alias rm="rm -v"
 alias cp="cp -v"
@@ -48,7 +53,7 @@ export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
 # bun completions
-[ -s "/home/alex/.bun/_bun" ] && source "/home/alex/.bun/_bun"
+[ -s "$BUN_INSTALL/_bun" ] && source "$BUN_INSTALL/_bun"
 
 # yazi: hide Hyprland from it so it uses its built-in chafa previews
 # (its ueberzugpp mode puts the image mid-screen on this Hyprland)
@@ -65,5 +70,8 @@ function y() {
   command rm -f -- "$tmp"
 }
 
+## Machine-specific settings (untracked; see README) ##
+[ -f "$ZDOTDIR/local.zsh" ] && source "$ZDOTDIR/local.zsh"
+
 # zoxide: z <dir>, zi for interactive picker (keep near end of file)
-eval "$(zoxide init zsh)"
+(( $+commands[zoxide] )) && eval "$(zoxide init zsh)"

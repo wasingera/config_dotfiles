@@ -33,6 +33,18 @@ local fileManager = "alacritty -e env -u HYPRLAND_INSTANCE_SIGNATURE yazi"
 local menu        = "rofi -show drun"
 
 
+----------------
+---- COLORS ----
+----------------
+
+-- Palette of the active light/dark scheme (see ~/.local/bin/colorscheme), as
+-- hex without '#'. colorscheme reloads Hyprland when it switches.
+local ok, c = pcall(dofile, os.getenv("HOME") .. "/.local/state/colorscheme/current/hypr.lua")
+if not ok then
+    c = { blue = "89b4fa", mauve = "cba6f7", surface1 = "45475a" } -- Mocha
+end
+
+
 -------------------
 ---- AUTOSTART ----
 -------------------
@@ -101,8 +113,8 @@ hl.config({
         border_size = 2,
 
         col = {
-            active_border   = { colors = {"rgba(33ccffee)", "rgba(00ff99ee)"}, angle = 45 },
-            inactive_border = "rgba(595959aa)",
+            active_border   = { colors = {"rgb(" .. c.blue .. ")", "rgb(" .. c.mauve .. ")"}, angle = 45 },
+            inactive_border = "rgba(" .. c.surface1 .. "aa)",
         },
 
         -- Set to true to enable resizing windows by clicking and dragging on borders and gaps

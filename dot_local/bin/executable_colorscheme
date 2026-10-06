@@ -47,3 +47,7 @@ if eww ping >/dev/null 2>&1; then eww reload >/dev/null 2>&1 || true; fi
 if pgrep -x dunst >/dev/null; then dunstctl reload || true; fi
 if [[ -n ${HYPRLAND_INSTANCE_SIGNATURE:-} ]]; then hyprctl reload >/dev/null 2>&1 || true; fi
 gsettings set org.gnome.desktop.interface color-scheme "prefer-$mode" 2>/dev/null || true
+gtk_theme=$(sed -n 's/^gtk-theme-name=//p' "$state/current/gtk3.ini" 2>/dev/null)
+if [[ -n $gtk_theme ]]; then
+    gsettings set org.gnome.desktop.interface gtk-theme "$gtk_theme" 2>/dev/null || true
+fi

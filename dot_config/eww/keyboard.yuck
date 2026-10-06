@@ -1,8 +1,3 @@
-;;(defpoll keyboard_layout
-;;    :interval "1s"
-;;    `xkblayout-state print "%e"`
-;;)
-
 (deflisten keyboard_layout
     `./scripts/keyboard.sh`
 )

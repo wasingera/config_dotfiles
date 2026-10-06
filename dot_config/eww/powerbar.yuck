@@ -13,21 +13,3 @@
         )
     )
 )
-
-;;(defwindow powerbar
-;;  :monitor 0
-;;  :geometry (geometry
-;;              :x "-5px"
-;;              :y "5px"
-;;              :width "35px"
-;;              :height "30px"
-;;              :anchor "top right")
-;;  :reserve (struts :distance "35px" :side "top")
-;;  :stacking "bg"
-;;  :windowtype "dock"
-;;  :wm-ignore false
-;;
-;;  (box
-;;    :class "powerbar"
-;;    (power))
-;;)

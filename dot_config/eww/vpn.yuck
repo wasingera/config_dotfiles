@@ -8,23 +8,3 @@
         )
     )
 )
-
-;; (defwindow vpn
-;;     :monitor 0
-;;     :geometry (geometry
-;;         :anchor "top right"
-;;         :x "-360px"
-;;         :y "5px"
-;;         :width "20px"
-;;         :height "30px"
-;;     )
-;;     :reserve (struts :distance "35px" :side "top")
-;;     :stacking "bg"
-;;     :windowtype "dock"
-;;     :wm-ignore false
-;;
-;;     (box
-;;         :class "vpn"
-;;         (vpn_widget)
-;;     )
-;; )

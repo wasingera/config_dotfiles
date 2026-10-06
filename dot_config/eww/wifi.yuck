@@ -6,24 +6,3 @@
         )
     )
 )
-
-;; (defwindow wifi
-;;     :monitor 0
-;;     :geometry (geometry
-;;         :anchor "top right"
-;;         :x "-260px"
-;;         :y "5px"
-;;         :width "70px"
-;;         :height "30px"
-;;     )
-;;     :reserve (struts :distance "35px" :side "top")
-;;     :stacking "bg"
-;;     :windowtype "dock"
-;;     :wm-ignore false
-;;
-;;     (box
-;;         :class "wifi"
-;;         (wifi_widget)
-;;     )
-;; )
-;;

@@ -1,8 +1,6 @@
 (deflisten workspace_string :initial '{"icons": ["", "", "", "", "", "", "", "", "", ""], "special": "empty"}'
   `./scripts/workspaces.sh`)
 
-;;(defvar workspace_string "")
-
 (defwidget workspaces_w []
     (box
         :class "workspaces special-${workspace_string.special}"
@@ -13,44 +11,3 @@
             (label :class "ws-icon" :valign "center" :text icon))
     )
 )
-
-;;(defwindow workspaces
-;;    :geometry (geometry
-;;        :anchor "top center"
-;;        :x "0px"
-;;        :y "5px"
-;;        :width "215px"
-;;        :height "30px"
-;;    )
-;;    :stacking "bg"
-;;    :windowtype "dock"
-;;    :exclusive true
-;;    :namespace "eww-bar"
-;;
-;;    :wm-ignore false
-;;    :reserve (struts :distance "35px" :side "top")
-;;
-;;    (box
-;;        :class "workspaces"
-;;        workspace_string
-;;    )
-;;)
-
-;; (defwindow middlebar
-;;   :geometry (geometry
-;;               :x "0px"
-;;               :y "5px"
-;;               :width "220px"
-;;               :height "30px"
-;;               :anchor "top center")
-;;   :reserve (struts :distance "35px" :side "top")
-;;   :stacking "bg"
-;;   :windowtype "dock"
-;;   :wm-ignore false
-;;   (box
-;;     :class "workspaces"
-;;     :orientation "h"
-;;     :halign "center"
-;;     workspaces)
-;; ) 
-;;

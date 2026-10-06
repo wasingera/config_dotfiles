@@ -1,9 +1,3 @@
-;; (defwidget clock_text []
-;;   (box
-;;     :class "clock_class"
-;;     :orientation "h"
-;;     time))
-
 (defwidget clock_w []
   (box
     :orientation "h"
@@ -12,19 +6,3 @@
 
     {formattime(EWW_TIME, "%a %b %d | %H:%M")})
 )
-
-;;(defwindow clock
-;;  :monitor 0
-;;  :geometry (geometry
-;;              :x "-100px"
-;;              :y "0"
-;;              :width "185px"
-;;              :height "30px"
-;;              :anchor "top center")
-;;
-;;  :stacking "bottom"
-;;  :exclusive true
-;;  :namespace "eww-bar"
-;;
-;;  (clock_w)
-;;)

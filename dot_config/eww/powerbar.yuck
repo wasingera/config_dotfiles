@@ -7,7 +7,7 @@
 
         (button
             :class "power_button"
-            :onclick "./scripts/open_rofi.sh &"
+            :onclick "./scripts/power_menu.sh &"
 
             "")
         )

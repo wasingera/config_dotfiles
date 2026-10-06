@@ -1,0 +1,29 @@
+{{- /* Deleted from the target machine on `chezmoi apply`. */ -}}
+
+{{- /* Left behind by the old layout, where ~/.config itself was the git repo */}}
+.config/.gitignore
+.config/.gitmodules
+
+{{ if .desktop }}
+{{- /* Old bspwm/X11 setup, replaced by Hyprland */}}
+.config/bspwm
+.config/sxhkd
+.config/polybar
+.config/picom
+.config/betterlockscreenrc
+.config/wal
+.xinitrc
+.fehbg
+
+{{- /* Unused rofi theme collection (only config.rasi, powerbutton and select_* are used) */}}
+.config/rofi/applets
+.config/rofi/bin
+.config/rofi/launcher
+.config/rofi/launchers
+.config/rofi/powermenu
+
+{{- /* eww backups and a stray file */}}
+.config/eww/*.bak
+.config/eww/scripts/*.bak
+.config/eww/out
+{{ end }}

@@ -1,0 +1,83 @@
+/* Shared layout for the menus that drop down from eww bar buttons
+ * (wifi, vpn, power). Each menu's theme.rasi imports this and sets:
+ *   menu-color   text colour
+ *   menu-width   width of the menu box
+ *   menu-right   gap between the menu's right edge and the screen's
+ *
+ * rofi's click-to-exit does nothing on Wayland, so the window covers the
+ * whole screen (transparent) and only the menu box is drawn. A click on the
+ * transparent part hits no entry and falls through to kb-cancel, which
+ * rofi_menu (eww/scripts/lib.sh) binds to MousePrimary. rofi_menu also sets
+ * listview lines to the number of options. */
+
+* {
+    background-color: #303446;
+    color: @menu-color;
+}
+
+window {
+    fullscreen: true;
+    background-color: transparent;
+    children: [ "menu-row", "menu-below" ];
+}
+
+/* top strip: transparent filler, the menu box, then a gap of menu-right */
+menu-row {
+    orientation: horizontal;
+    expand: false;
+    background-color: transparent;
+    /* bar is 5px + 32px tall; drop the menu 5px below it */
+    padding: 42px 0px 0px 0px;
+    children: [ "menu-left", mainbox, "menu-gap" ];
+}
+
+menu-left, menu-below {
+    expand: true;
+    background-color: transparent;
+}
+
+/* a variable can't go inside a multi-value padding, so the gap is a box */
+menu-gap {
+    expand: false;
+    width: @menu-right;
+    background-color: transparent;
+}
+
+mainbox {
+    expand: false;
+    width: @menu-width;
+    padding: 6px 0px;
+    border-radius: 3px;
+    children: [ listview ];
+}
+
+inputbar {
+    enabled: false;
+}
+
+mode-switcher {
+    enabled: false;
+}
+
+listview {
+    layout: vertical;
+    spacing: 0px;
+}
+
+element {
+    orientation: horizontal;
+    padding: 5px 5px;
+    margin: 0px 5px;
+    children: [ element-text ];
+    border-radius: 3px;
+}
+
+element selected {
+    background-color: #414559;
+}
+
+element-text {
+    background-color: inherit;
+    font: "Iosevka Term Extended Bold 15px";
+    margin: 0px 0px 0px 5px;
+}

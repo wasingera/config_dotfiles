@@ -4,9 +4,17 @@
 # Show a rofi menu using ~/.config/rofi/<theme>/theme.rasi.
 # Reads the options from stdin, one per line, and prints the chosen one
 # (nothing if the menu was dismissed).
+# The themes cover the screen with a transparent window (rofi/dropdown.rasi),
+# so binding MousePrimary to cancel closes the menu on a click outside it;
+# clicks on an entry are taken by me-accept-entry first.
 rofi_menu() {
-    rofi -theme "$HOME/.config/rofi/$1/theme.rasi" -dmenu -hover-select \
-        -me-select-entry '' -me-accept-entry MousePrimary
+    local options
+    options=$(cat)
+    printf '%s\n' "$options" |
+        rofi -theme "$HOME/.config/rofi/$1/theme.rasi" \
+            -theme-str "listview { lines: $(printf '%s\n' "$options" | wc -l); }" \
+            -dmenu -hover-select -me-select-entry '' -me-accept-entry MousePrimary \
+            -kb-cancel 'Escape,Control+g,Control+bracketleft,MousePrimary'
 }
 
 # Print the names of NetworkManager connections of one type (e.g. wireguard,

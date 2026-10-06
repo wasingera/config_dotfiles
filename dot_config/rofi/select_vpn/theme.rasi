@@ -1,53 +1,7 @@
+@import "../dropdown.rasi"
+
 * {
-    background-color: #303446;
-    color: #e5c890;
-}
-
-window {
-    width: 150px;
-    height: 100px;
-    location: northeast;
-    anchor: northeast;
-    x-offset: -385px;
-    y-offset: 5px;
-    padding: 6px 0px 0px 0px;
-    border-radius: 3px;
-    /*border: 3px;
-    border-radius: 3px;
-    border-color: #85c1dc;*/
-}
-
-mainbox {
-    children: [listview];
-}
-
-inputbar {
-    enabled: false;
-}
-
-mode-switcher {
-    enabled: false;
-}
-
-listview {
-    layout: vertical;
-    spacing: 0px;
-}
-
-element {
-    orientation: horizontal;
-    padding: 5px 5px;
-    margin: 0px 5px;
-    children: [element-text];
-    border-radius: 3px;
-}
-
-element selected {
-    background-color: #414559;
-}
-
-element-text {
-    background-color: inherit;
-    font: "Iosevka Term Extended Bold 15px";
-    margin: 0px 0px 0px 5px;
+    menu-color: #e5c890;
+    menu-width: 150px;
+    menu-right: 385px;
 }

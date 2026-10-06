@@ -1,5 +1,5 @@
 (deflisten workspace_string :initial '{"icons": ["", "", "", "", "", "", "", "", "", ""], "special": "empty"}'
-  `./scripts/get_active_workspaces.sh`)
+  `./scripts/workspaces.sh`)
 
 ;;(defvar workspace_string "")
 

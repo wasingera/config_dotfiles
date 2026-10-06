@@ -6,15 +6,16 @@ return {
         name = "catppuccin",
         lazy = false, -- load the colorscheme before runtime
         config = function()
-            if not utils.is_dark_mode() then
-                vim.cmd([[colorscheme catppuccin-latte]])
-            else
-                vim.cmd([[colorscheme catppuccin-mocha]])
-            end
+            -- The flavour follows 'background': flavours.dark or flavours.light
+            require("catppuccin").setup({ background = require("flavours") })
+            vim.o.background = utils.mode()
+            vim.cmd.colorscheme("catppuccin")
 
-            -- vim.cmd([[colorscheme catppuccin-frappe]])
-            -- vim.cmd([[colorscheme catppuccin-macchiato]])
-            -- vim.cmd([[colorscheme catppuccin-mocha]])
+            -- Switch along with the desktop while running
+            utils.watch_mode(function(mode)
+                vim.o.background = mode
+                vim.cmd.colorscheme("catppuccin")
+            end)
         end
     },
     { -- Automatically insert closing brackets/braces/etc.

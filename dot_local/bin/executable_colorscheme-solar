@@ -2,7 +2,7 @@
 # colorscheme-solar
 #
 # Determines whether it is currently day or night at the user's location and
-# writes the appropriate colorscheme to ~/.local/state/colorscheme/mode.
+# switches the desktop to the light or dark colour scheme with `colorscheme`.
 # Then schedules a transient systemd timer to perform the *next* transition
 # (sunrise → light, sunset → dark) at the exact right time.
 #
@@ -10,7 +10,7 @@
 # colorscheme-solar.timer on boot (after a 30-second delay to allow the
 # network to come up) and again at midnight each day.
 #
-# Dependencies: curl, jq
+# Dependencies: curl, jq, colorscheme (~/.local/bin)
 #   Install on Arch Linux: pacman -S jq
 #
 # APIs used (both free, no key required):
@@ -23,13 +23,11 @@
 set -euo pipefail
 
 # ── Paths ─────────────────────────────────────────────────────────────────────
-STATE_FILE="${HOME}/.local/state/colorscheme/mode"
 CACHE_DIR="${HOME}/.cache/colorscheme-solar"
 SOLAR_CACHE="${CACHE_DIR}/solar.json"
 LOC_CACHE="${CACHE_DIR}/location.json"
 
 mkdir -p "${CACHE_DIR}"
-mkdir -p "$(dirname "${STATE_FILE}")"
 
 TODAY=$(date +%Y-%m-%d)
 
@@ -188,13 +186,11 @@ main() {
 
     if (( now_ts >= sunrise_ts && now_ts < sunset_ts )); then
         mode="light"
-        sed -i "s/mocha/latte/" "$HOME/.config/alacritty/alacritty.toml"
     else
         mode="dark"
-        sed -i "s/latte/mocha/" "$HOME/.config/alacritty/alacritty.toml"
     fi
 
-    echo "${mode}" > "${STATE_FILE}"
+    "${HOME}/.local/bin/colorscheme" "${mode}"
     echo "colorscheme-solar: mode set to '${mode}' \
 (sunrise $(date -d "${sunrise}" +%H:%M), sunset $(date -d "${sunset}" +%H:%M) local time)"
 

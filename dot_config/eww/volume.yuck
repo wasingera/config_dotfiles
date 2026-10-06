@@ -1,24 +1,21 @@
 ;; ==== Variables ====
-(defpoll volume_value
-    :initial "50"
-    :interval "1s"
-    `pamixer --get-volume`)
-
-(defvar volume_muted false)
+;; {"volume": N, "muted": bool}, updated on PulseAudio/PipeWire events
+(deflisten volume :initial '{"volume": 50, "muted": false}'
+    `./scripts/volume.sh`)
 
 ;; ==== Widgets ====
 (defwidget volume_mute []
     (button
         :class "volume_button"
-        :onclick "pamixer --toggle-mute && ~/scripts/eww update volume_muted=${!volume_muted}"
-        {volume_muted ? "婢" : "墳"}
+        :onclick "pamixer --toggle-mute"
+        {volume.muted ? "婢" : "墳"}
     )
 )
 
 (defwidget volume_slider []
     (scale
         :class "volume_slider"
-        :value volume_value
+        :value {volume.volume}
         :min 0
         :max 100
         :onchange "pamixer --set-volume {}"

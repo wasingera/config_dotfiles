@@ -1,7 +1,3 @@
-(defpoll time
-  :interval "1s"
-  `date +"%a %b %d | %H:%M"`)
-
 ;; (defwidget clock_text []
 ;;   (box
 ;;     :class "clock_class"
@@ -14,7 +10,7 @@
     :halign "center"
     :class "clock"
 
-    time)
+    {formattime(EWW_TIME, "%a %b %d | %H:%M")})
 )
 
 ;;(defwindow clock

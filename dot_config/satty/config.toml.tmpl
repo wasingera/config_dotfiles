@@ -1,0 +1,15 @@
+{{- $c := index .catppuccin .colorscheme.dark -}}
+# Annotation colours: Catppuccin {{ $c.name }} (the dark flavour), from the palette
+# in .chezmoidata. These are drawn into screenshots, so they don't switch with
+# light/dark mode; satty's window follows the GTK4 theme.
+[color-palette]
+palette = [
+{{- range list "red" "peach" "yellow" "green" "blue" "mauve" }}
+    "{{ index $c . }}", # {{ . }}
+{{- end }}
+]
+custom = [
+{{- range list "red" "maroon" "peach" "yellow" "green" "teal" "sky" "sapphire" "blue" "lavender" "mauve" "pink" "text" "overlay0" "base" "crust" }}
+    "{{ index $c . }}", # {{ . }}
+{{- end }}
+]

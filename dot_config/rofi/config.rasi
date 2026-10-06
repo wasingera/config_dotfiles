@@ -14,7 +14,7 @@ configuration{
     sidebar-mode: true;
 }
 
-@theme "catppuccin-frappe"
+@theme "catppuccin"
 
 * {
     font: "Iosevka Term Extended Bold 15px";
@@ -39,7 +39,7 @@ element {
 }
 
 element selected {
-    background-color: #414559;
+    background-color: @surface0;
 }
 
 element-icon {

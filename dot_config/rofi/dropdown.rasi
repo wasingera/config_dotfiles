@@ -10,8 +10,12 @@
  * rofi_menu (eww/scripts/lib.sh) binds to MousePrimary. rofi_menu also sets
  * listview lines to the number of options. */
 
+/* Palette variables (@base, @blue, ...) of the active light/dark scheme;
+ * see ~/.local/bin/colorscheme */
+@import "~/.local/state/colorscheme/current/rofi.rasi"
+
 * {
-    background-color: #303446;
+    background-color: @base;
     color: @menu-color;
 }
 
@@ -73,7 +77,7 @@ element {
 }
 
 element selected {
-    background-color: #414559;
+    background-color: @surface0;
 }
 
 element-text {

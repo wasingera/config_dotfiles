@@ -1,3 +1,7 @@
+// Palette variables ($base, $blue, ...) of the active light/dark scheme;
+// see ~/.local/bin/colorscheme
+@import "colors";
+
 * {
   all: unset;
 }
@@ -16,10 +20,10 @@
 }
 
 .clock, .workspaces, .volume, .powerbar, .keyboard, .wifi, .vpn {
-  background: #303446;
+  background: $base;
   font-family: "Iosevka Term Extended";
   font-weight: bold;
-  color: #444;
+  color: $text;
   border-radius: 5px;
   padding: 5px;
 }
@@ -27,13 +31,13 @@
 .clock {
   // padding-left: 10px;
   // padding-right: 10px;
-  color: #ea999c;
+  color: $maroon;
   padding-left: 10px;
   padding-right: 10px;
 }
 
 .workspaces {
-  color: #8caaee;
+  color: $blue;
   // Equal padding + fixed gaps (the yuck :spacing) keep the row centred.
   // Label is 21px tall (hinted ascent 16 + descent 5) with the circle at
   // 3.23px from the top and 3.76px from the bottom. min-height matches it so
@@ -56,11 +60,11 @@
 
 // Special workspace indicator: inset outline so the box doesn't resize
 .workspaces.special-occupied {
-  box-shadow: inset 0 0 0 1px #8caaee;
+  box-shadow: inset 0 0 0 1px $blue;
 }
 
 .workspaces.special-open {
-  box-shadow: inset 0 0 0 2px #8caaee;
+  box-shadow: inset 0 0 0 2px $blue;
 }
 
 .volume {
@@ -75,7 +79,7 @@
 
 // background base slider
 .volume_slider trough {
-  background-color: #737994;
+  background-color: $overlay0;
 
   border-radius: 10px;
 
@@ -88,19 +92,19 @@
 
 // slider filler color
 .volume_slider trough highlight {
-  background-color: #ca9ee6;
-  color: #000000;
+  background-color: $mauve;
+  color: $crust;
   border-radius: 10px;
 }
 
 .volume_button {
   font-size: 20px;
-  color: #ca9ee6;
+  color: $mauve;
   margin-top: 2px;
 }
 
 .keyboard {
-  color: #eed49f;
+  color: $yellow;
   min-width: 2.5em;
 }
 
@@ -109,13 +113,13 @@
 }
 
 .power_button {
-  color: #a6d189;
+  color: $green;
   padding-left: 5px;
   padding-right: 8px;
 }
 
 .wifi {
-  color: #f38ba8;
+  color: $red;
   padding-left: 10px;
   padding-right: 10px;
   min-width: 150px;
@@ -123,7 +127,7 @@
 }
 
 .vpn {
-  color: #f9e2af;
+  color: $yellow;
   padding-right: 10px;
   padding-left: 10px;
   min-width: 150px;

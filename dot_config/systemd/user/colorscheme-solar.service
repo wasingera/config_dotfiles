@@ -1,0 +1,19 @@
+[Unit]
+Description=Set colorscheme based on time of day (solar)
+Documentation=man:systemd.service(5)
+# Soft network dependency: the script handles the offline/cached case itself,
+# so we only want the network to be *attempted*, not strictly required.
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+# ExecStart path must be absolute; ~ is not expanded in unit files.
+ExecStart=%h/.local/bin/colorscheme-solar
+# Keep journal output so `journalctl --user -u colorscheme-solar` shows the
+# last mode set and the next scheduled transition.
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=default.target

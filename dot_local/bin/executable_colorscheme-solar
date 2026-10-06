@@ -1,0 +1,205 @@
+#!/usr/bin/env bash
+# colorscheme-solar
+#
+# Determines whether it is currently day or night at the user's location and
+# writes the appropriate colorscheme to ~/.local/state/colorscheme/mode.
+# Then schedules a transient systemd timer to perform the *next* transition
+# (sunrise → light, sunset → dark) at the exact right time.
+#
+# Called by colorscheme-solar.service, which is activated by
+# colorscheme-solar.timer on boot (after a 30-second delay to allow the
+# network to come up) and again at midnight each day.
+#
+# Dependencies: curl, jq
+#   Install on Arch Linux: pacman -S jq
+#
+# APIs used (both free, no key required):
+#   https://ipinfo.io/json               — IP-based geolocation
+#   https://api.sunrise-sunset.org/json  — sunrise/sunset times
+#
+# Cache: results are stored in ~/.cache/colorscheme-solar/ and reused for the
+# rest of the calendar day to avoid redundant API calls.
+
+set -euo pipefail
+
+# ── Paths ─────────────────────────────────────────────────────────────────────
+STATE_FILE="${HOME}/.local/state/colorscheme/mode"
+CACHE_DIR="${HOME}/.cache/colorscheme-solar"
+SOLAR_CACHE="${CACHE_DIR}/solar.json"
+LOC_CACHE="${CACHE_DIR}/location.json"
+
+mkdir -p "${CACHE_DIR}"
+mkdir -p "$(dirname "${STATE_FILE}")"
+
+TODAY=$(date +%Y-%m-%d)
+
+# ── Location detection ────────────────────────────────────────────────────────
+# Returns a cached result when the cached city matches today's network, or
+# fetches a fresh result from ipinfo.io. The location cache is intentionally
+# kept for longer than one day (it is only invalidated when the city changes)
+# so the script remains functional during brief internet outages.
+detect_location() {
+    local cached_loc cached_city fresh city
+
+    if [[ -f "${LOC_CACHE}" ]]; then
+        cached_loc=$(jq -r '.loc' "${LOC_CACHE}")
+        cached_city=$(jq -r '.city // ""' "${LOC_CACHE}")
+        # Try a quick refresh; if it fails, fall back to cache silently
+        if fresh=$(curl -sf --max-time 8 "https://ipinfo.io/json"); then
+            city=$(echo "${fresh}" | jq -r '.city // ""')
+            if [[ "${city}" == "${cached_city}" ]]; then
+                # Same city — no need to refetch solar times
+                echo "${cached_loc}"
+                return
+            fi
+            echo "${fresh}" > "${LOC_CACHE}"
+            echo "${fresh}" | jq -r '.loc'
+        else
+            echo "colorscheme-solar: ipinfo.io unreachable, using cached location (${cached_city})" >&2
+            echo "${cached_loc}"
+        fi
+        return
+    fi
+
+    # No cache at all
+    local data
+    data=$(curl -sf --max-time 10 "https://ipinfo.io/json") || {
+        echo "colorscheme-solar: ERROR — cannot reach ipinfo.io and no location cache exists" >&2
+        exit 1
+    }
+    echo "${data}" > "${LOC_CACHE}"
+    echo "${data}" | jq -r '.loc'
+}
+
+# ── Solar time fetching ───────────────────────────────────────────────────────
+# Returns today's sunrise and sunset as ISO-8601 UTC strings.
+# Results are cached for the calendar day.
+load_solar_times() {
+    # Return cached data if it was fetched today
+    if [[ -f "${SOLAR_CACHE}" ]] && \
+       [[ "$(jq -r '.date // ""' "${SOLAR_CACHE}")" == "${TODAY}" ]]; then
+        cat "${SOLAR_CACHE}"
+        return
+    fi
+
+    local loc lat lon data
+    loc=$(detect_location)
+    lat="${loc%,*}"
+    lon="${loc#*,}"
+
+    data=$(curl -sf --max-time 10 \
+        "https://api.sunrise-sunset.org/json?lat=${lat}&lng=${lon}&date=${TODAY}&formatted=0") || {
+        # If the API is unreachable but we have a recent cache, use it with a warning.
+        # Solar times change slowly, so yesterday's values are acceptable as a fallback.
+        if [[ -f "${SOLAR_CACHE}" ]]; then
+            echo "colorscheme-solar: WARNING — sunrise-sunset.org unreachable; using previous solar data" >&2
+            cat "${SOLAR_CACHE}"
+            return
+        fi
+        echo "colorscheme-solar: ERROR — cannot reach sunrise-sunset.org and no solar cache exists" >&2
+        exit 1
+    }
+
+    # Annotate with today's date for cache invalidation
+    echo "${data}" | jq --arg date "${TODAY}" '. + {date: $date}' | tee "${SOLAR_CACHE}"
+}
+
+# ── Transition scheduling ─────────────────────────────────────────────────────
+# Schedules a transient systemd timer for the next solar event using
+# `systemd-run --on-calendar`, so the colorscheme switches at the exact minute.
+# Any previously scheduled transition is cancelled first.
+schedule_next_transition() {
+    local now_ts="$1" sunrise_ts="$2" sunrise="$3" sunset_ts="$4" sunset="$5"
+    local next_mode next_time_iso calendar_spec
+    local timer_file="${HOME}/.config/systemd/user/colorscheme-solar-transition.timer"
+
+    if (( now_ts < sunrise_ts )); then
+        next_mode="light"
+        next_time_iso="${sunrise}"
+    elif (( now_ts < sunset_ts )); then
+        next_mode="dark"
+        next_time_iso="${sunset}"
+    else
+        # Past sunset — no more transitions today.
+        # The daily (midnight) timer will re-run this script tomorrow.
+        echo "colorscheme-solar: no further transitions today; will reschedule at midnight"
+        return
+    fi
+
+    # Convert UTC time to local wall-clock time for the calendar spec
+    calendar_spec=$(date -d "${next_time_iso}" +"%Y-%m-%d %H:%M:%S")
+
+    # Write a persistent timer unit that triggers the main colorscheme-solar
+    # service at the next solar event. Persistent units survive logout/login.
+    cat > "${timer_file}" <<UNIT
+[Unit]
+Description=colorscheme-solar: trigger ${next_mode} mode transition
+
+[Timer]
+OnCalendar=${calendar_spec}
+Unit=colorscheme-solar.service
+
+[Install]
+WantedBy=timers.target
+UNIT
+
+    systemctl --user daemon-reload
+    systemctl --user enable --now colorscheme-solar-transition.timer
+
+    echo "colorscheme-solar: scheduled '${next_mode}' mode at $(date -d "${next_time_iso}" +%H:%M)"
+}
+
+# ── Main ──────────────────────────────────────────────────────────────────────
+usage() {
+    echo "Usage: colorscheme-solar [--sunrise HH:MM] [--sunset HH:MM]"
+    echo "  --sunrise HH:MM  Override today's sunrise (local time) for testing"
+    echo "  --sunset  HH:MM  Override today's sunset  (local time) for testing"
+}
+
+main() {
+    local solar sunrise sunset now_ts sunrise_ts sunset_ts mode
+    local override_sunrise="" override_sunset=""
+
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            --sunrise) override_sunrise="$2"; shift 2 ;;
+            --sunset)  override_sunset="$2";  shift 2 ;;
+            --help|-h) usage; exit 0 ;;
+            *) echo "colorscheme-solar: unknown option: $1" >&2; usage >&2; exit 1 ;;
+        esac
+    done
+
+    solar=$(load_solar_times)
+    sunrise=$(echo "${solar}" | jq -r '.results.sunrise')  # ISO 8601 UTC
+    sunset=$(echo "${solar}"  | jq -r '.results.sunset')   # ISO 8601 UTC
+
+    if [[ -n "${override_sunrise}" ]]; then
+        sunrise=$(date -u -d "@$(date -d "${TODAY} ${override_sunrise}" +%s)" +"%Y-%m-%dT%H:%M:%S+00:00")
+        echo "colorscheme-solar: sunrise overridden to ${override_sunrise} local time"
+    fi
+    if [[ -n "${override_sunset}" ]]; then
+        sunset=$(date -u -d "@$(date -d "${TODAY} ${override_sunset}" +%s)" +"%Y-%m-%dT%H:%M:%S+00:00")
+        echo "colorscheme-solar: sunset overridden to ${override_sunset} local time"
+    fi
+
+    now_ts=$(date +%s)
+    sunrise_ts=$(date -d "${sunrise}" +%s)
+    sunset_ts=$(date  -d "${sunset}"  +%s)
+
+    if (( now_ts >= sunrise_ts && now_ts < sunset_ts )); then
+        mode="light"
+        sed -i "s/mocha/latte/" "$HOME/.config/alacritty/alacritty.toml"
+    else
+        mode="dark"
+        sed -i "s/latte/mocha/" "$HOME/.config/alacritty/alacritty.toml"
+    fi
+
+    echo "${mode}" > "${STATE_FILE}"
+    echo "colorscheme-solar: mode set to '${mode}' \
+(sunrise $(date -d "${sunrise}" +%H:%M), sunset $(date -d "${sunset}" +%H:%M) local time)"
+
+    schedule_next_transition \
+        "${now_ts}" "${sunrise_ts}" "${sunrise}" "${sunset_ts}" "${sunset}"
+}
+
+main "$@"

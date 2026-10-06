@@ -1,0 +1,20 @@
+[Unit]
+Description=Trigger colorscheme-solar at boot and daily at midnight
+Documentation=man:systemd.timer(5)
+
+[Timer]
+# Run 30 seconds after the user session starts, giving the network time to
+# come up and allowing other startup services to settle first.
+OnBootSec=30s
+
+# Re-run at midnight each day. This recalculates the next day's sunrise/
+# sunset times and immediately applies the correct mode (dark, since midnight
+# is always after sunset and before sunrise).
+OnCalendar=daily
+# If the machine was suspended across midnight, fire immediately on wake
+# rather than waiting until the next midnight.
+WakeSystem=false
+Persistent=true
+
+[Install]
+WantedBy=timers.target

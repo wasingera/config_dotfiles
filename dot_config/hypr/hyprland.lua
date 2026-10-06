@@ -417,15 +417,3 @@ hl.window_rule({
     float  = true,
     center = true,
 })
-
--- ueberzugpp image overlay (yazi previews): keep it from tiling, stealing focus or animating
-hl.window_rule({
-    name  = "ueberzugpp",
-    match = { class = "^ueberzugpp_.*$" },
-    float     = true,
-    no_focus  = true,
-    no_anim   = true,
-    no_shadow = true,
-    border_size = 0,
-    no_blur   = true,
-})

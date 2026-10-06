@@ -46,3 +46,4 @@ printf '%s\n' "$mode" >"$state/mode"
 if eww ping >/dev/null 2>&1; then eww reload >/dev/null 2>&1 || true; fi
 if pgrep -x dunst >/dev/null; then dunstctl reload || true; fi
 if [[ -n ${HYPRLAND_INSTANCE_SIGNATURE:-} ]]; then hyprctl reload >/dev/null 2>&1 || true; fi
+gsettings set org.gnome.desktop.interface color-scheme "prefer-$mode" 2>/dev/null || true

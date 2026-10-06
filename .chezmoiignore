@@ -6,6 +6,7 @@ README.md
 .config/hypr
 .config/eww
 .config/rofi
+.local/share/rofi
 .config/dunst
 .config/alacritty
 .config/gtk-3.0

@@ -1,0 +1,47 @@
+configuration{
+    modi: "run,drun,window";
+    icon-theme: "Oranchelo";
+    show-icons: true;
+    terminal: "alacritty";
+    drun-display-format: "{icon} {name}";
+    location: 0;
+    disable-history: false;
+    hide-scrollbar: true;
+    display-drun: "   Apps ";
+    display-run: "   Run ";
+    display-window: " 﩯  Window";
+    display-Network: " 󰤨  Network";
+    sidebar-mode: true;
+}
+
+@theme "catppuccin-frappe"
+
+* {
+    font: "Iosevka Term Extended Bold 15px";
+}
+
+window {
+    height: 350px;
+    width: 550px;
+    border-radius: 3px;
+}
+
+listview {
+    layout: vertical;
+    columns: 1;
+}
+
+element {
+    //padding: 5px 0px 0px 0px;
+    padding: 5px;
+    margin: 0px 15px 0px 0px;
+    border-radius: 3px;
+}
+
+element selected {
+    background-color: #414559;
+}
+
+element-icon {
+    size: 20px;
+}

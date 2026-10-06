@@ -3,6 +3,8 @@
 {{- /* Left behind by the old layout, where ~/.config itself was the git repo */}}
 .config/.gitignore
 .config/.gitmodules
+.config/zsh/.gitignore
+.config/zsh/readme.md
 
 {{ if .desktop }}
 {{- /* Old bspwm/X11 setup, replaced by Hyprland */}}

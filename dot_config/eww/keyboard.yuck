@@ -1,0 +1,15 @@
+;;(defpoll keyboard_layout
+;;    :interval "1s"
+;;    `xkblayout-state print "%e"`
+;;)
+
+(deflisten keyboard_layout
+    `./scripts/listen_active_kb.sh`
+)
+
+(defwidget keyboard []
+    (box
+        :class "keyboard"
+        keyboard_layout
+    )
+)

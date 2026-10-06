@@ -1,0 +1,34 @@
+(defpoll time
+  :interval "1s"
+  `date +"%a %b %d | %H:%M"`)
+
+;; (defwidget clock_text []
+;;   (box
+;;     :class "clock_class"
+;;     :orientation "h"
+;;     time))
+
+(defwidget clock_w []
+  (box
+    :orientation "h"
+    :halign "center"
+    :class "clock"
+
+    time)
+)
+
+;;(defwindow clock
+;;  :monitor 0
+;;  :geometry (geometry
+;;              :x "-100px"
+;;              :y "0"
+;;              :width "185px"
+;;              :height "30px"
+;;              :anchor "top center")
+;;
+;;  :stacking "bottom"
+;;  :exclusive true
+;;  :namespace "eww-bar"
+;;
+;;  (clock_w)
+;;)

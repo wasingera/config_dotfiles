@@ -1,0 +1,107 @@
+;; ==== Variables ====
+(defpoll volume_value
+    :initial "50"
+    :interval "1s"
+    `pamixer --get-volume`)
+
+(defvar volume_muted false)
+
+;; ==== Widgets ====
+(defwidget volume_mute []
+    (button
+        :class "volume_button"
+        :onclick "pamixer --toggle-mute && ~/scripts/eww update volume_muted=${!volume_muted}"
+        {volume_muted ? "婢" : "墳"}
+    )
+)
+
+(defwidget volume_slider []
+    (scale
+        :class "volume_slider"
+        :value volume_value
+        :min 0
+        :max 100
+        :onchange "pamixer --set-volume {}"
+    )
+)
+
+(defwidget volume []
+    (box
+        :class "volume"
+        :space-evenly false
+        :valign "center"
+        :halign "center"
+        (volume_mute)
+        (volume_slider)
+    )
+)
+
+;; ==== Window ====
+;;(defwindow volume
+;;    :geometry (geometry
+;;        :anchor "top center"
+;;        :x "-45px"
+;;        :y "5px"
+;;        :width "155px"
+;;        :height "30px")
+;;    :reserve (struts :distance "35px" :side "top")
+;;    :stacking "bg"
+;;    :exclusive "true"
+;;    :windowtype "dock"
+;;    :namespace "bar"
+;;
+;;    (box
+;;        :class "volume"
+;;
+;;        (volume)
+;;    )
+;;)
+
+
+;; ==== Widgets ====
+
+;; (defwidget metric [label value onchange]
+;;   (box
+;;     :orientation "h"
+;;     :class "metric"
+;;     :space-evenly false
+;;     ; (box :class label label)
+;;     (button
+;;       :class "volume_button"
+;;       :onclick "pamixer --toggle-mute && eww update volume_muted=${!volume_muted}"
+;;       {volume_muted ? "婢" : "墳"})
+;;     (scale
+;;       :value value
+;;       :min 0
+;;       :max 100
+;;       :active {onchange != ""}
+;;       :onchange onchange)))
+;;
+;; (defwidget volume_widget []
+;;   (box :orientation "h" :space-evenly false :halign "end"
+;;     (metric
+;;       :value volume
+;;       :label "VOL:"
+;;       :onchange "./scripts/set_volume.sh {}")
+;;     ))
+;;
+;; ;; ==== Windows ====
+;;
+;; (defwindow volume
+;;   :monitor 0
+;;   :geometry (geometry
+;;               :x "-45px"
+;;               :y "5px"
+;;               :width "155px"
+;;               :height "30px"
+;;               :anchor "top right")
+;;   :reserve (struts :distance "35px" :side "top")
+;;   :stacking "bg"
+;;   :windowtype "dock"
+;;   :wm-ignore false
+;;   (box
+;;     :class "rightbar"
+;;     :orientation "h"
+;;     :halign "center"
+;;     (volume_widget))
+;; )

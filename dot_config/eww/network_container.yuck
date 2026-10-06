@@ -1,0 +1,17 @@
+(include "./vpn.yuck")
+(include "./wifi.yuck")
+
+(defwidget network_container []
+    (box
+        :class "network_container"
+        (box
+            :class "vpn"
+            (vpn_widget)
+        )
+
+        (box
+            :class "wifi"
+            (wifi_widget)
+        )
+    )
+)

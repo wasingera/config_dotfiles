@@ -1,0 +1,15 @@
+# Annotation colours: Catppuccin Frappé
+[color-palette]
+palette = [
+    "#e78284", # red
+    "#ef9f76", # peach
+    "#e5c890", # yellow
+    "#a6d189", # green
+    "#8caaee", # blue
+    "#ca9ee6", # mauve
+]
+custom = [
+    "#e78284", "#ea999c", "#ef9f76", "#e5c890", "#a6d189", "#81c8be",
+    "#99d1db", "#85c1dc", "#8caaee", "#babbf1", "#ca9ee6", "#f4b8e4",
+    "#c6d0f5", "#737994", "#303446", "#232634",
+]

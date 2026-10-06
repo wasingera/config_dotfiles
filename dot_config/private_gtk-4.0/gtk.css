@@ -1,0 +1,45 @@
+/* Catppuccin Frappé for libadwaita / GTK4 apps (satty, etc.)
+ * https://catppuccin.com/palette — matches the eww bar colours. */
+:root {
+  --accent-bg-color: #8caaee;      /* blue */
+  --accent-fg-color: #232634;      /* crust */
+  --accent-color: #8caaee;
+
+  --destructive-bg-color: #e78284; /* red */
+  --destructive-fg-color: #232634;
+  --destructive-color: #e78284;
+  --success-bg-color: #a6d189;     /* green */
+  --success-fg-color: #232634;
+  --success-color: #a6d189;
+  --warning-bg-color: #e5c890;     /* yellow */
+  --warning-fg-color: #232634;
+  --warning-color: #e5c890;
+  --error-bg-color: #e78284;
+  --error-fg-color: #232634;
+  --error-color: #e78284;
+
+  --window-bg-color: #303446;      /* base */
+  --window-fg-color: #c6d0f5;      /* text */
+  --view-bg-color: #292c3c;        /* mantle */
+  --view-fg-color: #c6d0f5;
+  --headerbar-bg-color: #292c3c;
+  --headerbar-fg-color: #c6d0f5;
+  --headerbar-border-color: #c6d0f5;
+  --headerbar-backdrop-color: #303446;
+  --headerbar-shade-color: rgb(0 0 0 / 36%);
+  --sidebar-bg-color: #292c3c;
+  --sidebar-fg-color: #c6d0f5;
+  --sidebar-backdrop-color: #303446;
+  --secondary-sidebar-bg-color: #232634; /* crust */
+  --secondary-sidebar-fg-color: #c6d0f5;
+  --card-bg-color: #414559;        /* surface0 */
+  --card-fg-color: #c6d0f5;
+  --dialog-bg-color: #303446;
+  --dialog-fg-color: #c6d0f5;
+  --popover-bg-color: #414559;
+  --popover-fg-color: #c6d0f5;
+  --thumbnail-bg-color: #414559;
+  --thumbnail-fg-color: #c6d0f5;
+  --shade-color: rgb(0 0 0 / 36%);
+  --scrollbar-outline-color: rgb(0 0 0 / 50%);
+}

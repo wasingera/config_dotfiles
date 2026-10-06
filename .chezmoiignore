@@ -1,4 +1,6 @@
 README.md
+AGENTS.md
+CLAUDE.md
 
 {{- /* Hyprland desktop configs: only on native Linux, not macOS or WSL */}}
 {{ if not .desktop }}

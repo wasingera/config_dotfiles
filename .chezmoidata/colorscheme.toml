@@ -1,0 +1,5 @@
+# Catppuccin flavour for each mode. The desktop switches between them at
+# sunrise and sunset (dot_local/bin/executable_colorscheme-solar).
+[colorscheme]
+dark  = "mocha"
+light = "latte"

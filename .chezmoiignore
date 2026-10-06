@@ -1,0 +1,15 @@
+README.md
+
+{{- /* Hyprland desktop configs: only on native Linux, not macOS or WSL */}}
+{{ if not .desktop }}
+.config/zsh/.zprofile
+.config/hypr
+.config/eww
+.config/rofi
+.config/dunst
+.config/alacritty
+.config/gtk-3.0
+.config/gtk-4.0
+.config/satty
+.config/chromium-flags.conf
+{{ end }}

@@ -1,0 +1,10 @@
+{{- /* Machine type, used by .chezmoiignore and .chezmoiremove.
+       wsl:     Linux running under Windows (kernel release mentions microsoft)
+       desktop: native Linux with the Hyprland desktop */ -}}
+{{- $wsl := false -}}
+{{- if eq .chezmoi.os "linux" -}}
+{{-   $wsl = .chezmoi.kernel.osrelease | lower | contains "microsoft" -}}
+{{- end -}}
+[data]
+    wsl = {{ $wsl }}
+    desktop = {{ and (eq .chezmoi.os "linux") (not $wsl) }}

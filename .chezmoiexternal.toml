@@ -1,0 +1,32 @@
+# zsh plugins, pinned to a commit. To update one, swap the commit hash in its URL.
+# exact = true removes files that aren't in the archive (e.g. old submodule .git files).
+
+[".config/zsh/plugins/pure"]
+    type = "archive"
+    url = "https://github.com/sindresorhus/pure/archive/54bd501c802283dee0940457da6eb3e642bd1453.tar.gz"
+    exact = true
+    stripComponents = 1
+
+[".config/zsh/plugins/zsh-autosuggestions"]
+    type = "archive"
+    url = "https://github.com/zsh-users/zsh-autosuggestions/archive/85919cd1ffa7d2d5412f6d3fe437ebdbeeec4fc5.tar.gz"
+    exact = true
+    stripComponents = 1
+
+[".config/zsh/plugins/zsh-completions"]
+    type = "archive"
+    url = "https://github.com/zsh-users/zsh-completions/archive/989d0445450b8e79b3cde2da3b7f4bb54934354c.tar.gz"
+    exact = true
+    stripComponents = 1
+
+[".config/zsh/plugins/zsh-history-substring-search"]
+    type = "archive"
+    url = "https://github.com/zsh-users/zsh-history-substring-search/archive/14c8d2e0ffaee98f2df9850b19944f32546fdea5.tar.gz"
+    exact = true
+    stripComponents = 1
+
+[".config/zsh/plugins/zsh-syntax-highlighting"]
+    type = "archive"
+    url = "https://github.com/zsh-users/zsh-syntax-highlighting/archive/1d85c692615a25fe2293bdd44b34c217d5d2bf04.tar.gz"
+    exact = true
+    stripComponents = 1

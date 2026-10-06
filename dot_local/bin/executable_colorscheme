@@ -44,3 +44,4 @@ printf '%s\n' "$mode" >"$state/mode"
 
 # Reload what's running; anything that isn't is skipped quietly.
 if eww ping >/dev/null 2>&1; then eww reload >/dev/null 2>&1 || true; fi
+if pgrep -x dunst >/dev/null; then dunstctl reload || true; fi

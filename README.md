@@ -62,3 +62,23 @@ chezmoi cd                          # shell in the source repo, to commit and pu
 
 zsh plugins are pinned in `.chezmoiexternal.toml`. To update one, change the commit
 hash in its URL.
+
+## Colours
+
+Everything uses [Catppuccin](https://catppuccin.com). The palette is in
+`.chezmoidata/catppuccin.toml`, and `.chezmoidata/colorscheme.toml` picks the
+flavour for each mode (dark = Mocha, light = Latte). Tool configs refer to colours
+by name, so to change a flavour edit that one line and run `chezmoi apply`.
+
+On the desktop the whole session (terminal, nvim, bar, menus, notifications, GTK
+apps, borders, lock screen) switches between light and dark at sunrise and sunset:
+
+```sh
+colorscheme light        # or dark / toggle; no argument re-applies the current mode
+systemctl --user enable --now colorscheme-solar.timer   # once, on a new desktop
+```
+
+The desktop needs the AUR packages `catppuccin-gtk-theme-mocha` and
+`catppuccin-gtk-theme-latte` (GTK3 apps and file dialogs), plus `papirus-icon-theme`.
+nvim follows `~/.local/state/colorscheme/mode` on every machine, and defaults to
+dark when nothing writes it.

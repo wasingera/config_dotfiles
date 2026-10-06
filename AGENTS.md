@@ -24,6 +24,7 @@ chezmoi maps source names to target paths:
 | `dot_config/eww/scripts/executable_volume.sh` | `~/.config/eww/scripts/volume.sh` (mode 755) |
 | `dot_config/private_gtk-3.0/` | `~/.config/gtk-3.0/` (mode 700) |
 | `dot_config/hypr/hyprpaper.conf.tmpl` | `~/.config/hypr/hyprpaper.conf` (Go template) |
+| `dot_config/eww/symlink_colors.scss.tmpl` | `~/.config/eww/colors.scss`, a symlink to the path in the file |
 
 - `chezmoi source-path <target>` and `chezmoi target-path <source>` convert between the two.
 - A plain file like `lib.sh` (no `executable_`) is deployed non-executable. That's intended for
@@ -38,6 +39,9 @@ Special files at the root:
 | `.chezmoiignore` | Template. Desktop-only paths are listed inside `{{ if not .desktop }}`. |
 | `.chezmoiremove` | Template. Target paths to **delete** on apply (the old X11 setup, leftovers). |
 | `.chezmoiexternal.toml` | zsh plugins, as GitHub archives pinned to a commit hash. |
+| `.chezmoidata/` | Template data on every machine: the Catppuccin palette and the flavour per mode. See "Colours". |
+| `.chezmoitemplates/colors/` | One colour template per tool, rendered from the palette. See "Colours". |
+| `run_onchange_after_colorscheme.sh.tmpl` | Re-runs `colorscheme` when the palette or a colour template changes. Desktop only (renders empty elsewhere). |
 | `README.md`, `AGENTS.md`, `CLAUDE.md` | Docs, ignored by chezmoi (not deployed). |
 
 ## Machine types
@@ -51,7 +55,9 @@ What each machine gets:
 
 - **Every machine:** zsh (`ZDOTDIR=~/.config/zsh` via `dot_zshenv`), nvim, clangd.
 - **Desktop only:** `hypr`, `eww`, `rofi` (+ `~/.local/share/rofi`), `dunst`, `alacritty`,
-  `gtk-3.0`, `gtk-4.0`, `satty`, `chromium-flags.conf`, `zsh/.zprofile` (starts Hyprland on tty1).
+  `gtk-3.0`, `gtk-4.0`, `satty`, `chromium-flags.conf`, `zsh/.zprofile` (starts Hyprland on tty1),
+  and the light/dark switching: `~/.config/colorscheme/`, `~/.local/bin/colorscheme`,
+  `~/.local/bin/colorscheme-solar` and `~/.config/systemd/`.
 
 When adding a new desktop-only config, also add its path to the `{{ if not .desktop }}` block in
 `.chezmoiignore`. Then check it doesn't leak to other machines:
@@ -108,11 +114,19 @@ The desktop is live while you work. Check each change in the real session:
 | rofi theme | `rofi -theme <file> -dump-theme 2>&1 \| grep 'Failed to parse'` (no output = OK) |
 | zsh | `zsh -n <file>`, then `zsh -ic exit` |
 | any shell script | `bash -n <file>` |
+| colours | `colorscheme light`, check, `colorscheme dark`; `chezmoi diff` must be empty in both modes |
+| hyprlock | `hyprlock --grace 60 &` (any input unlocks), screenshot, then `pkill -USR1 -x hyprlock` to unlock |
 | visual result | `grim -g "x,y wxh" out.png` (screen scale is 1.5, so the image is in physical px) |
 
 Some things can't be checked from a non-interactive shell: rofi menus, keybinds, mouse behaviour.
 For those, ask the user to try them, or open a test instance with dummy data in the background
 and ask them to interact with it.
+
+Shell traps:
+
+- `eww logs` follows the log forever; wrap it in `timeout`.
+- `pkill -f pattern` also matches your own shell, whose command line contains the pattern.
+  Anchor it (`pkill -f '^alacritty --class test'`) or use `pkill -x name`.
 
 ## Component notes and gotchas
 
@@ -163,7 +177,7 @@ and ask them to interact with it.
 
 ### rofi (`dot_config/rofi/`)
 
-- `config.rasi` is the app launcher; it uses the theme `~/.local/share/rofi/themes/catppuccin-frappe.rasi`.
+- `config.rasi` is the app launcher; it uses the theme `~/.local/share/rofi/themes/catppuccin.rasi`.
 - The bar menus (wifi, VPN, power) share the layout in `dropdown.rasi`. Each menu's `theme.rasi`
   only sets `menu-color`, `menu-width` and `menu-right`.
 - rofi 2.0's `click-to-exit` is **not implemented on Wayland**. So the dropdown window covers the
@@ -177,34 +191,71 @@ and ask them to interact with it.
 
 - dunst places notifications below the eww bar's reserved space, so `offset = 5x5` means "5px under
   the bar".
-- Colours follow the palette below. The border uses the bar's blue, red for critical.
+- Colours and the icon theme are in the drop-in `dunstrc.d/colors.conf`, which links to the active
+  scheme (see "Colours"); `dunstrc` holds only layout and timeouts.
 
-### Theming
+### Colours
 
-The whole desktop uses **Catppuccin Frappé**:
+Everything uses **Catppuccin**: Mocha in dark mode and Latte in light mode. On the desktop the
+whole session switches at sunrise and sunset. **Never write hex colours into a tool's config**;
+use palette names from the active scheme.
 
-| Name | Colour |
-|------|--------|
-| base | `#303446` |
-| mantle | `#292c3c` |
-| crust | `#232634` |
-| surface0 | `#414559` |
-| overlay0 | `#737994` |
-| text | `#c6d0f5` |
-| subtext0 | `#a5adce` |
-| blue | `#8caaee` |
-| red | `#e78284` |
-| yellow | `#e5c890` |
-| green | `#a6d189` |
-| mauve | `#ca9ee6` |
+How it fits together:
 
-The bar font is "Iosevka Term Extended"; icons come from "Iosevka Nerd Font".
+1. **Palette:** `.chezmoidata/catppuccin.toml` holds all four flavours. `.chezmoidata/colorscheme.toml`
+   picks `dark` and `light`. Change a flavour there, nowhere else.
+2. **Templates:** `.chezmoitemplates/colors/<file>` renders one tool's colours. Its `.` is one
+   flavour's map (`.base`, `.blue`, ..., plus `.name`, e.g. `"latte"`).
+3. **Per-mode files:** one-line stubs in `dot_config/colorscheme/{dark,light}/` render each
+   template into `~/.config/colorscheme/<mode>/`, e.g.
+   `{{ template "colors/eww.scss" (index .catppuccin .colorscheme.dark) }}`.
+4. **Active scheme:** `colorscheme dark|light|toggle` (`dot_local/bin/executable_colorscheme`)
+   copies a mode's files into `~/.local/state/colorscheme/current/` (untracked state), writes
+   `~/.local/state/colorscheme/mode`, and reloads running tools. `colorscheme-solar` calls it from
+   a systemd timer. Switching therefore never touches a managed file.
+5. **Tools read `current/`** through their own include mechanism, so their main configs stay
+   plain files:
 
-- **GTK4 / libadwaita** (e.g. satty): colour variables in `private_gtk-4.0/gtk.css`.
-- **GTK3** and the file dialog from xdg-desktop-portal-gtk: the `catppuccin-frappe-blue-standard+default`
-  theme (AUR package), set in `private_gtk-3.0/settings.ini` and gsettings.
+   | Tool | How |
+   |------|-----|
+   | alacritty | `import` of `current/alacritty.toml`; live-reloads by itself |
+   | eww | `@import "colors"`; `colors.scss` is a chezmoi symlink to `current/eww.scss` |
+   | rofi | `@import "~/.local/state/colorscheme/current/rofi.rasi"` |
+   | dunst | `dunstrc.d/colors.conf`, a symlink to `current/dunst.conf` |
+   | Hyprland | `pcall(dofile, ...current/hypr.lua)` returns hex without `#`, with a fallback |
+   | hyprlock | `source = ~/.local/state/colorscheme/current/hyprlock.conf` (`$blue` = `rgb(...)`) |
+   | GTK4 | `gtk-4.0/gtk.css` is a symlink to `current/gtk4.css` |
+   | GTK3 | `gtk-3.0/settings.ini` is a symlink to `current/gtk3.ini`; the theme name also goes to gsettings |
+   | nvim | `lua/flavours.lua.tmpl` (flavour names) and a watcher on the mode file |
+   | satty | `config.toml.tmpl`: annotation colours from the dark flavour, not switched |
+
+**To add a tool:**
+
+1. Write `.chezmoitemplates/colors/<file>`.
+2. Add a stub to both `dot_config/colorscheme/dark/` and `.../light/`.
+3. Point the tool at `~/.local/state/colorscheme/current/<file>`, with a `symlink_` entry if the
+   tool can only include relative paths.
+4. If the tool doesn't re-read the file by itself, add its reload command to `colorscheme`.
+
+`chezmoi apply` runs `run_onchange_after_colorscheme.sh` when templates or palette change; it
+re-applies the current mode.
+
+Details:
+
+- nvim on every machine reads `~/.local/state/colorscheme/mode` (dark if missing) and flips
+  live when it changes. On the Mac or WSL something else may write it, or nothing.
+- GTK3 needs the AUR themes `catppuccin-gtk-theme-mocha` and `catppuccin-gtk-theme-latte`
+  (`catppuccin-<flavour>-blue-standard+default`). They're also used by the
+  xdg-desktop-portal-gtk file dialog, which follows gsettings live.
+- GTK4: some apps' own CSS uses libadwaita's old named colours (satty's toolbar uses
+  `@headerbar_bg_color`), so `gtk4.css` sets every colour both as a CSS variable and with
+  `@define-color`. A plain selector like `.toolbar {}` in `gtk.css` loses to app CSS.
 - Don't force GTK4's built-in file chooser (`GDK_DEBUG=no-portals`): it fails here with "folder
   contents could not be displayed".
+- An alacritty window watches only the import paths it saw at startup; windows opened before an
+  import path changes won't live-switch until reopened.
+
+The bar font is "Iosevka Term Extended"; icons come from "Iosevka Nerd Font".
 
 ### Shell (`dot_config/zsh/`)
 
@@ -218,6 +269,9 @@ The bar font is "Iosevka Term Extended"; icons come from "Iosevka Nerd Font".
 ## Not tracked here (on purpose)
 
 - `~/.config/zsh/local.zsh`: per-machine settings.
+- `~/.local/state/colorscheme/`: the active scheme and mode, written by `colorscheme`.
+- `~/.config/systemd/user/colorscheme-solar-transition.timer`: rewritten by `colorscheme-solar`
+  for each sunrise and sunset.
 - `~/.claude/`: Claude Code settings and hooks, including the desktop notification hook.
 - `~/eww`: eww source checkout.
 - `hypr/images/`: wallpapers.

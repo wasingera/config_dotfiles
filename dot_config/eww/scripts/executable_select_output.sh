@@ -10,9 +10,11 @@ headphones_icon=$'\U000F02CB'
 speaker_icon=$'\U000F04C3'
 
 default=$(pactl get-default-sink)
-# One "name<TAB>port type<TAB>label" line per sink
+# One "name<TAB>port type<TAB>label" line per sink. The type is never empty
+# (sinks without ports, e.g. virtual ones, get "none"): read would merge two
+# tabs into one separator and shift the label into it.
 mapfile -t sinks < <(pactl -f json list sinks | jq -r '.[] |
-    (.active_port as $p | first(.ports[] | select(.name == $p)).type // "") as $type |
+    (.active_port as $p | first(.ports[] | select(.name == $p)).type // "none") as $type |
     [.name, $type, .properties["node.nick"] // .description] | @tsv')
 
 args=()

@@ -67,11 +67,13 @@ hash in its URL.
 
 Everything uses [Catppuccin](https://catppuccin.com). The palette is in
 `.chezmoidata/catppuccin.toml`, and `.chezmoidata/colorscheme.toml` picks the
-flavour for each mode (dark = Mocha, light = Latte). Tool configs refer to colours
-by name, so to change a flavour edit that one line and run `chezmoi apply`.
+flavour for each mode (dark = Mocha, light = Latte) along with each mode's desktop
+and lock screen wallpapers. Tool configs refer to colours by name, so to change a
+flavour or wallpaper edit that file and run `chezmoi apply`.
 
 On the desktop the whole session (terminal, nvim, bar, menus, notifications, GTK
-apps, borders, lock screen) switches between light and dark at sunrise and sunset:
+apps, borders, wallpaper, lock screen) switches between light and dark at sunrise
+and sunset:
 
 ```sh
 colorscheme light        # or dark / toggle; no argument re-applies the current mode

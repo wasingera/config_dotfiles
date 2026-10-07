@@ -22,6 +22,7 @@ phone_icon=$'\U000F011C'
 computer_icon=$'\U000F0322'
 device_icon=$'\U000F00AF'
 scan_row=$(icon_row $'\U000F0450' 'Scan for devices')
+stop_scan_row=$(icon_row $'\U000F04DB' 'Stop scanning')
 off_row=$(icon_row $'\U000F0425' 'Turn Bluetooth off')
 on_row=$(icon_row $'\U000F00AF' 'Turn Bluetooth on')
 
@@ -82,50 +83,41 @@ power_on() {
     busctl --system set-property org.bluez "$adapter" org.bluez.Adapter1 Powered b true
 }
 
-# A scan started from the menu goes on while the menu is shown again, so
-# devices in range keep their signal strength (BlueZ drops it when discovery
-# stops) and don't expire before one is picked. It stops once that menu
-# closes. Exported, as the menu comes back through exec "$0".
+# Choosing Scan starts a scan and shows the menu again at once (exec "$0"),
+# with devices added as they're found. The scan goes on while that menu is
+# shown, so devices in range keep their signal strength (BlueZ drops it when
+# discovery stops) and don't expire before one is picked, and stops once it
+# closes. Exported, for the menu after exec "$0".
 stop_scan() {
     [[ -n $BT_SCAN_PID ]] && kill "$BT_SCAN_PID" 2>/dev/null
     unset BT_SCAN_PID
 }
 
-objects=$(bluez_objects)
-adapter=$(jq -r 'first(to_entries[] | select(.value["org.bluez.Adapter1"]) | .key) // empty' \
-    <<<"$objects")
-if [[ -z $adapter ]]; then
-    notify-send -u critical "${tag[@]}" "No Bluetooth adapter" "Or bluetoothd isn't running"
-    exit 1
-fi
+# BlueZ's devices on the adapter as "path<TAB>state<TAB>icon<TAB>name<TAB>
+# battery %" lines, state being connected, paired or new. Pass "known" for
+# connected devices then the other paired ones, or "new" for new ones with a
+# name (found by a scan), strongest first. The battery level is last, as it
+# may be empty: read would merge two tabs.
+device_lines() {
+    bluez_objects | jq -r --arg adapter "$adapter" --arg want "$1" '
+        [to_entries[] | .key as $path |
+         .value["org.bluez.Battery1"].Percentage as $battery |
+         .value["org.bluez.Device1"] // empty | select(.Adapter == $adapter) |
+         {$path, $battery, icon: (.Icon // "none"), name: .Alias, named: (.Name != null),
+          rssi: (.RSSI // -999),
+          state: (if .Connected then "connected" elif .Paired then "paired" else "new" end)}] |
+        if $want == "known" then
+            map(select(.state != "new")) | sort_by(.state != "connected", (.name | ascii_downcase))
+        else
+            map(select(.state == "new" and .named)) | sort_by(-.rssi)
+        end |
+        .[] | [.path, .state, .icon, .name, (.battery // "" | tostring)] | @tsv'
+}
 
-if [[ $(jq --arg a "$adapter" '.[$a]["org.bluez.Adapter1"].Powered' <<<"$objects") != true ]]; then
-    chosen=$(printf '%s\n' "$on_row" | rofi_menu select_bluetooth -markup-rows)
-    if [[ $chosen == "$on_row" ]]; then
-        bt_run "Turning Bluetooth on" power_on
-    fi
-    exit
-fi
-
-# One "path<TAB>state<TAB>icon<TAB>name<TAB>battery %" line per device, state
-# being connected, paired or new: connected devices, the other paired ones,
-# then the 10 strongest new ones with a name (from a scan), in that order.
-# The battery level is last, as it may be empty: read would merge two tabs.
-mapfile -t devices < <(jq -r --arg adapter "$adapter" '
-    [to_entries[] | .key as $path |
-     .value["org.bluez.Battery1"].Percentage as $battery |
-     .value["org.bluez.Device1"] // empty | select(.Adapter == $adapter) |
-     {$path, $battery, icon: (.Icon // "none"), name: .Alias, named: (.Name != null),
-      rssi: (.RSSI // -999),
-      state: (if .Connected then "connected" elif .Paired then "paired" else "new" end)}] |
-    (map(select(.state != "new")) | sort_by(.state != "connected", (.name | ascii_downcase))) +
-    (map(select(.state == "new" and .named)) | sort_by(-.rssi) | .[:10]) |
-    .[] | [.path, .state, .icon, .name, (.battery // "" | tostring)] | @tsv' <<<"$objects")
-
-rows=()
-active=()
-for i in "${!devices[@]}"; do
-    IFS=$'\t' read -r path state icon name battery <<<"${devices[i]}"
+# Print the menu row for a device_lines line
+device_row() {
+    local path state icon name battery
+    IFS=$'\t' read -r path state icon name battery <<<"$1"
     case $icon in
         audio-headset | audio-headphones) icon=$headphones_icon ;;
         audio-card)                       icon=$speaker_icon ;;
@@ -136,10 +128,66 @@ for i in "${!devices[@]}"; do
         computer)                         icon=$computer_icon ;;
         *)                                icon=$device_icon ;;
     esac
-    rows+=("$(icon_row "$icon" "$name${battery:+  $battery%}")")
-    [[ $state == connected ]] && active+=("$i")
+    icon_row "$icon" "$name${battery:+  $battery%}"
+}
+
+# During a scan, for the menu: print a row for each new device with a name,
+# the ones BlueZ already has, then each one as it's found (or gets a name),
+# and append its device_lines line to FILE, to look up the row picked. Runs
+# until killed, or the scan's 60s are up.
+found_rows() {
+    local file=$1 fd line
+    local -A shown
+    exec {fd}< <(exec timeout 60 gdbus monitor --system --dest org.bluez)
+    # Double quotes: the monitor's pid now, as $! changes below
+    trap "kill $! 2>/dev/null; exit" TERM
+    show_new() {
+        while IFS= read -r line; do
+            [[ -n ${shown[${line%%$'\t'*}]} ]] && continue
+            shown[${line%%$'\t'*}]=1
+            printf '%s\n' "$line" >>"$file"
+            device_row "$line"
+        done < <(device_lines new)
+    }
+    show_new
+    while read -r line <&"$fd"; do
+        case $line in
+            *.InterfacesAdded* | *"'Name'"*)
+                drain_burst <&"$fd"
+                show_new
+                ;;
+        esac
+    done
+}
+
+adapter=$(bluez_objects |
+    jq -r 'first(to_entries[] | select(.value["org.bluez.Adapter1"]) | .key) // empty')
+if [[ -z $adapter ]]; then
+    notify-send -u critical "${tag[@]}" "No Bluetooth adapter" "Or bluetoothd isn't running"
+    exit 1
+fi
+
+if [[ $(busctl --system get-property org.bluez "$adapter" org.bluez.Adapter1 Powered) != 'b true' ]]; then
+    chosen=$(printf '%s\n' "$on_row" | rofi_menu select_bluetooth -markup-rows)
+    if [[ $chosen == "$on_row" ]]; then
+        bt_run "Turning Bluetooth on" power_on
+    fi
+    exit
+fi
+
+mapfile -t devices < <(device_lines known)
+rows=()
+active=()
+for i in "${!devices[@]}"; do
+    rows+=("$(device_row "${devices[i]}")")
+    [[ ${devices[i]} == *$'\t'connected$'\t'* ]] && active+=("$i")
 done
-footer=("$scan_row" "$off_row")
+# The scan row is last, so the devices a scan finds come in under it
+if [[ -n $BT_SCAN_PID ]]; then
+    footer=("$off_row" "$stop_scan_row")
+else
+    footer=("$off_row" "$scan_row")
+fi
 
 # Connected devices are marked
 args=()
@@ -147,8 +195,15 @@ if (( ${#active[@]} )); then
     args=(-a "$(IFS=,; printf '%s' "${active[*]}")")
 fi
 
-i=$(printf '%s\n' "${rows[@]}" "${footer[@]}" |
-    rofi_menu select_bluetooth -markup-rows -format i "${args[@]}")
+# While scanning, found devices come in under the rest: room for a few
+lines=$(( ${#rows[@]} + ${#footer[@]} ))
+[[ -n $BT_SCAN_PID ]] && (( lines += 6 ))
+found=$(mktemp)
+trap 'command rm -f "$found"' EXIT
+i=$(rofi_menu_streamed select_bluetooth "$lines" -markup-rows -format i "${args[@]}" \
+        < <(printf '%s\n' "${rows[@]}" "${footer[@]}"
+            if [[ -n $BT_SCAN_PID ]]; then found_rows "$found"; fi)
+    kill $! 2>/dev/null)
 stop_scan
 [[ -z $i ]] && exit 0
 
@@ -160,17 +215,26 @@ if (( i < ${#devices[@]} )); then
                 busctl --system call org.bluez "$path" org.bluez.Device1 Disconnect
             ;;
         paired) connect "$path" "$name" ;;
-        new) pair "$path" "$name" ;;
     esac
     exit
 fi
 
-case ${footer[i - ${#devices[@]}]} in
+(( i -= ${#devices[@]} ))
+if (( i >= ${#footer[@]} )); then
+    IFS=$'\t' read -r path _ _ name _ < <(sed -n "$(( i - ${#footer[@]} + 1 ))p" "$found")
+    pair "$path" "$name"
+    exit
+fi
+
+case ${footer[i]} in
     "$scan_row")
         bluetoothctl --timeout 60 scan on </dev/null >/dev/null 2>&1 &
         export BT_SCAN_PID=$!
-        # The bar's Bluetooth icon changes colour while it scans
-        sleep 10
+        command rm -f "$found" # exec skips the EXIT trap
+        exec "$0"
+        ;;
+    "$stop_scan_row")
+        command rm -f "$found"
         exec "$0"
         ;;
     "$off_row")

@@ -155,6 +155,7 @@ Shell traps:
   | Helper | What it does |
   |--------|--------------|
   | `rofi_menu THEME` | Shows a rofi dropdown under the clicked bar button and prints the chosen option. |
+  | `rofi_menu_streamed THEME LINES` | The same, but rows arriving on stdin later are added while it's shown (room for LINES; rofi can't resize an open menu). |
   | `nm_connections TYPE [--active]` | Prints NetworkManager connection names of that type. |
   | `bluez_objects` | Prints BlueZ's objects (adapters, devices) as JSON, `{path: {interface: {property: value}}}`. |
   | `hypr_events` | Streams Hyprland's event socket. |

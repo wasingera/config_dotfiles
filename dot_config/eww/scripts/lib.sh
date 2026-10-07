@@ -14,12 +14,24 @@ rofi_menu() {
     options=$(cat)
     # No options (a prompt) means no lines, rather than one empty one
     options=${options:+$options$nl}
+    printf '%s' "$options" | _rofi_dropdown "$theme" "$(printf '%s' "$options" | wc -l)" "$@"
+}
+
+# Like rofi_menu, but the menu shows at once and rows that come in on stdin
+# later are added to it, for a list that grows while it's shown. rofi sizes
+# the menu only as it opens, so it has room for LINES rows; more scroll.
+rofi_menu_streamed() {
+    local theme=$1 lines=$2; shift 2
+    _rofi_dropdown "$theme" "$lines" -async-pre-read 0 "$@"
+}
+
+_rofi_dropdown() {
+    local theme=$1 lines=$2; shift 2
     menu_anchor
-    printf '%s' "$options" |
-        rofi -theme "$HOME/.config/rofi/$theme/theme.rasi" \
-            -theme-str "listview { lines: $(printf '%s' "$options" | wc -l); } $MENU_ANCHOR" \
-            -dmenu -hover-select -me-select-entry '' -me-accept-entry MousePrimary \
-            -kb-cancel 'Escape,Control+g,Control+bracketleft,MousePrimary' "$@"
+    rofi -theme "$HOME/.config/rofi/$theme/theme.rasi" \
+        -theme-str "listview { lines: $lines; } $MENU_ANCHOR" \
+        -dmenu -hover-select -me-select-entry '' -me-accept-entry MousePrimary \
+        -kb-cancel 'Escape,Control+g,Control+bracketleft,MousePrimary' "$@"
 }
 
 # Set MENU_ANCHOR to rofi theme lines that put the menu under the bar button

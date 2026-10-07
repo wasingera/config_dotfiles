@@ -124,11 +124,12 @@
   margin-left: 5px;
 }
 
-// A little wider than the other icon pills: it ends the bar
+// A square: the pill spans the bar's 38px, and the icon is 16px wide, so
+// .powerbar's 5px plus 6px each side makes it 38px wide too
 .power_button {
   color: $green;
-  padding-left: 14px;
-  padding-right: 14px;
+  padding-left: 6px;
+  padding-right: 6px;
 }
 
 .wifi {

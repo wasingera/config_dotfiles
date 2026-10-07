@@ -48,6 +48,10 @@ mainbox {
     /* 5px below the bar, the same gap as between its buttons */
     margin: 5px 0px 0px 0px;
     padding: 6px 0px;
+    /* The menu's colour, so it stands out from a terminal (also @base) and
+     * matches its button; the width of Hyprland's window borders */
+    border: 2px;
+    border-color: @menu-color;
     border-radius: 3px;
     children: [ listview ];
 }

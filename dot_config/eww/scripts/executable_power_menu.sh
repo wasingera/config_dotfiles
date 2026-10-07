@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 source "${BASH_SOURCE%/*}/lib.sh"
+menu_anchor
 
 # Rows and their Nerd Font icons, in menu order
 labels=(Shutdown Restart Lock Suspend Logout)

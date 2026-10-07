@@ -8,6 +8,7 @@
 # brings the agent pairing needs. bluetoothctl is used only to scan:
 # discovery lasts as long as the client that started it.
 source "${BASH_SOURCE%/*}/lib.sh"
+menu_anchor
 
 tag=(-h string:x-dunst-stack-tag:bluetooth)
 

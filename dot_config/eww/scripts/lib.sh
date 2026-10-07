@@ -24,9 +24,10 @@ rofi_menu() {
 
 # Set MENU_ANCHOR to rofi theme lines that put the menu under the bar button
 # beneath the pointer, flush with its right edge (bar_anchor.py has the
-# geometry). Found once per script and exported: later menus, e.g. a password
-# prompt or the menu again after exec "$0", open in the same spot while the
-# pointer is over the first one.
+# geometry). A menu script calls it first, in its own shell, while the pointer
+# is still on the clicked button; rofi_menu runs in $(...), where it would be
+# lost. Exported, so later menus (a password prompt, the menu again after
+# exec "$0") open in the same spot rather than under the pointer.
 menu_anchor() {
     local right top
     [[ -n $MENU_ANCHOR ]] && return

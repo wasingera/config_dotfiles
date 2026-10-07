@@ -3,6 +3,7 @@
 # Pick a VPN (WireGuard or a NetworkManager VPN plugin) to connect to, or
 # disconnect the active one. Only one VPN is up at a time.
 source "${BASH_SOURCE%/*}/lib.sh"
+menu_anchor
 
 vpns() { nm_connections wireguard "$@"; nm_connections vpn "$@"; }
 

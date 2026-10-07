@@ -3,6 +3,7 @@
 # Pick a Wi-Fi network in range to join, or disconnect, rescan, or turn the
 # radio off. New secured networks get a password prompt.
 source "${BASH_SOURCE%/*}/lib.sh"
+menu_anchor
 
 # Nerd Font signal bars: 1-4 bars, then the same with a lock
 bars=($'\U000F091F' $'\U000F0922' $'\U000F0925' $'\U000F0928')

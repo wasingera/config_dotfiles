@@ -2,6 +2,7 @@
 
 # Pick the default audio output. PipeWire moves playing streams to it.
 source "${BASH_SOURCE%/*}/lib.sh"
+menu_anchor
 
 # Nerd Font icons by the sink's active port: HDMI/DisplayPort, headphones,
 # anything else

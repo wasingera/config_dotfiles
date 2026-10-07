@@ -21,7 +21,11 @@
 
 .clock, .metrics, .workspaces, .volume, .powerbar, .keyboard, .wifi, .vpn {
   background: $base;
+  // The size of the rofi menus' text. Set here rather than taken from GTK's
+  // default font, so em widths below come out in whole pixels: every
+  // character of this monospace font is 0.6em, 9px.
   font-family: "Iosevka Term Extended";
+  font-size: 15px;
   font-weight: bold;
   color: $text;
   border-radius: 5px;
@@ -36,9 +40,9 @@
 
 .metrics {
   color: $teal;
-  // Fits two digits everywhere (37 chars of the monospace bar font), so the
-  // pill keeps its width as readings change
-  min-width: 313px;
+  // Fits two digits everywhere ("CPU 99% 99° | MEM 99% | GPU 99% 99°", 35
+  // characters of 0.6em), so the pill keeps its width as readings change
+  min-width: 21em;
   padding-left: 10px;
   padding-right: 10px;
   margin-left: 5px;

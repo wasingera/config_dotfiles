@@ -6,7 +6,9 @@ light = "latte"
 
 # Wallpapers for each mode, relative to $HOME (the images aren't tracked)
 [colorscheme.wallpaper.dark]
+desktop    = ".config/hypr/images/anime_wallpaper_night_2x.png"
 lockscreen = "images/wallpapers/Cloudsday.png"
 
 [colorscheme.wallpaper.light]
+desktop    = ".config/hypr/images/anime_girl_paper.jpg"
 lockscreen = "images/wallpapers/artisticlandscape.png"

@@ -51,3 +51,7 @@ gtk_theme=$(sed -n 's/^gtk-theme-name=//p' "$state/current/gtk3.ini" 2>/dev/null
 if [[ -n $gtk_theme ]]; then
     gsettings set org.gnome.desktop.interface gtk-theme "$gtk_theme" 2>/dev/null || true
 fi
+wallpaper=$(sed -n 's/^ *path = //p' "$state/current/hyprpaper.conf" 2>/dev/null)
+if [[ -n $wallpaper ]] && pgrep -x hyprpaper >/dev/null; then
+    hyprctl hyprpaper wallpaper ",$wallpaper" >/dev/null 2>&1 || true
+fi

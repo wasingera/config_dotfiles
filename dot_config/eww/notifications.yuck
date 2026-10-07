@@ -14,30 +14,39 @@
                 :space-evenly false
                 (label :class "net-icon ${notifications.unseen > 0 ? 'unseen' : ''}"
                     :text {notifications.icon})
-                (label :class "notif-count"
-                    :visible {notifications.unseen > 0}
-                    :text {notifications.unseen})
+                ;; Always there, empty at 0, so the pill keeps its width
+                (label :class "notif-count" :xalign 0
+                    :text {notifications.unseen > 0 ? notifications.unseen : ""})
             )
         )
     )
 )
 
-;; One history entry: click it to show it again, × to remove it
+;; One history entry: click it to show it again, × to remove it. Two buttons
+;; side by side, as a button can't hold another: GTK3 gives a button an input
+;; window over its whole area, so one inside it never gets a click. The
+;; eventbox gives the row a :hover for both.
 (defwidget notification_entry [n]
-    (button
+    (eventbox
         :class "notif-entry"
-        :onclick "dunstctl history-pop ${n.id}; eww close notification_history"
         (box
+            :class "notif-row"
             :space-evenly false
-            (box
-                :orientation "v"
-                :space-evenly false
+            (button
                 :hexpand true
-                (label :class "notif-meta" :xalign 0 :limit-width 44
-                    :text "${n.app} · ${n.time}")
-                (label :class "notif-summary" :xalign 0 :limit-width 34 :text {n.summary})
-                (label :class "notif-body" :xalign 0 :limit-width 44
-                    :visible {n.body != ""} :text {n.body})
+                :onclick "dunstctl history-pop ${n.id}; eww close notification_history"
+                ;; The labels are capped to fit .notif-text's width, so long
+                ;; text is cut short rather than widening the popup
+                (box
+                    :class "notif-text"
+                    :orientation "v"
+                    :space-evenly false
+                    (label :class "notif-meta" :xalign 0 :limit-width 43
+                        :text "${n.app} · ${n.time}")
+                    (label :class "notif-summary" :xalign 0 :limit-width 38 :text {n.summary})
+                    (label :class "notif-body" :xalign 0 :limit-width 43
+                        :visible {n.body != ""} :text {n.body})
+                )
             )
             (button
                 :class "notif-dismiss"
@@ -95,7 +104,7 @@
                 (scroll
                     :hscroll false
                     :visible {arraylength(notifications.entries) > 0}
-                    ;; .notif-entry's height, 64px, per row
+                    ;; .notif-row's height, 64px, per row
                     :height {64 * min(arraylength(notifications.entries), notification_rows)}
                     (box
                         :orientation "v"

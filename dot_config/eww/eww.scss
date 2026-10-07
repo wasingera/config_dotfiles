@@ -186,8 +186,11 @@
   color: $peach;
 }
 
+// Room for two digits (the history holds 20 at most), so the pill keeps its
+// width as the count changes
 .notif-count {
   margin-left: 5px;
+  min-width: 1.2em;
 }
 
 // The history popup, made to look like the rofi menus (rofi/dropdown.rasi)
@@ -204,7 +207,12 @@
   border: 2px solid $sky;
   border-radius: 3px;
   padding: 6px 0px;
-  min-width: 380px;
+}
+
+// The popup's width comes from this: 38 characters of the 15px summary
+// (0.6em each). The 13px lines get 43 characters, 335px.
+.notif-text {
+  min-width: 342px;
 }
 
 .notif-header {
@@ -229,14 +237,14 @@
 
 // 64px high in all (min-height + padding): notifications.yuck sizes the
 // scrolled list from that
-.notif-entry {
+.notif-row {
   min-height: 54px;
   padding: 5px 10px;
   margin: 0px 5px;
   border-radius: 3px;
 }
 
-.notif-entry:hover {
+.notif-entry:hover .notif-row {
   background: $surface0;
 }
 

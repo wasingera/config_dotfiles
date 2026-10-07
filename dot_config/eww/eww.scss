@@ -190,7 +190,7 @@
   margin-left: 5px;
 }
 
-// The history popup, made to look like the rofi menus (rofi/dropdown.rasi)
+// The history popup, framed like the rofi menus (rofi/dropdown.rasi)
 .backdrop {
   background: transparent;
 }
@@ -206,25 +206,33 @@
   padding: 6px 0px;
 }
 
-// The popup's width comes from this: 38 characters of the 15px summary
-// (0.6em each). The 13px lines get 43 characters, 335px.
-.notif-text {
-  min-width: 342px;
-}
-
 .notif-header {
   color: $sky;
-  padding: 5px 15px 5px 15px;
+  padding: 5px 10px 5px 15px;
 }
 
-.notif-clear, .notif-dismiss {
+// how many are in the history, beside the title
+.notif-total {
+  color: $overlay1;
+  margin-left: 8px;
+}
+
+.notif-clear {
   color: $subtext0;
-  padding: 0px 5px;
+  background: $surface0;
+  font-size: 13px;
+  padding: 1px 8px;
   border-radius: 3px;
 }
 
-.notif-clear:hover, .notif-dismiss:hover {
+.notif-clear:hover {
   color: $red;
+}
+
+.notif-divider {
+  min-height: 1px;
+  background: $surface0;
+  margin: 4px 10px 6px 10px;
 }
 
 .notif-empty {
@@ -232,11 +240,16 @@
   padding: 5px 15px;
 }
 
-// 64px high in all (min-height + padding): notifications.yuck sizes the
-// scrolled list from that
+// A row is 70px in all, which notifications.yuck sizes the scrolled list
+// from: the three lines (12, 15 and 13px text in lines 1.25em high, 50px),
+// plus 8px of padding over and under and 2px of margin between rows.
+.notif-entry {
+  padding-bottom: 2px;
+}
+
 .notif-row {
-  min-height: 54px;
-  padding: 5px 10px;
+  min-height: 52px;
+  padding: 8px 8px 8px 5px;
   margin: 0px 5px;
   border-radius: 3px;
 }
@@ -245,8 +258,58 @@
   background: $surface0;
 }
 
-.notif-meta, .notif-body {
+.notif-accent {
+  min-width: 3px;
+  border-radius: 2px;
+  margin-right: 8px;
+}
+
+.notif-accent.critical {
+  background: $red;
+}
+
+// a fixed slot, so text lines up whether there's an icon or the bell
+.notif-icon {
+  min-width: 24px;
+  margin: 2px 12px 0px 0px;
+  color: $overlay1;
+  font-family: "Iosevka Nerd Font";
+  font-size: 20px;
+  font-weight: normal;
+}
+
+// The popup's width comes from this: 38 characters of the 15px summary
+// (0.6em each). The 13px body gets 43 characters, 335px; the 12px app name
+// 40 beside the time.
+.notif-text {
+  min-width: 342px;
+}
+
+.notif-meta {
+  font-size: 12px;
+  font-weight: normal;
+  color: $overlay1;
+}
+
+.notif-body {
   font-size: 13px;
   font-weight: normal;
   color: $subtext0;
+}
+
+// shown only over the row it removes
+.notif-dismiss {
+  color: $subtext0;
+  padding: 0px 6px;
+  margin-left: 4px;
+  border-radius: 3px;
+  opacity: 0;
+}
+
+.notif-entry:hover .notif-dismiss {
+  opacity: 1;
+}
+
+.notif-dismiss:hover {
+  color: $red;
 }

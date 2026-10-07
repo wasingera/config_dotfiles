@@ -32,20 +32,35 @@
         (box
             :class "notif-row"
             :space-evenly false
+            ;; red on critical notifications
+            (box :class "notif-accent ${n.critical ? 'critical' : ''}")
             (button
                 :hexpand true
                 :onclick "dunstctl history-pop ${n.id}; eww close notification_history"
-                ;; The labels are capped to fit .notif-text's width, so long
-                ;; text is cut short rather than widening the popup
                 (box
-                    :class "notif-text"
-                    :orientation "v"
                     :space-evenly false
-                    (label :class "notif-meta" :xalign 0 :limit-width 43
-                        :text "${n.app} · ${n.time}")
-                    (label :class "notif-summary" :xalign 0 :limit-width 38 :text {n.summary})
-                    (label :class "notif-body" :xalign 0 :limit-width 43
-                        :visible {n.body != ""} :text {n.body})
+                    ;; the app's icon, or a bell when it sent none
+                    (box
+                        :class "notif-icon"
+                        :valign "start"
+                        (image :visible {n.icon != ""} :path {n.icon}
+                            :image-width 24 :image-height 24)
+                        (label :visible {n.icon == ""} :text "󰂚"))
+                    ;; The labels are capped to fit .notif-text's width, so
+                    ;; long text is cut short rather than widening the popup
+                    (box
+                        :class "notif-text"
+                        :orientation "v"
+                        :space-evenly false
+                        (box
+                            :space-evenly false
+                            (label :class "notif-meta" :hexpand true :xalign 0 :limit-width 40
+                                :text {n.app})
+                            (label :class "notif-meta" :text {n.time}))
+                        (label :class "notif-summary" :xalign 0 :limit-width 38 :text {n.summary})
+                        (label :class "notif-body" :xalign 0 :limit-width 43
+                            :visible {n.body != ""} :text {n.body})
+                    )
                 )
             )
             (button
@@ -90,13 +105,17 @@
                 (box
                     :class "notif-header"
                     :space-evenly false
-                    (label :hexpand true :xalign 0 :text "Notifications")
+                    (label :xalign 0 :text "Notifications")
+                    (label :class "notif-total" :hexpand true :xalign 0
+                        :visible {arraylength(notifications.entries) > 0}
+                        :text {arraylength(notifications.entries)})
                     (button
                         :class "notif-clear"
                         :visible {arraylength(notifications.entries) > 0}
                         :onclick "dunstctl history-clear"
-                        "Clear")
+                        "Clear all")
                 )
+                (box :class "notif-divider")
                 (label
                     :class "notif-empty"
                     :visible {arraylength(notifications.entries) == 0}
@@ -104,8 +123,8 @@
                 (scroll
                     :hscroll false
                     :visible {arraylength(notifications.entries) > 0}
-                    ;; .notif-row's height, 64px, per row
-                    :height {64 * min(arraylength(notifications.entries), notification_rows)}
+                    ;; .notif-entry's height, 70px, per row
+                    :height {70 * min(arraylength(notifications.entries), notification_rows)}
                     (box
                         :orientation "v"
                         :space-evenly false

@@ -11,6 +11,9 @@
 .config/nvim/lua/plugins/telescope.lua
 .config/nvim/lua/plugins/terminal.lua
 
+{{- /* Replaced by render-markdown.nvim */}}
+.config/nvim/lua/plugins/markdown-preview.lua
+
 {{ if .desktop }}
 {{- /* Old bspwm/X11 setup, replaced by Hyprland */}}
 .config/bspwm

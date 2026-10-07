@@ -14,9 +14,9 @@
                 :space-evenly false
                 (label :class "net-icon ${notifications.unseen > 0 ? 'unseen' : ''}"
                     :text {notifications.icon})
-                ;; Always there, empty at 0, so the pill keeps its width
-                (label :class "notif-count" :xalign 0
-                    :text {notifications.unseen > 0 ? notifications.unseen : ""})
+                ;; Two digits, 00 to 20, so the pill keeps its width
+                (label :class "notif-count ${notifications.unseen > 0 ? 'unseen' : ''}"
+                    :text {notifications.unseen < 10 ? "0${notifications.unseen}" : notifications.unseen})
             )
         )
     )

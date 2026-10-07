@@ -182,15 +182,12 @@
 }
 
 // Notifications came in since the history was last opened
-.notifications .unseen, .notif-count {
+.notifications .unseen {
   color: $peach;
 }
 
-// Room for two digits (the history holds 20 at most), so the pill keeps its
-// width as the count changes
 .notif-count {
   margin-left: 5px;
-  min-width: 1.2em;
 }
 
 // The history popup, made to look like the rofi menus (rofi/dropdown.rasi)

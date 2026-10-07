@@ -56,4 +56,16 @@ return {
             },
         },
     },
+    { -- Teaches lua_ls the Neovim API and plugin modules when editing this config
+        "folke/lazydev.nvim",
+        ft = "lua",
+        opts = {
+            library = {
+                -- Types for vim.uv
+                { path = "${3rd}/luv/library", words = { "vim%.uv" } },
+                -- The Snacks global
+                { path = "snacks.nvim", words = { "Snacks" } },
+            },
+        },
+    },
 }

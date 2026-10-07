@@ -29,8 +29,6 @@
 }
 
 .clock {
-  // padding-left: 10px;
-  // padding-right: 10px;
   color: $maroon;
   padding-left: 10px;
   padding-right: 10px;
@@ -68,13 +66,8 @@
 }
 
 .volume {
-  // margin-left: 7px;
   padding: 5px 10px;
   margin-left: 5px;
-}
-
-.volume_slider {
-  // min-width: 150px;
 }
 
 // background base slider
@@ -87,7 +80,6 @@
   min-width: 100px;
 
   margin-left: 10px;
-  // margin-right: 10px;
 }
 
 // slider filler color

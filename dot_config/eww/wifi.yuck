@@ -1,8 +1,6 @@
 (defwidget wifi_widget []
-    (box
-        (button
-            :onclick `./scripts/select_wifi.sh &`
-            (label :class "net-icon" :text {network.wifi_icon})
-        )
+    (button
+        :onclick `./scripts/select_wifi.sh &`
+        (label :class "net-icon" :text {network.wifi_icon})
     )
 )

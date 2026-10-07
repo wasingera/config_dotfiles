@@ -1,10 +1,6 @@
 (defwidget vpn_widget []
-    (box
-        :class "vpn-button"
-
-        (button
-            :onclick `./scripts/select_vpn.sh &`
-            (label :class "net-icon" :text {network.vpn_icon})
-        )
+    (button
+        :onclick `./scripts/select_vpn.sh &`
+        (label :class "net-icon" :text {network.vpn_icon})
     )
 )

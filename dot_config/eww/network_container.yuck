@@ -8,7 +8,6 @@
 
 (defwidget network_container []
     (box
-        :class "network_container"
         (box
             :class "vpn"
             (vpn_widget)

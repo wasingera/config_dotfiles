@@ -163,6 +163,9 @@ Shell traps:
   - `network.sh` uses `nmcli monitor`.
   - `volume.sh` uses `pactl subscribe`.
   - The clock is `formattime(EWW_TIME, ...)`.
+  - `gpu.sh` streams `nvidia-smi --loop=2` (one long-lived process).
+  - CPU, memory and temperatures use eww's built-in `EWW_CPU`, `EWW_RAM` and `EWW_TEMPS`,
+    which eww samples itself.
 
   Follow this pattern for new widgets; avoid `defpoll` with external commands.
 - `pactl subscribe` must be filtered to `sink`/`server` events. `pamixer` and `pactl` calls create

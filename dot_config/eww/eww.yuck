@@ -4,13 +4,16 @@
 (include "./powerbar.yuck")
 (include "./keyboard.yuck")
 (include "./network_container.yuck")
+(include "./metrics.yuck")
 
 (defwidget leftbar []
     (box
         :class "leftbar"
         :halign "start"
+        :space-evenly false
 
         (clock_w)
+        (metrics)
     )
 )
 

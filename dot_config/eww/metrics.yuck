@@ -1,0 +1,12 @@
+;; CPU and memory come from eww's built-in EWW_* variables (sampled by eww
+;; itself); the GPU from nvidia-smi.
+;; {"usage": N, "temp": N}, updated every 2s
+(deflisten gpu :initial '{"usage": 0, "temp": 0}'
+    `./scripts/gpu.sh`)
+
+(defwidget metrics []
+    (box
+        :class "metrics"
+        "CPU ${round(EWW_CPU.avg, 0)}% ${round(EWW_TEMPS.K10TEMP_TCTL, 0)}° | MEM ${round(EWW_RAM.used_mem_perc, 0)}% | GPU ${gpu.usage}% ${gpu.temp}°"
+    )
+)

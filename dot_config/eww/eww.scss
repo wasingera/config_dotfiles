@@ -19,7 +19,7 @@
   padding-right: 5px;
 }
 
-.clock, .workspaces, .volume, .powerbar, .keyboard, .wifi, .vpn {
+.clock, .metrics, .workspaces, .volume, .powerbar, .keyboard, .wifi, .vpn {
   background: $base;
   font-family: "Iosevka Term Extended";
   font-weight: bold;
@@ -32,6 +32,16 @@
   color: $maroon;
   padding-left: 10px;
   padding-right: 10px;
+}
+
+.metrics {
+  color: $teal;
+  // Fits two digits everywhere (37 chars of the monospace bar font), so the
+  // pill keeps its width as readings change
+  min-width: 313px;
+  padding-left: 10px;
+  padding-right: 10px;
+  margin-left: 5px;
 }
 
 .workspaces {

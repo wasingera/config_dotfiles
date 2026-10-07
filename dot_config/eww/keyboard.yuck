@@ -6,7 +6,6 @@
     (box
         :class "keyboard"
         (button
-            :tooltip {keyboard_layout.keymap}
             :onclick "hyprctl switchxkblayout all next"
             {keyboard_layout.label})
     )

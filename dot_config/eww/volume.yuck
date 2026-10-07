@@ -8,7 +8,6 @@
 (defwidget volume_mute []
     (button
         :class "volume_button"
-        :tooltip "${volume.sink}: ${volume.volume}%"
         :onclick "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"
         :onrightclick "./scripts/select_output.sh &"
         {volume.icon}

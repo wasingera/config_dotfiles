@@ -3,7 +3,6 @@
         :class "vpn-button"
 
         (button
-            :tooltip {network.vpn}
             :onclick `./scripts/select_vpn.sh &`
             (label :class "net-icon" :text {network.vpn_icon})
         )

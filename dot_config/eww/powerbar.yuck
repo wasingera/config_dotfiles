@@ -3,7 +3,6 @@
         :class "powerbar"
         (button
             :class "power_button"
-            :tooltip "Power"
             :onclick "./scripts/power_menu.sh &"
             "")
     )

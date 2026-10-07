@@ -194,6 +194,10 @@ Shell traps:
   the bar".
 - Colours and the icon theme are in the drop-in `dunstrc.d/colors.conf`, which links to the active
   scheme (see "Colours"); `dunstrc` holds only layout and timeouts.
+- The frosted-glass look is translucent backgrounds (`#RRGGBBAA` in the colour template) plus a
+  Hyprland `layer_rule` that blurs the `notifications` layer.
+- Icons are capped at 24px so Papirus serves its flat monochrome glyphs; at 32px and up it switches
+  to the colourful set. App icons (Firefox etc.) still show in full colour.
 
 ### Colours
 

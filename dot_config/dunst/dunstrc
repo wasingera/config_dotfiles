@@ -24,7 +24,7 @@
     # dynamic width from 0 to 300
     # width = (0, 300)
     # constant width of 300
-    width = 360
+    width = 380
 
     # The maximum height of a single notification, excluding the frame.
     height = 300
@@ -50,17 +50,18 @@
 
     # Set the progress bar height. This includes the frame, so make sure
     # it's at least twice as big as the frame width.
-    progress_bar_height = 8
+    progress_bar_height = 6
 
     # Set the frame width of the progress bar
     progress_bar_frame_width = 0
-    progress_bar_corner_radius = 4
+    progress_bar_corner_radius = 3
 
     # Set the minimum width for the progress bar
     progress_bar_min_width = 150
 
     # Set the maximum width for the progress bar
-    progress_bar_max_width = 300
+    # the full text width (width minus horizontal_padding on both sides)
+    progress_bar_max_width = 348
 
 
     # Show how many messages are currently hidden (because of
@@ -79,17 +80,18 @@
     separator_height = 3
 
     # Padding between text and separator.
-    padding = 10
+    padding = 14
 
     # Horizontal padding.
-    horizontal_padding = 12
+    horizontal_padding = 16
 
     # Padding between text and icon.
-    text_icon_padding = 12
+    text_icon_padding = 14
 
     # Defines width in pixels of frame around the notification window.
     # Set to 0 to disable.
-    frame_width = 2
+    # a hairline edge, like light catching the rim of the glass
+    frame_width = 1
 
     # Colours (frame_color, the urgency colours below) and icon_theme come
     # from the active light/dark scheme, in dunstrc.d/colors.conf.
@@ -98,7 +100,7 @@
     # If value is greater than 0, separator_height will be ignored and a border
     # of size frame_width will be drawn around each notification instead.
     # Click events on gaps do not currently propagate to applications below.
-    gap_size = 6
+    gap_size = 8
 
     # Define a color for the separator.
     # possible values are:
@@ -160,7 +162,8 @@
     #   %n  progress value if set without any extra characters
     #   %%  Literal %
     # Markup is allowed
-    format = "<b>%s</b>\n%b"
+    # body slightly dimmer than the summary
+    format = "<b>%s</b>\n<span alpha='80%'>%b</span>"
     # format = "%i<b>%a</b>\ntest"
 
     # Alignment of message text.
@@ -206,13 +209,13 @@
     # Scale small icons up to this size, set to 0 to disable. Helpful
     # for e.g. small files or high-dpi screens. In case of conflict,
     # max_icon_size takes precedence over this.
-    min_icon_size = 32
+    min_icon_size = 24
 
     # Scale larger icons down to this size, set to 0 to disable
-    max_icon_size = 40
+    max_icon_size = 24
 
-    # Paths to default icons (only neccesary when not using recursive icon lookup)
-    icon_path = /usr/share/icons/gnome/16x16/status/:/usr/share/icons/gnome/16x16/devices/
+    # Round images such as avatars and album art
+    icon_corner_radius = 6
 
     ### History ###
 
@@ -245,8 +248,8 @@
     # corners.
     # The radius will be automatically lowered if it exceeds half of the
     # notification height to avoid clipping text and/or icons.
-    # same as the bar boxes
-    corner_radius = 5
+    # same as Hyprland windows
+    corner_radius = 10
 
     # Ignore the dbus closeNotification message.
     # Useful to enforce the timeout set by dunst configuration. Without this

@@ -58,8 +58,7 @@ connect_with_password() {
     local uuid=$1 ssid=$2 password
     password=$(rofi_menu wifi_password -password -p "Password for $ssid" </dev/null)
     [[ -z $password ]] && return 1
-    nm_run "Connecting to $ssid" "Connected to $ssid" \
-        nmcli connection up "$uuid" passwd-file \
+    nm_run "Connecting to $ssid" nmcli connection up "$uuid" passwd-file \
         <(printf '802-11-wireless-security.psk:%s\n' "$password")
 }
 
@@ -68,7 +67,7 @@ connect() {
     uuid=$(saved_profile "$ssid")
 
     if [[ -n $uuid ]]; then
-        nm_run "Connecting to $ssid" "Connected to $ssid" nmcli connection up "$uuid" && return
+        nm_run "Connecting to $ssid" nmcli connection up "$uuid" && return
         # The saved password is missing or wrong
         if [[ $nm_error == *[Ss]ecrets* && -n $sec ]]; then
             connect_with_password "$uuid" "$ssid"
@@ -78,7 +77,7 @@ connect() {
 
     case $sec in
         "")
-            nm_run "Connecting to $ssid" "Connected to $ssid" nmcli dev wifi connect "$ssid"
+            nm_run "Connecting to $ssid" nmcli dev wifi connect "$ssid"
             return
             ;;
         *802.1X* | *WEP*)
@@ -101,7 +100,7 @@ connect() {
 if [[ $(nmcli radio wifi) != enabled ]]; then
     chosen=$(printf '%s\n' "$on_row" | rofi_menu select_wifi -markup-rows)
     if [[ $chosen == "$on_row" ]]; then
-        nm_run "Turning Wi-Fi on" "Wi-Fi on" nmcli radio wifi on
+        nm_run "Turning Wi-Fi on" nmcli radio wifi on
     fi
     exit
 fi
@@ -138,15 +137,13 @@ fi
 case ${footer[i - ${#ssids[@]}]} in
     "$disconnect_row")
         active=$(nm_connections 802-11-wireless --active | head -n1)
-        nm_run "Disconnecting from $active_ssid" "Disconnected from $active_ssid" \
-            nmcli connection down "$active"
+        nm_run "Disconnecting from $active_ssid" nmcli connection down "$active"
         ;;
     "$rescan_row")
-        nm_run "Scanning for networks" "Scan finished" \
-            nmcli dev wifi list --rescan yes
+        nm_run "Scanning for networks" nmcli dev wifi list --rescan yes
         exec "$0"
         ;;
     "$off_row")
-        nm_run "Turning Wi-Fi off" "Wi-Fi off" nmcli radio wifi off
+        nm_run "Turning Wi-Fi off" nmcli radio wifi off
         ;;
 esac

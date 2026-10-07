@@ -35,10 +35,9 @@ chosen=${names[i]}
 [[ $chosen == "$active" ]] && exit 0
 
 if [[ -n $active ]]; then
-    nm_run "Disconnecting from $active" "Disconnected from $active" \
-        nmcli connection down "$active" || exit 1
+    nm_run "Disconnecting from $active" nmcli connection down "$active" || exit 1
 fi
 
 if (( i < ${#names[@]} )); then
-    nm_run "Connecting to $chosen" "Connected to $chosen" nmcli connection up "$chosen"
+    nm_run "Connecting to $chosen" nmcli connection up "$chosen"
 fi

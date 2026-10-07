@@ -24,17 +24,13 @@ scan_row=$(icon_row $'\U000F0450' 'Scan for devices')
 off_row=$(icon_row $'\U000F0425' 'Turn Bluetooth off')
 on_row=$(icon_row $'\U000F00AF' 'Turn Bluetooth on')
 
-# Run a command with notifications, like nm_run: DOING while it runs, then
-# DONE, or a critical one with busctl's error (the part after its "...: ")
+# Run a command with progress_run, like nm_run, plus a critical notification
+# with busctl's error (the part after its "...: ") if it fails
 bt_run() {
-    local doing=$1 done=$2 error; shift 2
-    notify-send -u low "${tag[@]}" "$doing…"
-    if error=$("$@" 2>&1 >/dev/null); then
-        notify-send -u low "${tag[@]}" "$done"
-    else
-        notify-send -u critical "${tag[@]}" "$doing failed" "${error##*: }"
-        return 1
-    fi
+    local doing=$1; shift
+    progress_run bluetooth "$doing" "$@" && return
+    notify-send -u critical "${tag[@]}" "$doing failed" "${run_error##*: }"
+    return 1
 }
 
 # Print one of a device's properties (true, an address, ...). Fails if
@@ -48,7 +44,7 @@ device_property() {
 }
 
 connect() {
-    bt_run "Connecting to $2" "Connected to $2" \
+    bt_run "Connecting to $2" \
         busctl --system --timeout=30 call org.bluez "$1" org.bluez.Device1 Connect
 }
 
@@ -56,24 +52,19 @@ connect() {
 # a phone asks to confirm on its own screen), trust it so it can connect by
 # itself later, then connect.
 pair() {
-    local path=$1 name=$2 error
+    local path=$1 name=$2
     # A device from a scan expires
     if ! device_property "$path" Address >/dev/null; then
         notify-send -u critical "${tag[@]}" "$name is out of range" \
             "Scan again with it in pairing mode"
         return 1
     fi
-    notify-send -u low "${tag[@]}" "Pairing with $name…"
-    if ! error=$("${BASH_SOURCE%/*}/bt_pair.py" "$path" 2>&1); then
-        notify-send -u critical "${tag[@]}" "Pairing with $name failed" "$error"
+    if ! progress_run bluetooth "Pairing with $name" "${BASH_SOURCE%/*}/bt_pair.py" "$path"; then
+        notify-send -u critical "${tag[@]}" "Pairing with $name failed" "$run_error"
         return 1
     fi
     busctl --system set-property org.bluez "$path" org.bluez.Device1 Trusted b true
-    if [[ $(device_property "$path" Connected) == true ]]; then
-        notify-send -u low "${tag[@]}" "Connected to $name"
-    else
-        connect "$path" "$name"
-    fi
+    [[ $(device_property "$path" Connected) == true ]] || connect "$path" "$name"
 }
 
 # Unblock the radio if it's soft-blocked (bluetoothd then powers the adapter
@@ -110,7 +101,7 @@ fi
 if [[ $(jq --arg a "$adapter" '.[$a]["org.bluez.Adapter1"].Powered' <<<"$objects") != true ]]; then
     chosen=$(printf '%s\n' "$on_row" | rofi_menu select_bluetooth -markup-rows)
     if [[ $chosen == "$on_row" ]]; then
-        bt_run "Turning Bluetooth on" "Bluetooth on" power_on
+        bt_run "Turning Bluetooth on" power_on
     fi
     exit
 fi
@@ -164,7 +155,7 @@ if (( i < ${#devices[@]} )); then
     IFS=$'\t' read -r path state _ name _ <<<"${devices[i]}"
     case $state in
         connected)
-            bt_run "Disconnecting from $name" "Disconnected from $name" \
+            bt_run "Disconnecting from $name" \
                 busctl --system call org.bluez "$path" org.bluez.Device1 Disconnect
             ;;
         paired) connect "$path" "$name" ;;
@@ -177,11 +168,11 @@ case ${footer[i - ${#devices[@]}]} in
     "$scan_row")
         bluetoothctl --timeout 60 scan on </dev/null >/dev/null 2>&1 &
         export BT_SCAN_PID=$!
-        bt_run "Scanning for devices" "Scan finished" sleep 10
+        bt_run "Scanning for devices" sleep 10
         exec "$0"
         ;;
     "$off_row")
-        bt_run "Turning Bluetooth off" "Bluetooth off" \
+        bt_run "Turning Bluetooth off" \
             busctl --system set-property org.bluez "$adapter" org.bluez.Adapter1 Powered b false
         ;;
 esac

@@ -42,22 +42,40 @@ icon_row() {
     printf '<span size="larger">%s</span>  %s\n' "$1" "$text"
 }
 
-# Run an nmcli command with notifications: DOING while it runs, then DONE, or
-# a critical one with nmcli's error. They share a stack tag, so each replaces
-# the last. Returns the command's status; the error is left in $nm_error.
-#   nm_run "Connecting to X" "Connected to X" nmcli connection up X
-nm_run() {
-    local doing=$1 done=$2; shift 2
-    local tag=(-h string:x-dunst-stack-tag:network)
-    notify-send -u low "${tag[@]}" "$doing…"
-    if nm_error=$("$@" 2>&1 >/dev/null); then
-        notify-send -u low "${tag[@]}" "$done"
-    else
-        nm_error=${nm_error#Error: }
-        nm_error=${nm_error%%$'\n'Hint:*}
-        notify-send -u critical "${tag[@]}" "$doing failed" "$nm_error"
-        return 1
+# Run a command for a menu action. Success needs no notification, as the bar
+# icon shows it; only a slow command gets one, "DOING…", shown after a second
+# and closed when it finishes. It has the stack tag TAG, so a failure
+# notification with the same tag replaces it. Returns the command's status;
+# its stderr is left in $run_error.
+#   progress_run network "Connecting to X" nmcli connection up X
+progress_run() {
+    local tag=$1 doing=$2 fd status id=; shift 2
+    # The command's status, then its stderr, once it has finished
+    exec {fd}< <(run_error=$("$@" 2>&1 >/dev/null); printf '%s\n%s' $? "$run_error")
+    if ! read -r -t 1 -u "$fd" status; then
+        id=$(notify-send -p -u low -h "string:x-dunst-stack-tag:$tag" "$doing…")
+        read -r -u "$fd" status
     fi
+    run_error=$(cat <&"$fd")
+    exec {fd}<&-
+    if [[ -n $id ]] && (( status == 0 )); then
+        gdbus call --session --dest org.freedesktop.Notifications \
+            --object-path /org/freedesktop/Notifications \
+            --method org.freedesktop.Notifications.CloseNotification "$id" >/dev/null
+    fi
+    return "$status"
+}
+
+# Run an nmcli command with progress_run, plus a critical notification with
+# nmcli's error if it fails. The error is left in $nm_error.
+#   nm_run "Connecting to X" nmcli connection up X
+nm_run() {
+    local doing=$1; shift
+    progress_run network "$doing" "$@" && return
+    nm_error=${run_error#Error: }
+    nm_error=${nm_error%%$'\n'Hint:*}
+    notify-send -u critical -h string:x-dunst-stack-tag:network "$doing failed" "$nm_error"
+    return 1
 }
 
 # Print the names of NetworkManager connections of one type (e.g. wireguard,

@@ -25,8 +25,11 @@ return {
                     local current = vim.api.nvim_get_current_win()
                     for _, win in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
                         local filetype = vim.bo[vim.api.nvim_win_get_buf(win)].filetype
-                        if win ~= current and vim.api.nvim_win_get_config(win).relative == ""
-                            and not filetype:match("^snacks_") then
+                        if
+                            win ~= current
+                            and vim.api.nvim_win_get_config(win).relative == ""
+                            and not filetype:match("^snacks_")
+                        then
                             return
                         end
                     end
@@ -48,7 +51,12 @@ return {
             { "<leader>,", function() Snacks.picker.buffers() end, desc = "Buffers" },
             { "<leader>fr", function() Snacks.picker.recent() end, desc = "Recent files" },
 
-            { "<leader>sw", function() Snacks.picker.grep_word() end, mode = { "n", "x" }, desc = "Grep word or selection" },
+            {
+                "<leader>sw",
+                function() Snacks.picker.grep_word() end,
+                mode = { "n", "x" },
+                desc = "Grep word or selection",
+            },
             { "<leader>sh", function() Snacks.picker.help() end, desc = "Help pages" },
             { "<leader>sk", function() Snacks.picker.keymaps() end, desc = "Keymaps" },
             { "<leader>sd", function() Snacks.picker.diagnostics() end, desc = "Diagnostics" },

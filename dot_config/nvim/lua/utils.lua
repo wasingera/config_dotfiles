@@ -16,9 +16,7 @@ function M.mode()
     return mode == "light" and "light" or "dark"
 end
 
-function M.is_dark_mode()
-    return M.mode() == "dark"
-end
+function M.is_dark_mode() return M.mode() == "dark" end
 
 -- Call on_change(mode) each time the mode file is written. Watches the
 -- directory, so it keeps working if the file is replaced. Does nothing if

@@ -56,8 +56,6 @@ vim.diagnostic.config({
     },
     -- Show the diagnostic in a float after jumping with [d and ]d
     jump = {
-        on_jump = function(_, bufnr)
-            vim.diagnostic.open_float({ bufnr = bufnr, scope = "cursor", focus = false })
-        end,
+        on_jump = function(_, bufnr) vim.diagnostic.open_float({ bufnr = bufnr, scope = "cursor", focus = false }) end,
     },
 })

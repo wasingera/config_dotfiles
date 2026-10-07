@@ -1,4 +1,4 @@
-local utils = require('utils')
+local utils = require("utils")
 
 return {
     { -- The catppuccin colorscheme
@@ -17,6 +17,6 @@ return {
                 vim.o.background = mode
                 vim.cmd.colorscheme("catppuccin")
             end)
-        end
+        end,
     },
 }

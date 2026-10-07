@@ -47,16 +47,23 @@ return {
                 pattern = "VeryLazy",
                 once = true,
                 callback = function()
-                    Snacks.toggle.new({
-                        name = "Format on save",
-                        get = function() return vim.g.autoformat ~= false end,
-                        set = function(state) vim.g.autoformat = state end,
-                    }):map("<leader>uf")
+                    Snacks.toggle
+                        .new({
+                            name = "Format on save",
+                            get = function() return vim.g.autoformat ~= false end,
+                            set = function(state) vim.g.autoformat = state end,
+                        })
+                        :map("<leader>uf")
                 end,
             })
         end,
         keys = {
-            { "<leader>cf", function() require("conform").format() end, mode = { "n", "x" }, desc = "Format buffer or selection" },
+            {
+                "<leader>cf",
+                function() require("conform").format() end,
+                mode = { "n", "x" },
+                desc = "Format buffer or selection",
+            },
         },
     },
 }

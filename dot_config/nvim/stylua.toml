@@ -1,3 +1,5 @@
 indent_type = "Spaces"
 indent_width = 4
 column_width = 120
+# Keep one-line functions such as `function() Snacks.picker.files() end` on one line
+collapse_simple_statement = "FunctionOnly"

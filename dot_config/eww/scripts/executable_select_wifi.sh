@@ -55,8 +55,10 @@ saved_profile() {
 # it from a file descriptor rather than its arguments, so it never shows up
 # in the process list.
 connect_with_password() {
-    local uuid=$1 ssid=$2 password
-    password=$(rofi_menu wifi_password -password -p "Password for $ssid" </dev/null)
+    local uuid=$1 ssid=$2 password mesg
+    mesg=$("${BASH_SOURCE%/*}/rofi_wrap.py" "$HOME/.config/rofi/wifi_password/theme.rasi" \
+        "Password for $ssid")
+    password=$(rofi_menu wifi_password -password -mesg "$mesg" </dev/null)
     [[ -z $password ]] && return 1
     nm_run "Connecting to $ssid" nmcli connection up "$uuid" passwd-file \
         <(printf '802-11-wireless-security.psk:%s\n' "$password")

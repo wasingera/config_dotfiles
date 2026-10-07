@@ -1,10 +1,24 @@
-/* Password prompt for joining a Wi-Fi network, in the Wi-Fi menu's spot */
+/* Password prompt for joining a Wi-Fi network, in the Wi-Fi menu's spot.
+ * "Password for <ssid>" is the message (-mesg) rather than the prompt, which
+ * can't wrap. select_wifi.sh breaks it into lines with eww's rofi_wrap.py,
+ * which reads textbox's font and padding from here. */
 @import "../select_wifi/theme.rasi"
 
 mainbox {
-    children: [ inputbar ];
+    children: [ message, inputbar ];
+}
+
+textbox {
+    padding: 5px 10px;
+    font: "Iosevka Term Extended Bold 15px";
 }
 
 inputbar {
     enabled: true;
+    children: [ entry ];
+}
+
+entry {
+    placeholder: "Password";
+    placeholder-color: @overlay0;
 }

@@ -61,7 +61,7 @@
 
     # Set the maximum width for the progress bar
     # the full text width (width minus horizontal_padding on both sides)
-    progress_bar_max_width = 348
+    progress_bar_max_width = 352
 
 
     # Show how many messages are currently hidden (because of
@@ -80,18 +80,18 @@
     separator_height = 3
 
     # Padding between text and separator.
-    padding = 14
+    padding = 12
 
     # Horizontal padding.
-    horizontal_padding = 16
+    horizontal_padding = 14
 
     # Padding between text and icon.
-    text_icon_padding = 14
+    text_icon_padding = 12
 
     # Defines width in pixels of frame around the notification window.
     # Set to 0 to disable.
-    # a hairline edge, like light catching the rim of the glass
-    frame_width = 1
+    # a thin rim; red on critical notifications (dunstrc.d/colors.conf)
+    frame_width = 2
 
     # Colours (frame_color, the urgency colours below) and icon_theme come
     # from the active light/dark scheme, in dunstrc.d/colors.conf.
@@ -100,7 +100,7 @@
     # If value is greater than 0, separator_height will be ignored and a border
     # of size frame_width will be drawn around each notification instead.
     # Click events on gaps do not currently propagate to applications below.
-    gap_size = 8
+    gap_size = 6
 
     # Define a color for the separator.
     # possible values are:
@@ -162,8 +162,9 @@
     #   %n  progress value if set without any extra characters
     #   %%  Literal %
     # Markup is allowed
-    # body slightly dimmer than the summary
-    format = "<b>%s</b>\n<span alpha='80%'>%b</span>"
+    # three tiers, like the bar's history panel: a small dim app name, the
+    # summary in bold, then the body
+    format = "<span size='small' alpha='65%'>%a</span>\n<b>%s</b>\n%b"
     # format = "%i<b>%a</b>\ntest"
 
     # Alignment of message text.
@@ -172,7 +173,7 @@
 
     # Vertical alignment of message text and icon.
     # Possible values are "top", "center" and "bottom".
-    vertical_alignment = center
+    vertical_alignment = top
 
     # Show age of message if message is older than show_age_threshold
     # seconds.
@@ -215,7 +216,7 @@
     max_icon_size = 24
 
     # Round images such as avatars and album art
-    icon_corner_radius = 6
+    icon_corner_radius = 4
 
     ### History ###
 
@@ -248,8 +249,7 @@
     # corners.
     # The radius will be automatically lowered if it exceeds half of the
     # notification height to avoid clipping text and/or icons.
-    # same as Hyprland windows
-    corner_radius = 10
+    corner_radius = 8
 
     # Ignore the dbus closeNotification message.
     # Useful to enforce the timeout set by dunst configuration. Without this

@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
-# Prints {"volume": N, "muted": bool, "icon": ..., "sink": ...} for eww: the
-# default output's volume, a matching icon and the output's name, now and
-# again whenever it changes (volume keys, mute, switching devices, ...).
+# Prints {"volume": N, "muted": bool, "icon": ...} for eww: the default
+# output's volume and a matching icon, now and again whenever it changes
+# (volume keys, mute, switching devices, ...).
 source "${BASH_SOURCE%/*}/lib.sh"
 
 # Nerd Font icons: muted or 0, then low, medium, high
@@ -22,8 +22,7 @@ render() {
          icon: (if $muted or $volume == 0 then $off
                 elif $volume < 34 then $low
                 elif $volume < 67 then $medium
-                else $high end),
-         sink: (.properties["node.nick"] // .description // "No output")}')"
+                else $high end)}')"
 }
 
 render

@@ -1,7 +1,7 @@
 ;; ==== Variables ====
-;; {"volume": N, "muted": bool, "icon": ..., "sink": ...} for the default
-;; output, updated on PulseAudio/PipeWire events
-(deflisten volume :initial '{"volume": 50, "muted": false, "icon": "", "sink": ""}'
+;; {"volume": N, "muted": bool, "icon": ...} for the default output, updated
+;; on PulseAudio/PipeWire events
+(deflisten volume :initial '{"volume": 50, "muted": false, "icon": ""}'
     `./scripts/volume.sh`)
 
 ;; ==== Widgets ====

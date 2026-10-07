@@ -1,5 +1,5 @@
-;; {"label": ..., "keymap": ...} for the main keyboard, updated on layout switches
-(deflisten keyboard_layout :initial '{"label": "", "keymap": ""}'
+;; short name of the main keyboard's layout, updated on layout switches
+(deflisten keyboard_layout :initial ""
     `./scripts/keyboard.sh`)
 
 (defwidget keyboard []
@@ -7,6 +7,6 @@
         :class "keyboard"
         (button
             :onclick "hyprctl switchxkblayout all next"
-            {keyboard_layout.label})
+            {keyboard_layout})
     )
 )

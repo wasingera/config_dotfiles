@@ -1,5 +1,6 @@
-;; names and icons of the active Wi-Fi and VPN, updated on NetworkManager events
-(deflisten network :initial '{"wifi": "", "wifi_icon": "", "vpn": "", "vpn_icon": ""}'
+;; icons of the active Wi-Fi (or wired) connection and VPN, updated on
+;; NetworkManager events
+(deflisten network :initial '{"wifi_icon": "", "vpn_icon": ""}'
     `./scripts/network.sh`)
 
 (include "./vpn.yuck")

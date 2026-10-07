@@ -114,6 +114,7 @@ The desktop is live while you work. Check each change in the real session:
 | rofi theme | `rofi -theme <file> -dump-theme 2>&1 \| grep 'Failed to parse'` (no output = OK) |
 | zsh | `zsh -n <file>`, then `zsh -ic exit` |
 | any shell script | `bash -n <file>` |
+| nvim | `nvim --headless +qa` prints nothing; `nvim --headless "+checkhealth <plugin>" "+w! out.txt" +qa` |
 | colours | `colorscheme light`, check, `colorscheme dark`; `chezmoi diff` must be empty in both modes |
 | hyprlock | `hyprlock --grace 60 &` (any input unlocks), screenshot, then `pkill -USR1 -x hyprlock` to unlock |
 | visual result | `grim -g "x,y wxh" out.png` (screen scale is 1.5, so the image is in physical px) |
@@ -272,6 +273,24 @@ The bar font is "Iosevka Term Extended"; icons come from "Iosevka Nerd Font".
 - `y` runs yazi and `cd`s to the last directory you browsed. zoxide (`z`, `zi`) is initialised
   last, only if it's installed.
 
+### Neovim (`dot_config/nvim/`)
+
+- lazy.nvim, with one spec file per area in `lua/plugins/`. Options, keymaps and autocmds live in
+  `lua/config/` and load before the plugins.
+- **Lockfile:** `~/.config/nvim/lazy-lock.json` is a symlink (`symlink_lazy-lock.json.tmpl`) to
+  `dot_config/nvim/.lazy-lock.json` in this repo; the leading dot stops chezmoi deploying it as a
+  file. `:Lazy update` writes straight into the repo, so commit the lock afterwards
+  (`nvim: update plugins`). On the other machines, `chezmoi apply`, then `:Lazy restore` to check
+  out the same commits.
+- **Removing a plugin spec file:** also list it in `.chezmoiremove`. lazy.nvim loads every file in
+  `lua/plugins/`, and chezmoi leaves deleted files behind on the other machines.
+- **Formatting:** conform formats on save only when the project has that formatter's config (the
+  `project_config` table in `lua/plugins/formatting.lua`); this config has `stylua.toml`.
+  `<leader>cf` formats on demand, `<leader>uf` toggles format on save.
+- Mason installs the language servers (`ensure_installed` in `lsp.lua`) and stylua, ruff and
+  shfmt. clang-format and rustfmt come from the system, and the treesitter parsers need the
+  `tree-sitter` CLI.
+
 ## Not tracked here (on purpose)
 
 - `~/.config/zsh/local.zsh`: per-machine settings.
@@ -281,6 +300,5 @@ The bar font is "Iosevka Term Extended"; icons come from "Iosevka Nerd Font".
 - `~/.claude/`: Claude Code settings and hooks, including the desktop notification hook.
 - `~/eww`: eww source checkout.
 - `hypr/images/`: wallpapers.
-- `nvim/lazy-lock.json`.
 - Old repo backup: `~/.local/share/config-git-backup`. This is the pre-chezmoi `~/.config/.git`;
   it can be deleted once the user is happy.

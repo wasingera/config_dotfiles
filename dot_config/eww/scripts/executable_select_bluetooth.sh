@@ -4,10 +4,9 @@
 # connect, or a new one found by a scan to pair with. Or scan, or turn
 # Bluetooth off (or on).
 #
-# BlueZ is driven with busctl, except where bluetoothctl's live client is
-# needed: discovery lasts only as long as the client that started it, and
-# pairing needs an agent. bluetoothctl can hang on errors, so it runs under
-# timeout and the outcome is read back from BlueZ.
+# BlueZ is driven with busctl, and pairing goes through bt_pair.py, which
+# brings the agent pairing needs. bluetoothctl is used only to scan:
+# discovery lasts as long as the client that started it.
 source "${BASH_SOURCE%/*}/lib.sh"
 
 tag=(-h string:x-dunst-stack-tag:bluetooth)
@@ -53,25 +52,20 @@ connect() {
         busctl --system --timeout=30 call org.bluez "$1" org.bluez.Device1 Connect
 }
 
-# Pair with a device found by a scan, trust it so it can connect by itself
-# later, then connect. bluetoothctl's agent does the pairing; NoInputNoOutput
-# makes it "just works" pairing, as there's nowhere to show a PIN (a phone
-# asks to confirm on its own screen).
+# Pair with a device found by a scan ("just works" pairing, see bt_pair.py;
+# a phone asks to confirm on its own screen), trust it so it can connect by
+# itself later, then connect.
 pair() {
-    local path=$1 name=$2 address output error
-    # A device from a scan expires; bluetoothctl would hang on it
-    if ! address=$(device_property "$path" Address); then
+    local path=$1 name=$2 error
+    # A device from a scan expires
+    if ! device_property "$path" Address >/dev/null; then
         notify-send -u critical "${tag[@]}" "$name is out of range" \
             "Scan again with it in pairing mode"
         return 1
     fi
     notify-send -u low "${tag[@]}" "Pairing with $name…"
-    output=$(timeout 30 bluetoothctl --agent NoInputNoOutput pair "$address" </dev/null 2>&1)
-    if [[ $(device_property "$path" Paired) != true ]]; then
-        error=$(grep -ao 'Failed to pair: [[:print:]]*' <<<"$output" | tail -n1)
-        error=${error#Failed to pair: }
-        notify-send -u critical "${tag[@]}" "Pairing with $name failed" \
-            "${error:-No answer; is it in pairing mode?}"
+    if ! error=$("${BASH_SOURCE%/*}/bt_pair.py" "$path" 2>&1); then
+        notify-send -u critical "${tag[@]}" "Pairing with $name failed" "$error"
         return 1
     fi
     busctl --system set-property org.bluez "$path" org.bluez.Device1 Trusted b true

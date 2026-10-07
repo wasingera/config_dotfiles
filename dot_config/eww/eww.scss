@@ -124,14 +124,20 @@
   color: $red;
   padding-left: 10px;
   padding-right: 10px;
-  min-width: 150px;
   margin-left: 5px;
+}
+
+// Wi-Fi and VPN show only a Nerd Font icon; the name is in the tooltip. The
+// glyphs come from a fallback font and are drawn about x-height at the bar's
+// size, so they're enlarged. Regular weight: synthetic bold blurs them.
+.net-icon {
+  font-size: 18px;
+  font-weight: normal;
 }
 
 .vpn {
   color: $yellow;
   padding-right: 10px;
   padding-left: 10px;
-  min-width: 150px;
   margin-left: 5px;
 }

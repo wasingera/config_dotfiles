@@ -1,29 +1,30 @@
 #!/usr/bin/env bash
 
-# Prints {"wifi": ..., "vpn": ...} for eww: labels for the active Wi-Fi (or
-# wired) connection and VPN, now and again whenever NetworkManager reports a
-# change.
+# Prints {"wifi": ..., "wifi_icon": ..., "vpn": ..., "vpn_icon": ...} for eww:
+# labels and icons for the active Wi-Fi (or wired) connection and VPN, now and
+# again whenever NetworkManager reports a change.
 source "${BASH_SOURCE%/*}/lib.sh"
 
 # Nerd Font icons
-wifi_icon=$'\U000F05A9'
+connected_icon=$'\U000F05A9'
 wired_icon=$'\U000F0200'
 offline_icon=$'\U000F05AA'
-vpn_icon=$'\U000F099D'
-no_vpn_icon=$'\U000F099E'
+vpn_on_icon=$'\U000F099D'
+vpn_off_icon=$'\U000F099E'
 
 render() {
-    local name wifi vpn
-    if name=$(nm_connections 802-11-wireless --active | head -n1) && [[ -n $name ]]; then
-        wifi="$wifi_icon $name"
-    elif name=$(nm_connections 802-3-ethernet --active | head -n1) && [[ -n $name ]]; then
-        wifi="$wired_icon Wired"
+    local wifi wifi_icon vpn vpn_icon
+    if wifi=$(nm_connections 802-11-wireless --active | head -n1) && [[ -n $wifi ]]; then
+        wifi_icon=$connected_icon
+    elif [[ -n $(nm_connections 802-3-ethernet --active) ]]; then
+        wifi=Wired wifi_icon=$wired_icon
     else
-        wifi="$offline_icon Offline"
+        wifi=Offline wifi_icon=$offline_icon
     fi
-    name=$({ nm_connections wireguard --active; nm_connections vpn --active; } | head -n1)
-    if [[ -n $name ]]; then vpn="$vpn_icon $name"; else vpn="$no_vpn_icon No VPN"; fi
-    emit "$(jq -nc --arg wifi "$wifi" --arg vpn "$vpn" '{$wifi, $vpn}')"
+    vpn=$({ nm_connections wireguard --active; nm_connections vpn --active; } | head -n1)
+    if [[ -n $vpn ]]; then vpn_icon=$vpn_on_icon; else vpn="No VPN" vpn_icon=$vpn_off_icon; fi
+    emit "$(jq -nc --arg wifi "$wifi" --arg wifi_icon "$wifi_icon" \
+                   --arg vpn "$vpn" --arg vpn_icon "$vpn_icon" '{$wifi, $wifi_icon, $vpn, $vpn_icon}')"
 }
 
 render

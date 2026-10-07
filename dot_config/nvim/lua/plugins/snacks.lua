@@ -6,7 +6,18 @@ return {
         ---@type snacks.Config
         opts = {
             -- Fuzzy picker; also replaces vim.ui.select (e.g. code actions)
-            picker = { enabled = true },
+            picker = {
+                enabled = true,
+                sources = {
+                    explorer = {
+                        -- <C-n> closes the explorer from inside it too; pickers use it to move down
+                        win = {
+                            input = { keys = { ["<c-n>"] = { "close", mode = { "n", "i" } } } },
+                            list = { keys = { ["<c-n>"] = "close" } },
+                        },
+                    },
+                },
+            },
             -- File explorer sidebar; also opens for `nvim <dir>`
             explorer = { enabled = true },
             -- Indentation guides, with the current scope highlighted

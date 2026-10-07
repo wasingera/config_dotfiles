@@ -99,6 +99,11 @@
   border-radius: 10px;
 }
 
+// muted: grey out the filled part
+.volume.muted .volume_slider trough highlight {
+  background-color: $overlay1;
+}
+
 .volume_button {
   font-size: 20px;
   color: $mauve;

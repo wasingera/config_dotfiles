@@ -1,14 +1,16 @@
 ;; ==== Variables ====
-;; {"volume": N, "muted": bool}, updated on PulseAudio/PipeWire events
-(deflisten volume :initial '{"volume": 50, "muted": false}'
+;; {"volume": N, "muted": bool, "icon": ..., "sink": ...} for the default
+;; output, updated on PulseAudio/PipeWire events
+(deflisten volume :initial '{"volume": 50, "muted": false, "icon": "", "sink": ""}'
     `./scripts/volume.sh`)
 
 ;; ==== Widgets ====
 (defwidget volume_mute []
     (button
         :class "volume_button"
-        :onclick "pamixer --toggle-mute"
-        {volume.muted ? "婢" : "墳"}
+        :tooltip "${volume.sink}: ${volume.volume}%"
+        :onclick "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"
+        {volume.icon}
     )
 )
 
@@ -18,13 +20,13 @@
         :value {volume.volume}
         :min 0
         :max 100
-        :onchange "pamixer --set-volume {}"
+        :onchange "wpctl set-volume @DEFAULT_AUDIO_SINK@ {}%"
     )
 )
 
 (defwidget volume []
     (box
-        :class "volume"
+        :class "volume ${volume.muted ? 'muted' : ''}"
         :space-evenly false
         :valign "center"
         :halign "center"

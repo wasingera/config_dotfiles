@@ -8,7 +8,10 @@
  * whole screen (transparent) and only the menu box is drawn. A click on the
  * transparent part hits no entry and falls through to kb-cancel, which
  * rofi_menu (eww/scripts/lib.sh) binds to MousePrimary. rofi_menu also sets
- * listview lines to the number of options. */
+ * listview lines to the number of options.
+ *
+ * Only the listview is shown; a prompt theme (wifi_password) swaps it for the
+ * inputbar. */
 
 /* Palette variables (@base, @blue, ...) of the active light/dark scheme;
  * see ~/.local/bin/colorscheme */
@@ -57,6 +60,13 @@ mainbox {
 
 inputbar {
     enabled: false;
+    padding: 5px 10px;
+    spacing: 10px;
+    children: [ prompt, entry ];
+}
+
+prompt, entry {
+    font: "Iosevka Term Extended Bold 15px";
 }
 
 mode-switcher {
@@ -80,8 +90,14 @@ element selected {
     background-color: @surface0;
 }
 
+/* rows passed with -a, e.g. the connected network */
+element normal.active, element alternate.active, element selected.active {
+    text-color: @green;
+}
+
 element-text {
     background-color: inherit;
+    text-color: inherit;
     font: "Iosevka Term Extended Bold 15px";
     margin: 0px 0px 0px 5px;
 }

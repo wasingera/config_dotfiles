@@ -1,0 +1,10 @@
+/* Password prompt for joining a Wi-Fi network, in the Wi-Fi menu's spot */
+@import "../select_wifi/theme.rasi"
+
+mainbox {
+    children: [ inputbar ];
+}
+
+inputbar {
+    enabled: true;
+}

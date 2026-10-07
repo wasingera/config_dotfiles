@@ -2,6 +2,6 @@
 
 * {
     menu-color: @red;
-    menu-width: 150px;
+    menu-width: 280px;
     menu-right: 205px;
 }

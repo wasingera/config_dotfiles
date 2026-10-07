@@ -160,3 +160,9 @@
   padding-right: 10px;
   margin-left: 5px;
 }
+
+// While an adapter scans for devices (the Bluetooth menu's Scan, which goes on
+// while the menu is shown again)
+.bluetooth .scanning {
+  color: $peach;
+}

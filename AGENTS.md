@@ -166,7 +166,7 @@ Shell traps:
   - `workspaces.sh` and `keyboard.sh` use Hyprland's socket.
   - `network.sh` uses `nmcli monitor`.
   - `bluetooth.sh` uses `gdbus monitor --system --dest org.bluez` (`dbus-monitor --system` needs
-    root), filtered to power, connection and add/remove signals.
+    root), filtered to power, connection, scan (`Discovering`) and add/remove signals.
   - `volume.sh` uses `pactl subscribe`.
   - The clock is `formattime(EWW_TIME, ...)`.
   - `gpu.sh` streams `nvidia-smi --loop=2` (one long-lived process).

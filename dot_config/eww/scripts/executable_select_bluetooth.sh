@@ -169,7 +169,8 @@ case ${footer[i - ${#devices[@]}]} in
     "$scan_row")
         bluetoothctl --timeout 60 scan on </dev/null >/dev/null 2>&1 &
         export BT_SCAN_PID=$!
-        bt_run "Scanning for devices" sleep 10
+        # The bar's Bluetooth icon changes colour while it scans
+        sleep 10
         exec "$0"
         ;;
     "$off_row")

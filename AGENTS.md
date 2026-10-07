@@ -281,7 +281,8 @@ The bar font is "Iosevka Term Extended"; icons come from "Iosevka Nerd Font".
   `dot_config/nvim/.lazy-lock.json` in this repo; the leading dot stops chezmoi deploying it as a
   file. `:Lazy update` writes straight into the repo, so commit the lock afterwards
   (`nvim: update plugins`). On the other machines, `chezmoi apply`, then `:Lazy restore` to check
-  out the same commits.
+  out the same commits. If highlighting then fails with "Invalid node type", the queries are
+  newer than the parsers: run `:TSUpdate`.
 - **Removing a plugin spec file:** also list it in `.chezmoiremove`. lazy.nvim loads every file in
   `lua/plugins/`, and chezmoi leaves deleted files behind on the other machines.
 - **Formatting:** conform formats on save only when the project has that formatter's config (the

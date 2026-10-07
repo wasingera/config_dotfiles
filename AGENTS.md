@@ -177,6 +177,11 @@ Shell traps:
 - `pactl subscribe` must be filtered to `sink`/`server` events. `pamixer` and `pactl` calls create
   `client` events, so reacting to those loops forever.
 - Never run `nmcli dev wifi` without `--rescan no`: it triggers an ~8s scan.
+- BlueZ: read its state and act through `busctl` (`bluez_objects` in lib.sh). Use `bluetoothctl`
+  only where its live client is needed: a scan lasts as long as the client that started it, and
+  pairing needs an agent. Non-interactively it can hang on errors (e.g. an unknown address), so run
+  it under `timeout` and read the outcome back from BlueZ. BlueZ drops every device's RSSI as soon
+  as discovery stops, which is why the menu keeps a scan running while it's open.
 - **Nerd Font glyphs**: icons in `.yuck` and `.sh` files are private-use Unicode characters that
   may not render in your editor or tool output. Don't retype or rewrite lines containing them.
   Edit only the surrounding ASCII (e.g. a Python `str.replace` on exact substrings), and check
@@ -188,8 +193,8 @@ Shell traps:
 ### rofi (`dot_config/rofi/`)
 
 - `config.rasi` is the app launcher; it uses the theme `~/.local/share/rofi/themes/catppuccin.rasi`.
-- The bar menus (wifi, VPN, audio output, power) share the layout in `dropdown.rasi`. Each menu's `theme.rasi`
-  only sets `menu-color` and `menu-width`.
+- The bar menus (wifi, VPN, Bluetooth, audio output, power) share the layout in `dropdown.rasi`.
+  Each menu's `theme.rasi` only sets `menu-color` and `menu-width`.
 - **Menus are placed from the real widget geometry, never hand-measured offsets.**
   `eww/scripts/bar_anchor.py` finds the bar button under the pointer in eww's accessibility tree
   (AT-SPI, through python-gobject), and `rofi_menu` pads the menu to the button's bottom and right

@@ -1,5 +1,5 @@
 /* Shared layout for the menus that drop down from eww bar buttons
- * (wifi, vpn, audio output, power). Each menu's theme.rasi imports this and sets:
+ * (wifi, vpn, bluetooth, audio output, power). Each menu's theme.rasi imports this and sets:
  *   menu-color   text colour
  *   menu-width   width of the menu box
  *

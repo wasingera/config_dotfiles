@@ -4,5 +4,8 @@
     `./scripts/bluetooth.sh`)
 
 (defwidget bluetooth_widget []
-    (label :class "net-icon" :text {bluetooth_icon})
+    (button
+        :onclick `./scripts/select_bluetooth.sh &`
+        (label :class "net-icon" :text {bluetooth_icon})
+    )
 )

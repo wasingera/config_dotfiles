@@ -49,14 +49,16 @@ render() {
 render
 # A notification enters the history as it leaves the screen
 # (displayedLength), or goes when removed or cleared; "The name ..." is dunst
-# starting or stopping. NotificationClosed isn't seen here: dunst sends it
-# only to the app that sent the notification. The fifo is opened read-write
-# so it never reaches end of file.
+# starting or stopping. One that dunst doesn't show goes straight into the
+# history, which changes historyLength only until it's full, so dunst's rule
+# for those also writes "added" to the fifo. NotificationClosed isn't seen
+# here: dunst sends it only to the app that sent the notification. The fifo
+# is opened read-write so it never reaches end of file.
 { gdbus monitor --session --dest org.freedesktop.Notifications & cat <> "$fifo"; } |
     while read -r line; do
         case $line in
             *"'displayedLength'"* | *"'historyLength'"* | *.NotificationHistory* | \
-                "The name "* | seen)
+                "The name "* | seen | added)
                 drain_burst
                 render
                 ;;

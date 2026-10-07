@@ -173,7 +173,8 @@ Shell traps:
   - `gpu.sh` streams `nvidia-smi --loop=2` (one long-lived process).
   - `notifications.sh` uses `gdbus monitor --session --dest org.freedesktop.Notifications`
     (dunst's `displayedLength` changes as a notification moves into the history), plus a FIFO in
-    `$XDG_RUNTIME_DIR` that `notification_history.sh` writes to after marking them seen.
+    `$XDG_RUNTIME_DIR` that `notification_history.sh` writes to after marking them seen, and
+    `notification_added.sh` (a dunst rule's script) for notifications that skip the screen.
   - CPU, memory and temperatures use eww's built-in `EWW_CPU`, `EWW_RAM` and `EWW_TEMPS`,
     which eww samples itself.
 
@@ -223,6 +224,9 @@ Shell traps:
 
 ### Notifications (`dot_config/dunst/dunstrc`)
 
+- Only critical notifications pop up. The `quiet_low` and `quiet_normal` rules send the rest straight
+  into the history (`skip_display`), where the bell on the bar shows them; their `script` wakes the
+  bar's listener. So a `notify-send` test of the look needs `-u critical`.
 - dunst places notifications below the eww bar's reserved space, so `offset = 5x5` means "5px under
   the bar".
 - Colours and the icon theme are in the drop-in `dunstrc.d/colors.conf`, which links to the active

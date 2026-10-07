@@ -325,6 +325,19 @@
     # Icon for notifications with critical urgency, uncomment to enable
     #default_icon = /path/to/icon
 
+# Only critical notifications pop up. The rest go straight into the history,
+# shown by the bell on the eww bar (eww/notifications.yuck); one popped from
+# there is shown. The script tells the bar one came in.
+[quiet_low]
+    msg_urgency = low
+    skip_display = yes
+    script = ~/.config/eww/scripts/notification_added.sh
+
+[quiet_normal]
+    msg_urgency = normal
+    skip_display = yes
+    script = ~/.config/eww/scripts/notification_added.sh
+
 # Every section that isn't one of the above is interpreted as a rules to
 # override settings for certain messages.
 #

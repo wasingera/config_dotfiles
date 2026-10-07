@@ -3,7 +3,8 @@
 # Prints {"icon": ..., "unseen": N, "newest": ID, "entries": [...]} for eww:
 # dunst's notification history, newest first, and how many of those came in
 # since the history popup was last opened; now and again whenever it changes.
-# Each entry is {id, app, summary, body, time}, as plain text.
+# Each entry is {id, app, summary, body, time} as plain text, plus icon (a
+# path, or "") and critical (a boolean).
 source "${BASH_SOURCE%/*}/lib.sh"
 
 # Nerd Font icons: a bell, and a bell with a dot for unseen notifications
@@ -29,8 +30,13 @@ render() {
     # dunst's timestamps are CLOCK_MONOTONIC microseconds, which python can
     # read (/proc/uptime counts suspend too, so it would drift)
     read -r now uptime < <(python3 -c 'import time; print(int(time.time()), time.monotonic())')
+    # dunst resolves icons in the theme of the mode it started in; show them in
+    # the current one's, so a dark-mode glyph isn't lost on a light card
+    local theme=Papirus-Dark
+    [[ $(cat "${XDG_STATE_HOME:-$HOME/.local/state}/colorscheme/mode" 2>/dev/null) == light ]] &&
+        theme=Papirus-Light
     emit "$({ dunstctl history 2>/dev/null || echo '{"data": [[]]}'; } | jq -c \
-        --argjson seen "${seen:-0}" --argjson now "$now" --argjson uptime "$uptime" \
+        --argjson seen "${seen:-0}" --argjson now "$now" --argjson uptime "$uptime" --arg theme "$theme" \
         --arg bell "$bell_icon" --arg unseen_icon "$unseen_icon" '
         # dunst runs with markup = full: drop the tags, decode the entities
         def plain: gsub("<[^>]*>"; "") | gsub("&lt;"; "<") | gsub("&gt;"; ">")
@@ -38,7 +44,8 @@ render() {
         [.data[0][] | map_values(.data) | {
             id, app: .appname, summary: (.summary | plain),
             body: (.body | plain | gsub("\\s+"; " ") | ltrimstr(" ")),
-            time: ($now - $uptime + .timestamp / 1e6 | localtime | strftime("%H:%M"))
+            time: ($now - $uptime + .timestamp / 1e6 | localtime | strftime("%H:%M")),
+            icon: (.icon_path | sub("/Papirus-(Dark|Light)/"; "/\($theme)/")), critical: (.urgency == "CRITICAL")
         }] | sort_by(-.id) as $entries |
         ([$entries[] | select(.id > $seen)] | length) as $unseen |
         {icon: (if $unseen > 0 then $unseen_icon else $bell end), $unseen,

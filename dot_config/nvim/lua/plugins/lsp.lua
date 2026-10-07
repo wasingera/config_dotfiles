@@ -10,7 +10,22 @@ return {
         dependencies = {
             { -- Package manager for Language Server Protocol (LSP) executables
                 "mason-org/mason.nvim",
-                opts = {}
+                opts = {},
+                config = function(_, opts)
+                    require("mason").setup(opts)
+
+                    -- Formatters for conform.nvim (formatting.lua). clang-format and
+                    -- rustfmt come from the system toolchains.
+                    local registry = require("mason-registry")
+                    registry.refresh(function()
+                        for _, name in ipairs({ "stylua", "ruff", "shfmt" }) do
+                            local package = registry.get_package(name)
+                            if not package:is_installed() and not package:is_installing() then
+                                package:install()
+                            end
+                        end
+                    end)
+                end
             },
             { -- Base LSP configurations
                 "neovim/nvim-lspconfig",

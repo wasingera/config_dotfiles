@@ -19,7 +19,7 @@
   padding-right: 5px;
 }
 
-.clock, .metrics, .workspaces, .volume, .powerbar, .keyboard, .wifi, .vpn {
+.clock, .metrics, .workspaces, .volume, .powerbar, .keyboard, .wifi, .vpn, .bluetooth {
   background: $base;
   // The size of the rofi menus' text. Set here rather than taken from GTK's
   // default font, so em widths below come out in whole pixels: every
@@ -136,7 +136,7 @@
   margin-left: 5px;
 }
 
-// Wi-Fi and VPN show only a Nerd Font icon.
+// Wi-Fi, VPN and Bluetooth show only a Nerd Font icon.
 // Propo variant: the plain Nerd Fonts give every icon a one-cell advance and
 // let it draw past that on the right, so it sat off-centre in the box; Propo
 // advances are the glyph's real width. Enlarged, as the glyphs are drawn
@@ -151,5 +151,12 @@
   color: $yellow;
   padding-right: 10px;
   padding-left: 10px;
+  margin-left: 5px;
+}
+
+.bluetooth {
+  color: $blue;
+  padding-left: 10px;
+  padding-right: 10px;
   margin-left: 5px;
 }

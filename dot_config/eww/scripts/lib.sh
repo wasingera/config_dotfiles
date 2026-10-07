@@ -71,6 +71,16 @@ nm_connections() {
         done
 }
 
+# Print BlueZ's objects as one JSON object, {path: {interface: {property:
+# value}}}, or {} if bluetoothd isn't running. A plain D-Bus method call: it
+# emits no signals, so a listener can make it on every event, and unlike
+# bluetoothctl it can't hang.
+bluez_objects() {
+    busctl --system --json=short call org.bluez / \
+        org.freedesktop.DBus.ObjectManager GetManagedObjects 2>/dev/null |
+        jq -cn '(input? // {data: [{}]}).data[0] | map_values(map_values(map_values(.data)))'
+}
+
 # After an event line, skip the rest of its burst (until 50ms of quiet) so a
 # listener re-renders once, on the final state rather than a half-applied one.
 drain_burst() {

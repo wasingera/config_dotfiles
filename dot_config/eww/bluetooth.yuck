@@ -1,0 +1,8 @@
+;; Nerd Font icon: Bluetooth off, on, or connected to a device, updated on
+;; BlueZ events
+(deflisten bluetooth_icon :initial ""
+    `./scripts/bluetooth.sh`)
+
+(defwidget bluetooth_widget []
+    (label :class "net-icon" :text {bluetooth_icon})
+)

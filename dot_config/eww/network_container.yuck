@@ -5,7 +5,9 @@
 
 (include "./vpn.yuck")
 (include "./wifi.yuck")
+(include "./bluetooth.yuck")
 
+;; The pills get equal widths: a box spaces its children evenly by default
 (defwidget network_container []
     (box
         (box
@@ -16,6 +18,11 @@
         (box
             :class "wifi"
             (wifi_widget)
+        )
+
+        (box
+            :class "bluetooth"
+            (bluetooth_widget)
         )
     )
 )

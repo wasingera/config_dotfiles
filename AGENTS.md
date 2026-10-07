@@ -156,6 +156,7 @@ Shell traps:
   |--------|--------------|
   | `rofi_menu THEME` | Shows a rofi dropdown under the clicked bar button and prints the chosen option. |
   | `nm_connections TYPE [--active]` | Prints NetworkManager connection names of that type. |
+  | `bluez_objects` | Prints BlueZ's objects (adapters, devices) as JSON, `{path: {interface: {property: value}}}`. |
   | `hypr_events` | Streams Hyprland's event socket. |
   | `drain_burst` | Waits out a burst of events (until 50ms of quiet). |
   | `emit` | Prints a widget's state only when it changed. |
@@ -164,6 +165,8 @@ Shell traps:
   re-render on events:
   - `workspaces.sh` and `keyboard.sh` use Hyprland's socket.
   - `network.sh` uses `nmcli monitor`.
+  - `bluetooth.sh` uses `gdbus monitor --system --dest org.bluez` (`dbus-monitor --system` needs
+    root), filtered to power, connection and add/remove signals.
   - `volume.sh` uses `pactl subscribe`.
   - The clock is `formattime(EWW_TIME, ...)`.
   - `gpu.sh` streams `nvidia-smi --loop=2` (one long-lived process).

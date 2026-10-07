@@ -1,6 +1,7 @@
 @import "../dropdown.rasi"
 
 * {
-    menu-color: @yellow;
-    menu-width: 150px;
+    /* green, like its button */
+    menu-color: @green;
+    menu-width: 170px;
 }

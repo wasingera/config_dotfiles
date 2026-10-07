@@ -297,9 +297,11 @@
   color: $subtext0;
 }
 
-// shown only over the row it removes
+// shown only over the row it removes. The size of .notif-meta, so with the
+// same top it sits on the line of the time.
 .notif-dismiss {
   color: $subtext0;
+  font-size: 12px;
   padding: 0px 6px;
   margin-left: 4px;
   border-radius: 3px;

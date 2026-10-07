@@ -55,7 +55,6 @@ end
 -- Or execute your favorite apps at launch like this:
 --
 hl.on("hyprland.start", function () 
-    -- hl.exec_cmd("${HOME}/.local/bin/eww open-many clock workspaces volume powerbar keyboard network_container")
     hl.exec_cmd("${HOME}/.local/bin/eww open top_bar")
     hl.exec_cmd("hyprpaper")
     hl.exec_cmd("dunst")

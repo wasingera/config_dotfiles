@@ -1,10 +1,10 @@
-;; dunst's notification history and the count of unseen ones, updated on
+;; dunst's notification history and how many of them are unseen, updated on
 ;; dunst's D-Bus signals; see scripts/notifications.sh
 (deflisten notifications :initial '{"icon": "", "unseen": 0, "newest": 0, "entries": []}'
     `./scripts/notifications.sh`)
 
-;; The bar button: a bell, with the count of notifications that came in
-;; since the history was last opened
+;; The bar button: a bell, with the count of notifications in the history.
+;; Peach while some came in since the history was last opened.
 (defwidget notifications_widget []
     (box
         :class "notifications"
@@ -16,7 +16,9 @@
                     :text {notifications.icon})
                 ;; Two digits, 00 to 20, so the pill keeps its width
                 (label :class "notif-count ${notifications.unseen > 0 ? 'unseen' : ''}"
-                    :text {notifications.unseen < 10 ? "0${notifications.unseen}" : notifications.unseen})
+                    :text {arraylength(notifications.entries) < 10
+                        ? "0${arraylength(notifications.entries)}"
+                        : arraylength(notifications.entries)})
             )
         )
     )

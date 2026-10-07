@@ -26,12 +26,30 @@ stop_scan_row=$(icon_row $'\U000F04DB' 'Stop scanning')
 off_row=$(icon_row $'\U000F0425' 'Turn Bluetooth off')
 on_row=$(icon_row $'\U000F00AF' 'Turn Bluetooth on')
 
-# Run a command with progress_run, like nm_run, plus a critical notification
-# with busctl's error (the part after its "...: ") if it fails
+# On exit: remove the file of devices found by a scan, and un-mark the icon
+found= busy=
+cleanup() {
+    [[ -n $found ]] && command rm -f "$found"
+    [[ -n $busy ]] && eww update bluetooth_busy=false
+}
+trap cleanup EXIT
+
+# Rather than notifications while connecting, pairing etc., mark the bar's
+# Bluetooth icon busy until the script exits: it turns the colour it has
+# during a scan.
+mark_busy() {
+    [[ -n $busy ]] && return
+    busy=1
+    eww update bluetooth_busy=true
+}
+
+# Run a command with the icon marked busy, and a critical notification with
+# busctl's error (the part after its "...: ") if it fails
 bt_run() {
-    local doing=$1; shift
-    progress_run bluetooth "$doing" "$@" && return
-    notify-send -u critical "${tag[@]}" "$doing failed" "${run_error##*: }"
+    local doing=$1 error; shift
+    mark_busy
+    error=$("$@" 2>&1 >/dev/null) && return
+    notify-send -u critical "${tag[@]}" "$doing failed" "${error##*: }"
     return 1
 }
 
@@ -54,15 +72,16 @@ connect() {
 # a phone asks to confirm on its own screen), trust it so it can connect by
 # itself later, then connect.
 pair() {
-    local path=$1 name=$2
+    local path=$1 name=$2 error
     # A device from a scan expires
     if ! device_property "$path" Address >/dev/null; then
         notify-send -u critical "${tag[@]}" "$name is out of range" \
             "Scan again with it in pairing mode"
         return 1
     fi
-    if ! progress_run bluetooth "Pairing with $name" "${BASH_SOURCE%/*}/bt_pair.py" "$path"; then
-        notify-send -u critical "${tag[@]}" "Pairing with $name failed" "$run_error"
+    mark_busy
+    if ! error=$("${BASH_SOURCE%/*}/bt_pair.py" "$path" 2>&1); then
+        notify-send -u critical "${tag[@]}" "Pairing with $name failed" "$error"
         return 1
     fi
     busctl --system set-property org.bluez "$path" org.bluez.Device1 Trusted b true
@@ -199,7 +218,6 @@ fi
 lines=$(( ${#rows[@]} + ${#footer[@]} ))
 [[ -n $BT_SCAN_PID ]] && (( lines += 6 ))
 found=$(mktemp)
-trap 'command rm -f "$found"' EXIT
 i=$(rofi_menu_streamed select_bluetooth "$lines" -markup-rows -format i "${args[@]}" \
         < <(printf '%s\n' "${rows[@]}" "${footer[@]}"
             if [[ -n $BT_SCAN_PID ]]; then found_rows "$found"; fi)

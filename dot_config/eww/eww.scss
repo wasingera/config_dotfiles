@@ -162,7 +162,7 @@
 }
 
 // While an adapter scans for devices (the Bluetooth menu's Scan, which goes on
-// while the menu is shown again)
-.bluetooth .scanning {
+// while the menu is shown again), or the menu connects, pairs etc.
+.bluetooth .busy {
   color: $peach;
 }

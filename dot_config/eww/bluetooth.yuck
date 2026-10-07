@@ -3,10 +3,13 @@
 (deflisten bluetooth :initial '{"icon": "", "scanning": false}'
     `./scripts/bluetooth.sh`)
 
+;; Set by select_bluetooth.sh while it connects, pairs etc.: shown like a scan
+(defvar bluetooth_busy false)
+
 (defwidget bluetooth_widget []
     (button
         :onclick `./scripts/select_bluetooth.sh &`
-        (label :class "net-icon ${bluetooth.scanning ? 'scanning' : ''}"
+        (label :class "net-icon ${bluetooth.scanning || bluetooth_busy ? 'busy' : ''}"
             :text {bluetooth.icon})
     )
 )

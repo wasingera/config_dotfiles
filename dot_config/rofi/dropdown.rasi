@@ -33,8 +33,9 @@ menu-row {
     orientation: horizontal;
     expand: false;
     background-color: transparent;
-    /* bar is 5px + 32px tall; drop the menu 5px below it */
-    padding: 42px 0px 0px 0px;
+    /* the bar is 38px tall, 5px from the top (hyprctl layers); drop the
+     * menu 5px below it, the same gap as between the bar's widgets */
+    padding: 48px 0px 0px 0px;
     children: [ "menu-left", mainbox, "menu-gap" ];
 }
 

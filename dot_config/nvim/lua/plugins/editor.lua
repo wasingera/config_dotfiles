@@ -7,8 +7,4 @@ return {
     {
         'tpope/vim-eunuch'
     },
-    { -- Advanced commenting support
-        'numToStr/Comment.nvim',
-        opts = {}
-    },
 }

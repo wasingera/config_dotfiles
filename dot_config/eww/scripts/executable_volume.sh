@@ -23,7 +23,7 @@ render() {
                 elif $volume < 34 then $low
                 elif $volume < 67 then $medium
                 else $high end),
-         sink: (.description // "No output")}')"
+         sink: (.properties["node.nick"] // .description // "No output")}')"
 }
 
 render

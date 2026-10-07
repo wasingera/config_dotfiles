@@ -182,7 +182,7 @@ Shell traps:
 ### rofi (`dot_config/rofi/`)
 
 - `config.rasi` is the app launcher; it uses the theme `~/.local/share/rofi/themes/catppuccin.rasi`.
-- The bar menus (wifi, VPN, power) share the layout in `dropdown.rasi`. Each menu's `theme.rasi`
+- The bar menus (wifi, VPN, audio output, power) share the layout in `dropdown.rasi`. Each menu's `theme.rasi`
   only sets `menu-color`, `menu-width` and `menu-right`.
 - rofi 2.0's `click-to-exit` is **not implemented on Wayland**. So the dropdown window covers the
   screen transparently, and `rofi_menu` binds `MousePrimary` to `kb-cancel`. Clicks on an entry are

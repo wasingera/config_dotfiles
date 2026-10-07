@@ -1,0 +1,112 @@
+;; dunst's notification history and the count of unseen ones, updated on
+;; dunst's D-Bus signals; see scripts/notifications.sh
+(deflisten notifications :initial '{"icon": "", "unseen": 0, "newest": 0, "entries": []}'
+    `./scripts/notifications.sh`)
+
+;; The bar button: a bell, with the count of notifications that came in
+;; since the history was last opened
+(defwidget notifications_widget []
+    (box
+        :class "notifications"
+        (button
+            :onclick "./scripts/notification_history.sh &"
+            (box
+                :space-evenly false
+                (label :class "net-icon ${notifications.unseen > 0 ? 'unseen' : ''}"
+                    :text {notifications.icon})
+                (label :class "notif-count"
+                    :visible {notifications.unseen > 0}
+                    :text {notifications.unseen})
+            )
+        )
+    )
+)
+
+;; One history entry: click it to show it again, × to remove it
+(defwidget notification_entry [n]
+    (button
+        :class "notif-entry"
+        :onclick "dunstctl history-pop ${n.id}; eww close notification_history"
+        (box
+            :space-evenly false
+            (box
+                :orientation "v"
+                :space-evenly false
+                :hexpand true
+                (label :class "notif-meta" :xalign 0 :limit-width 44
+                    :text "${n.app} · ${n.time}")
+                (label :class "notif-summary" :xalign 0 :limit-width 34 :text {n.summary})
+                (label :class "notif-body" :xalign 0 :limit-width 44
+                    :visible {n.body != ""} :text {n.body})
+            )
+            (button
+                :class "notif-dismiss"
+                :valign "start"
+                :onclick "dunstctl history-rm ${n.id}"
+                "×")
+        )
+    )
+)
+
+;; Rows the history shows before it scrolls
+(defvar notification_rows 6)
+
+;; The popup hangs from the bar button like the rofi menus: TOP and RIGHT are
+;; bar_anchor.py's gaps to the button's bottom and right edges. The window
+;; covers the screen; everything around the card is a transparent button
+;; that closes it, as rofi's click-to-exit doesn't work on Wayland either.
+(defwindow notification_history [top right]
+    :monitor 0
+    :geometry (geometry
+        :anchor "top left"
+        :width "100%"
+        :height "100%"
+    )
+    :stacking "overlay"
+    :exclusive false
+    :namespace "eww-notifications"
+
+    (box
+        :orientation "v"
+        :space-evenly false
+        ;; down to 5px below the button, the gap the rofi menus leave
+        (button :class "backdrop" :height {top + 5} :onclick "eww close notification_history")
+        (box
+            :space-evenly false
+            (button :class "backdrop" :hexpand true :onclick "eww close notification_history")
+            (box
+                :class "notif-card"
+                :orientation "v"
+                :space-evenly false
+                (box
+                    :class "notif-header"
+                    :space-evenly false
+                    (label :hexpand true :xalign 0 :text "Notifications")
+                    (button
+                        :class "notif-clear"
+                        :visible {arraylength(notifications.entries) > 0}
+                        :onclick "dunstctl history-clear"
+                        "Clear")
+                )
+                (label
+                    :class "notif-empty"
+                    :visible {arraylength(notifications.entries) == 0}
+                    :text "No notifications")
+                (scroll
+                    :hscroll false
+                    :visible {arraylength(notifications.entries) > 0}
+                    ;; .notif-entry's height, 64px, per row
+                    :height {64 * min(arraylength(notifications.entries), notification_rows)}
+                    (box
+                        :orientation "v"
+                        :space-evenly false
+                        (for n in {notifications.entries}
+                            (notification_entry :n n))
+                    )
+                )
+            )
+            (button :class "backdrop" :width right :onclick "eww close notification_history")
+        )
+        (button :class "backdrop" :vexpand true :onclick "eww close notification_history")
+    )
+)

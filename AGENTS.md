@@ -171,6 +171,9 @@ Shell traps:
   - `volume.sh` uses `pactl subscribe`.
   - The clock is `formattime(EWW_TIME, ...)`.
   - `gpu.sh` streams `nvidia-smi --loop=2` (one long-lived process).
+  - `notifications.sh` uses `gdbus monitor --session --dest org.freedesktop.Notifications`
+    (dunst's `displayedLength` changes as a notification moves into the history), plus a FIFO in
+    `$XDG_RUNTIME_DIR` that `notification_history.sh` writes to after marking them seen.
   - CPU, memory and temperatures use eww's built-in `EWW_CPU`, `EWW_RAM` and `EWW_TEMPS`,
     which eww samples itself.
 
@@ -178,6 +181,13 @@ Shell traps:
 - `pactl subscribe` must be filtered to `sink`/`server` events. `pamixer` and `pactl` calls create
   `client` events, so reacting to those loops forever.
 - Never run `nmcli dev wifi` without `--rescan no`: it triggers an ~8s scan.
+- The notification history is an eww window (`notifications.yuck`), not a rofi menu. It covers
+  the screen on the overlay layer, with transparent buttons around the card that close it, and is
+  placed from `bar_anchor.py` like the menus. Layer-shell keeps it out of the bar's exclusive zone,
+  so its `top` is shifted up by Hyprland's reserved space. The count is of notifications newer than
+  the ID in `~/.local/state/eww/notifications-seen`, stored with dunst's D-Bus name so a restarted
+  dunst (whose IDs start again at 1) counts from zero. dunst sends `NotificationClosed` only to the
+  app that sent the notification, so a listener never sees it.
 - BlueZ: read its state and act through `busctl` (`bluez_objects` in lib.sh). Pairing needs an
   agent, which `bluetoothctl` registers only in interactive mode (`--agent` does nothing with a
   command), so `scripts/bt_pair.py` registers its own and calls Pair. Use `bluetoothctl` only to

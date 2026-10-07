@@ -5,6 +5,7 @@
 (include "./keyboard.yuck")
 (include "./network_container.yuck")
 (include "./metrics.yuck")
+(include "./notifications.yuck")
 
 (defwidget leftbar []
     (box
@@ -35,6 +36,7 @@
         (keyboard)
         (network_container)
         (volume)
+        (notifications_widget)
         (power)
     )
 )

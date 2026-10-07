@@ -19,7 +19,8 @@
   padding-right: 5px;
 }
 
-.clock, .metrics, .workspaces, .volume, .powerbar, .keyboard, .wifi, .vpn, .bluetooth {
+.clock, .metrics, .workspaces, .volume, .powerbar, .keyboard, .wifi, .vpn, .bluetooth,
+.notifications {
   background: $base;
   // The size of the rofi menus' text. Set here rather than taken from GTK's
   // default font, so em widths below come out in whole pixels: every
@@ -171,4 +172,76 @@
 @keyframes bluetooth-blink {
   from { color: $blue; }
   to { color: $peach; }
+}
+
+.notifications {
+  color: $sky;
+  padding-left: 10px;
+  padding-right: 10px;
+  margin-left: 5px;
+}
+
+// Notifications came in since the history was last opened
+.notifications .unseen, .notif-count {
+  color: $peach;
+}
+
+.notif-count {
+  margin-left: 5px;
+}
+
+// The history popup, made to look like the rofi menus (rofi/dropdown.rasi)
+.backdrop {
+  background: transparent;
+}
+
+.notif-card {
+  background: $base;
+  color: $text;
+  font-family: "Iosevka Term Extended";
+  font-size: 15px;
+  font-weight: bold;
+  border: 2px solid $sky;
+  border-radius: 3px;
+  padding: 6px 0px;
+  min-width: 380px;
+}
+
+.notif-header {
+  color: $sky;
+  padding: 5px 15px 5px 15px;
+}
+
+.notif-clear, .notif-dismiss {
+  color: $subtext0;
+  padding: 0px 5px;
+  border-radius: 3px;
+}
+
+.notif-clear:hover, .notif-dismiss:hover {
+  color: $red;
+}
+
+.notif-empty {
+  color: $subtext0;
+  padding: 5px 15px;
+}
+
+// 64px high in all (min-height + padding): notifications.yuck sizes the
+// scrolled list from that
+.notif-entry {
+  min-height: 54px;
+  padding: 5px 10px;
+  margin: 0px 5px;
+  border-radius: 3px;
+}
+
+.notif-entry:hover {
+  background: $surface0;
+}
+
+.notif-meta, .notif-body {
+  font-size: 13px;
+  font-weight: normal;
+  color: $subtext0;
 }

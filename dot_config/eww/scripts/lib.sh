@@ -1,7 +1,8 @@
 # Shared helpers for the eww scripts. Load with:
 #   source "${BASH_SOURCE%/*}/lib.sh"
 
-# Show a rofi menu using ~/.config/rofi/<theme>/theme.rasi.
+# Show a rofi menu using ~/.config/rofi/<theme>/theme.rasi, hanging from the
+# bar button that was clicked (see menu_anchor).
 # Reads the options from stdin, one per line, and prints the chosen one
 # (nothing if the menu was dismissed). Extra arguments go to rofi, e.g.
 # -a 0 (mark row 0 active), -selected-row 0, -format i (print the index).
@@ -13,11 +14,24 @@ rofi_menu() {
     options=$(cat)
     # No options (a prompt) means no lines, rather than one empty one
     options=${options:+$options$nl}
+    menu_anchor
     printf '%s' "$options" |
         rofi -theme "$HOME/.config/rofi/$theme/theme.rasi" \
-            -theme-str "listview { lines: $(printf '%s' "$options" | wc -l); }" \
+            -theme-str "listview { lines: $(printf '%s' "$options" | wc -l); } $MENU_ANCHOR" \
             -dmenu -hover-select -me-select-entry '' -me-accept-entry MousePrimary \
             -kb-cancel 'Escape,Control+g,Control+bracketleft,MousePrimary' "$@"
+}
+
+# Set MENU_ANCHOR to rofi theme lines that put the menu under the bar button
+# beneath the pointer, flush with its right edge (bar_anchor.py has the
+# geometry). Found once per script and exported: later menus, e.g. a password
+# prompt or the menu again after exec "$0", open in the same spot while the
+# pointer is over the first one.
+menu_anchor() {
+    local right top
+    [[ -n $MENU_ANCHOR ]] && return
+    read -r right top < <("${BASH_SOURCE%/*}/bar_anchor.py") || return
+    export MENU_ANCHOR="menu-row { padding: ${top}px ${right}px 0px 0px; }"
 }
 
 # Print a menu row: a Nerd Font icon, enlarged to match the text, then TEXT.

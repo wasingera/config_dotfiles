@@ -118,6 +118,7 @@ The desktop is live while you work. Check each change in the real session:
 | colours | `colorscheme light`, check, `colorscheme dark`; `chezmoi diff` must be empty in both modes |
 | hyprlock | `hyprlock --grace 60 &` (any input unlocks), screenshot, then `pkill -USR1 -x hyprlock` to unlock |
 | visual result | `grim -g "x,y wxh" out.png` (screen scale is 1.5, so the image is in physical px) |
+| bar widget geometry | `~/.config/eww/scripts/bar_anchor.py` prints where a menu would hang from the button under the pointer |
 
 Some things can't be checked from a non-interactive shell: rofi menus, keybinds, mouse behaviour.
 For those, ask the user to try them, or open a test instance with dummy data in the background
@@ -128,6 +129,8 @@ Shell traps:
 - `eww logs` follows the log forever; wrap it in `timeout`.
 - `pkill -f pattern` also matches your own shell, whose command line contains the pattern.
   Anchor it (`pkill -f '^alacritty --class test'`) or use `pkill -x name`.
+- Importing a Python script (e.g. `bar_anchor.py` in a test) writes `__pycache__/` next to it. In
+  the source directory chezmoi would deploy that, so set `PYTHONDONTWRITEBYTECODE=1`.
 
 ## Component notes and gotchas
 
@@ -151,7 +154,7 @@ Shell traps:
 
   | Helper | What it does |
   |--------|--------------|
-  | `rofi_menu THEME` | Shows a rofi dropdown and prints the chosen option. |
+  | `rofi_menu THEME` | Shows a rofi dropdown under the clicked bar button and prints the chosen option. |
   | `nm_connections TYPE [--active]` | Prints NetworkManager connection names of that type. |
   | `hypr_events` | Streams Hyprland's event socket. |
   | `drain_burst` | Waits out a burst of events (until 50ms of quiet). |
@@ -183,7 +186,14 @@ Shell traps:
 
 - `config.rasi` is the app launcher; it uses the theme `~/.local/share/rofi/themes/catppuccin.rasi`.
 - The bar menus (wifi, VPN, audio output, power) share the layout in `dropdown.rasi`. Each menu's `theme.rasi`
-  only sets `menu-color`, `menu-width` and `menu-right`.
+  only sets `menu-color` and `menu-width`.
+- **Menus are placed from the real widget geometry, never hand-measured offsets.**
+  `eww/scripts/bar_anchor.py` finds the bar button under the pointer in eww's accessibility tree
+  (AT-SPI, through python-gobject), and `rofi_menu` pads the menu to the button's bottom and right
+  edges. A button's "pill" is the innermost widget spanning the bar's full height, so keep pills'
+  contents inside their padding and their margins on the left. Without AT-SPI the pointer stands in
+  for the right edge. The anchor is found once per script (`MENU_ANCHOR`), so a follow-up menu (the
+  Wi-Fi password prompt, a rescan) opens in the same place.
 - rofi 2.0's `click-to-exit` is **not implemented on Wayland**. So the dropdown window covers the
   screen transparently, and `rofi_menu` binds `MousePrimary` to `kb-cancel`. Clicks on an entry are
   handled by the entry first; clicks on empty space cancel.

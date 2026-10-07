@@ -3,5 +3,4 @@
 * {
     menu-color: @red;
     menu-width: 280px;
-    menu-right: 189px;
 }

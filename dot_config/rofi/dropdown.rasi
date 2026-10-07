@@ -2,13 +2,13 @@
  * (wifi, vpn, audio output, power). Each menu's theme.rasi imports this and sets:
  *   menu-color   text colour
  *   menu-width   width of the menu box
- *   menu-right   gap between the menu's right edge and the screen's
  *
  * rofi's click-to-exit does nothing on Wayland, so the window covers the
  * whole screen (transparent) and only the menu box is drawn. A click on the
  * transparent part hits no entry and falls through to kb-cancel, which
  * rofi_menu (eww/scripts/lib.sh) binds to MousePrimary. rofi_menu also sets
- * listview lines to the number of options.
+ * listview lines to the number of options, and menu-row's padding so the
+ * menu hangs from the button that was clicked (eww/scripts/bar_anchor.py).
  *
  * Only the listview is shown; a prompt theme (wifi_password) swaps it for the
  * inputbar. */
@@ -28,15 +28,13 @@ window {
     children: [ "menu-row", "menu-below" ];
 }
 
-/* top strip: transparent filler, the menu box, then a gap of menu-right */
+/* top strip: transparent filler, then the menu box. rofi_menu pads it down
+ * to the button's bottom edge and in from the right to its right edge. */
 menu-row {
     orientation: horizontal;
     expand: false;
     background-color: transparent;
-    /* the bar is 38px tall, 5px from the top (hyprctl layers); drop the
-     * menu 5px below it, the same gap as between the bar's widgets */
-    padding: 48px 0px 0px 0px;
-    children: [ "menu-left", mainbox, "menu-gap" ];
+    children: [ "menu-left", mainbox ];
 }
 
 menu-left, menu-below {
@@ -44,16 +42,11 @@ menu-left, menu-below {
     background-color: transparent;
 }
 
-/* a variable can't go inside a multi-value padding, so the gap is a box */
-menu-gap {
-    expand: false;
-    width: @menu-right;
-    background-color: transparent;
-}
-
 mainbox {
     expand: false;
     width: @menu-width;
+    /* 5px below the bar, the same gap as between its buttons */
+    margin: 5px 0px 0px 0px;
     padding: 6px 0px;
     border-radius: 3px;
     children: [ listview ];

@@ -4,6 +4,7 @@ Neovim 0.12+ with [lazy.nvim](https://github.com/folke/lazy.nvim). It's deployed
 `~/.config/nvim` on every machine (desktop, macOS, WSL). Edit it here in the source repo, not in
 `~/.config/nvim`.
 
+- [GUIDE.md](GUIDE.md): a quick, task-by-task guide to common commands; start here
 - [Usage](#usage): setup, keys, everyday tasks, updating, troubleshooting
 - [Implementation](#implementation): layout, load order, how each part works, how to change it
 
@@ -59,7 +60,7 @@ The leader is **Space**. Press it and wait to see every leader key; which-key do
 | `<leader>sd` | Diagnostics |
 | `<leader>ss` | LSP symbols in the buffer |
 | `<leader>sr` | Reopen the last picker where you left it |
-| `<C-n>` | Toggle the file explorer |
+| `<C-n>` | Toggle the file explorer (from inside it too) |
 | `<C-Space>` | Toggle the floating terminal (works from inside it too) |
 | `<Esc>` | Clear search highlighting |
 
@@ -306,6 +307,9 @@ the `Snacks` global.
   never fires in `nvim --headless`, so headless health checks report both as not set.
 - **Explorer:** the explorer is a picker in a sidebar. `Snacks.explorer()` toggles it, because
   opening a picker whose source is already open closes that picker instead.
+- **`<C-n>` in the explorer:** pickers bind `<C-n>` to "move down" in their own windows, which
+  hides the global toggle once the explorer has focus. `picker.sources.explorer.win` rebinds it
+  to `close` in the explorer's list and input only.
 - **Terminal:** `terminal.win.position = "float"` makes `Snacks.terminal.toggle()` float. The key
   is mapped in normal and terminal mode, so the same key hides it again.
 - **`:q` and the explorer:** without help, `:q` in the last editor window leaves the explorer

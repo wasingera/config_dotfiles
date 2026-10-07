@@ -7,7 +7,7 @@ menu_anchor
 
 # Nerd Font signal bars: 1-4 bars, then the same with a lock
 bars=($'\U000F091F' $'\U000F0922' $'\U000F0925' $'\U000F0928')
-locked_bars=($'\U000F0920' $'\U000F0923' $'\U000F0926' $'\U000F0929')
+locked_bars=($'\U000F0921' $'\U000F0924' $'\U000F0927' $'\U000F092A')
 disconnect_row=$(icon_row $'\U000F0156' 'Disconnect')
 rescan_row=$(icon_row $'\U000F0450' 'Rescan')
 off_row=$(icon_row $'\U000F0425' 'Turn Wi-Fi off')

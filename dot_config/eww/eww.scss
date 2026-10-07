@@ -162,7 +162,13 @@
 }
 
 // While an adapter scans for devices (the Bluetooth menu's Scan, which goes on
-// while the menu is shown again), or the menu connects, pairs etc.
+// while the menu is shown again), or the menu connects, pairs etc.: blinks
+// between its usual colour and peach.
 .bluetooth .busy {
-  color: $peach;
+  animation: bluetooth-blink 0.6s ease-in-out infinite alternate;
+}
+
+@keyframes bluetooth-blink {
+  from { color: $blue; }
+  to { color: $peach; }
 }

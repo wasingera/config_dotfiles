@@ -1,3 +1,7 @@
+# .zshrc adds ~/.local/bin too late for Hyprland, started below: what it
+# runs (eww's onclick scripts, which call eww) needs it in the session's PATH
+export PATH="$HOME/.local/bin:$PATH"
+
 if [ -z "$DISPLAY" ] && [ "${XDG_VTNR}" -eq 1 ]; then
     start-hyprland
 fi

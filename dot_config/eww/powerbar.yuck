@@ -4,6 +4,6 @@
         (button
             :class "power_button"
             :onclick "./scripts/power_menu.sh &"
-            "")
+            (label :class "net-icon" :text ""))
     )
 )

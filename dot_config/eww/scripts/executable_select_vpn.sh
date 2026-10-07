@@ -1,18 +1,34 @@
 #!/usr/bin/env bash
 
-# Pick a WireGuard VPN to connect to, or disconnect the active one.
+# Pick a VPN (WireGuard or a NetworkManager VPN plugin) to connect to, or
+# disconnect the active one. Only one VPN is up at a time.
 source "${BASH_SOURCE%/*}/lib.sh"
 
-active=$(nm_connections wireguard --active | head -n1)
-chosen=$({ echo Disconnect; nm_connections wireguard | sort -u; } | rofi_menu select_vpn)
+vpns() { nm_connections wireguard "$@"; nm_connections vpn "$@"; }
 
-[[ -z $chosen ]] && exit 0
+active=$(vpns --active | head -n1)
+mapfile -t names < <(vpns | sort -u)
 
-# Only one VPN at a time: drop the current one first
+# The active VPN is marked and selected; Disconnect goes last, if there's
+# anything to disconnect
+args=()
+for i in "${!names[@]}"; do
+    [[ ${names[i]} == "$active" ]] && args=(-a "$i" -selected-row "$i")
+done
+options=("${names[@]}")
+[[ -n $active ]] && options+=(Disconnect)
+
+i=$(printf '%s\n' "${options[@]}" | rofi_menu select_vpn -format i "${args[@]}")
+[[ -z $i ]] && exit 0
+chosen=${options[i]}
+
+[[ $chosen == "$active" ]] && exit 0
+
 if [[ -n $active ]]; then
-    nmcli connection down "$active" || notify-send "Failed to disconnect from $active"
+    nm_run "Disconnecting from $active" "Disconnected from $active" \
+        nmcli connection down "$active" || exit 1
 fi
 
-if [[ $chosen != Disconnect ]]; then
-    nmcli connection up "$chosen" || notify-send "Failed to connect to $chosen"
+if (( i < ${#names[@]} )); then
+    nm_run "Connecting to $chosen" "Connected to $chosen" nmcli connection up "$chosen"
 fi

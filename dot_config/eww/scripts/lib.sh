@@ -20,6 +20,14 @@ rofi_menu() {
             -kb-cancel 'Escape,Control+g,Control+bracketleft,MousePrimary' "$@"
 }
 
+# Print a menu row: a Nerd Font icon, enlarged to match the text, then TEXT.
+# The row is pango markup, so pass rofi_menu -markup-rows.
+icon_row() {
+    local text=$2
+    text=${text//'&'/'&amp;'} text=${text//'<'/'&lt;'} text=${text//'>'/'&gt;'}
+    printf '<span size="larger">%s</span>  %s\n' "$1" "$text"
+}
+
 # Run an nmcli command with notifications: DOING while it runs, then DONE, or
 # a critical one with nmcli's error. They share a stack tag, so each replaces
 # the last. Returns the command's status; the error is left in $nm_error.

@@ -7,10 +7,10 @@ source "${BASH_SOURCE%/*}/lib.sh"
 # Nerd Font signal bars: 1-4 bars, then the same with a lock
 bars=($'\U000F091F' $'\U000F0922' $'\U000F0925' $'\U000F0928')
 locked_bars=($'\U000F0920' $'\U000F0923' $'\U000F0926' $'\U000F0929')
-disconnect_row=$'\U000F0156  Disconnect'
-rescan_row=$'\U000F0450  Rescan'
-off_row=$'\U000F0425  Turn Wi-Fi off'
-on_row=$'\U000F05A9  Turn Wi-Fi on'
+disconnect_row=$(icon_row $'\U000F0156' 'Disconnect')
+rescan_row=$(icon_row $'\U000F0450' 'Rescan')
+off_row=$(icon_row $'\U000F0425' 'Turn Wi-Fi off')
+on_row=$(icon_row $'\U000F05A9' 'Turn Wi-Fi on')
 
 # Fills signal[ssid] and security[ssid] from the last scan, strongest access
 # point per SSID, and active_ssid. --rescan no: a rescan takes ~8s.
@@ -34,9 +34,9 @@ read_scan() {
 row() {
     local level=$(( ${signal[$1]} >= 75 ? 3 : ${signal[$1]} >= 50 ? 2 : ${signal[$1]} >= 25 ? 1 : 0 ))
     if [[ -n ${security[$1]} ]]; then
-        printf '%s  %s\n' "${locked_bars[level]}" "$1"
+        icon_row "${locked_bars[level]}" "$1"
     else
-        printf '%s  %s\n' "${bars[level]}" "$1"
+        icon_row "${bars[level]}" "$1"
     fi
 }
 
@@ -99,7 +99,7 @@ connect() {
 }
 
 if [[ $(nmcli radio wifi) != enabled ]]; then
-    chosen=$(printf '%s\n' "$on_row" | rofi_menu select_wifi)
+    chosen=$(printf '%s\n' "$on_row" | rofi_menu select_wifi -markup-rows)
     if [[ $chosen == "$on_row" ]]; then
         nm_run "Turning Wi-Fi on" "Wi-Fi on" nmcli radio wifi on
     fi
@@ -126,7 +126,7 @@ footer=()
 footer+=("$rescan_row" "$off_row")
 
 i=$({ for s in "${ssids[@]}"; do row "$s"; done; printf '%s\n' "${footer[@]}"; } |
-    rofi_menu select_wifi -format i "${args[@]}")
+    rofi_menu select_wifi -markup-rows -format i "${args[@]}")
 [[ -z $i ]] && exit 0
 
 if (( i < ${#ssids[@]} )); then

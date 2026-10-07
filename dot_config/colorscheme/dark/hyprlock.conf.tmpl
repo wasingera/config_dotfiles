@@ -1,1 +1,1 @@
-{{ template "colors/hyprlock.conf" (index .catppuccin .colorscheme.dark) }}
+{{ template "colors/hyprlock.conf" (merge (dict "wallpaper" (joinPath .chezmoi.homeDir .colorscheme.wallpaper.dark.lockscreen)) (index .catppuccin .colorscheme.dark)) }}

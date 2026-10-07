@@ -3,3 +3,10 @@
 [colorscheme]
 dark  = "mocha"
 light = "latte"
+
+# Wallpapers for each mode, relative to $HOME (the images aren't tracked)
+[colorscheme.wallpaper.dark]
+lockscreen = "images/wallpapers/Cloudsday.png"
+
+[colorscheme.wallpaper.light]
+lockscreen = "images/wallpapers/artisticlandscape.png"

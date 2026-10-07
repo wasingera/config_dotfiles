@@ -20,15 +20,17 @@ return {
                     vim.api.nvim_create_autocmd('LspAttach', {
                         desc = 'LSP actions',
                         callback = function(args)
-                            local function map(mode, lhs, rhs, desc)
-                                vim.keymap.set(mode, lhs, rhs, { buffer = args.buf, desc = desc })
+                            local function map(mode, lhs, rhs, desc, opts)
+                                opts = vim.tbl_extend('force', { buffer = args.buf, desc = desc }, opts or {})
+                                vim.keymap.set(mode, lhs, rhs, opts)
                             end
 
-                            map('n', 'gd', vim.lsp.buf.definition, 'Go to definition')
-                            map('n', 'gD', vim.lsp.buf.declaration, 'Go to declaration')
-                            map('n', 'gi', vim.lsp.buf.implementation, 'List implementations')
-                            map('n', 'go', vim.lsp.buf.type_definition, 'Go to type definition')
-                            map('n', 'gr', vim.lsp.buf.references, 'List references')
+                            map('n', 'gd', function() Snacks.picker.lsp_definitions() end, 'Go to definition')
+                            map('n', 'gD', function() Snacks.picker.lsp_declarations() end, 'Go to declaration')
+                            map('n', 'gi', function() Snacks.picker.lsp_implementations() end, 'List implementations')
+                            map('n', 'go', function() Snacks.picker.lsp_type_definitions() end, 'Go to type definition')
+                            -- nowait: don't wait for the built-in grn/gra/grr/... mappings
+                            map('n', 'gr', function() Snacks.picker.lsp_references() end, 'List references', { nowait = true })
                             map('n', '<C-k>', vim.lsp.buf.signature_help, 'Signature help')
                             map('n', '<F2>', vim.lsp.buf.rename, 'Rename symbol')
                             map({ 'n', 'x' }, '<F4>', vim.lsp.buf.code_action, 'Code action')

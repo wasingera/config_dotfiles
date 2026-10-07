@@ -6,6 +6,11 @@
 .config/zsh/.gitignore
 .config/zsh/readme.md
 
+{{- /* nvim plugin specs replaced by snacks.nvim; lazy.nvim would still load them */}}
+.config/nvim/lua/plugins/filebrowser.lua
+.config/nvim/lua/plugins/telescope.lua
+.config/nvim/lua/plugins/terminal.lua
+
 {{ if .desktop }}
 {{- /* Old bspwm/X11 setup, replaced by Hyprland */}}
 .config/bspwm

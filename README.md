@@ -84,3 +84,8 @@ The desktop needs the AUR packages `catppuccin-gtk-theme-mocha` and
 `catppuccin-gtk-theme-latte` (GTK3 apps and file dialogs), plus `papirus-icon-theme`.
 nvim follows `~/.local/state/colorscheme/mode` on every machine, and defaults to
 dark when nothing writes it.
+
+## Neovim
+
+See [`dot_config/nvim/README.md`](dot_config/nvim/README.md) for the keys, setup,
+plugin updates and how the config works.

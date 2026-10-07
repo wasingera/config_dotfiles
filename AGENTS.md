@@ -275,6 +275,9 @@ The bar font is "Iosevka Term Extended"; icons come from "Iosevka Nerd Font".
 
 ### Neovim (`dot_config/nvim/`)
 
+Full usage and implementation docs: `dot_config/nvim/README.md` (also deployed to
+`~/.config/nvim/README.md`). Keep it in step with the config.
+
 - lazy.nvim, with one spec file per area in `lua/plugins/`. Options, keymaps and autocmds live in
   `lua/config/` and load before the plugins.
 - **Lockfile:** `~/.config/nvim/lazy-lock.json` is a symlink (`symlink_lazy-lock.json.tmpl`) to

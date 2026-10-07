@@ -143,8 +143,9 @@ hl.config({
 
         blur = {
             enabled   = true,
-            size      = 3,
-            passes    = 1,
+            -- strong enough that text behind frosted notifications blurs away
+            size      = 8,
+            passes    = 3,
             vibrancy  = 0.1696,
         },
     },
@@ -398,6 +399,15 @@ hl.window_rule({
 --     move  = "20 monitor_h-120",
 --     float = true,
 -- })
+
+-- Blur behind dunst's translucent notifications. ignore_alpha keeps the
+-- blur inside their rounded corners.
+hl.layer_rule({
+    name  = "notifications-blur",
+    match = { namespace = "^notifications$" },
+    blur         = true,
+    ignore_alpha = 0,
+})
 
 -- Picture-in-Picture: matches Firefox ("Picture-in-Picture") and Chrome ("Picture in picture")
 hl.window_rule({

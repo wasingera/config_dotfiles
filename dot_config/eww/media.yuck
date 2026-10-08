@@ -5,13 +5,15 @@
     `./scripts/media.sh`)
 
 ;; ==== Widgets ====
-;; Hidden while nothing is playing or paused. Click: play/pause
+;; Hidden while nothing is playing or paused. Click: play/pause; right-click:
+;; previous/next and switching player (media_menu.sh)
 (defwidget media_widget []
     (box
         :class "media ${media.playing ? '' : 'paused'}"
         :visible {media.active}
         (button
             :onclick "playerctl play-pause"
+            :onrightclick "./scripts/media_menu.sh &"
             (box
                 :space-evenly false
                 (label :class "media-icon" :text {media.icon})

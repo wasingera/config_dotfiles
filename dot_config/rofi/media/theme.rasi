@@ -1,0 +1,8 @@
+@import "../dropdown.rasi"
+
+* {
+    /* pink, like the media pill */
+    menu-color: @pink;
+    /* fits "Switch to chromium" */
+    menu-width: 250px;
+}

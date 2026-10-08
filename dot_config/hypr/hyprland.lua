@@ -58,6 +58,9 @@ hl.on("hyprland.start", function ()
     hl.exec_cmd("${HOME}/.local/bin/eww open top_bar")
     hl.exec_cmd("hyprpaper")
     hl.exec_cmd("dunst")
+    -- Tracks which media player was active last, so playerctl (the media
+    -- keys, the bar's media widget) controls that one
+    hl.exec_cmd("playerctld daemon")
     -- hl.exec_cmd(terminal)
   -- hl.exec_cmd(terminal)
   -- hl.exec_cmd("nm-applet")
@@ -336,7 +339,7 @@ hl.bind("XF86AudioMicMute",     hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_S
 hl.bind("XF86MonBrightnessUp",  hl.dsp.exec_cmd("brightnessctl -e4 -n2 set 5%+"),                  { locked = true, repeating = true })
 hl.bind("XF86MonBrightnessDown",hl.dsp.exec_cmd("brightnessctl -e4 -n2 set 5%-"),                  { locked = true, repeating = true })
 
--- Requires playerctl
+-- Requires playerctl; act on the last active player (playerctld, started above)
 hl.bind("XF86AudioNext",  hl.dsp.exec_cmd("playerctl next"),       { locked = true })
 hl.bind("XF86AudioPause", hl.dsp.exec_cmd("playerctl play-pause"), { locked = true })
 hl.bind("XF86AudioPlay",  hl.dsp.exec_cmd("playerctl play-pause"), { locked = true })

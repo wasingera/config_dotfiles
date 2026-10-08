@@ -20,7 +20,7 @@
 }
 
 .clock, .metrics, .workspaces, .volume, .powerbar, .keyboard, .wifi, .vpn, .bluetooth,
-.notifications {
+.notifications, .media {
   background: $base;
   // The size of the rofi menus' text. Set here rather than taken from GTK's
   // default font, so em widths below come out in whole pixels: every
@@ -118,6 +118,27 @@
 .keyboard {
   color: $yellow;
   min-width: 2.5em;
+  // after the media pill (hidden while nothing plays)
+  margin-left: 5px;
+}
+
+.media {
+  color: $pink;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+// greyed out, like the muted volume
+.media.paused {
+  color: $overlay1;
+}
+
+// Propo and regular weight, like .net-icon
+.media-icon {
+  font-family: "FiraCode Nerd Font Propo";
+  font-size: 18px;
+  font-weight: normal;
+  margin-right: 8px;
 }
 
 .powerbar {

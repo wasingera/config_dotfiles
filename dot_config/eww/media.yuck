@@ -1,0 +1,21 @@
+;; ==== Variables ====
+;; {"active": bool, "playing": bool, "icon": ..., "text": "Artist – Title"}
+;; for the current media player, updated on MPRIS events
+(deflisten media :initial '{"active": false, "playing": false, "icon": "", "text": ""}'
+    `./scripts/media.sh`)
+
+;; ==== Widgets ====
+;; Hidden while nothing is playing or paused. Click: play/pause
+(defwidget media_widget []
+    (box
+        :class "media ${media.playing ? '' : 'paused'}"
+        :visible {media.active}
+        (button
+            :onclick "playerctl play-pause"
+            (box
+                :space-evenly false
+                (label :class "media-icon" :text {media.icon})
+                ;; 35 characters of the 9px-wide bar font
+                (label :limit-width 35 :text {media.text})))
+    )
+)

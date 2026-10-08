@@ -6,6 +6,7 @@
 (include "./network_container.yuck")
 (include "./metrics.yuck")
 (include "./notifications.yuck")
+(include "./media.yuck")
 
 (defwidget leftbar []
     (box
@@ -33,6 +34,7 @@
         :halign "end"
         :space-evenly false
 
+        (media_widget)
         (keyboard)
         (network_container)
         (volume)

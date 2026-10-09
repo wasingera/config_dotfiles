@@ -1,0 +1,20 @@
+[Desktop Entry]
+Version=1.0
+Name=Apple Music
+Comment=music.apple.com in its own Chromium window
+# Its own data folder, so it runs as a separate Chromium process and shows up
+# as a separate MPRIS player from the main browser (playerctl, the bar's media
+# pill); a profile in the main folder would share that browser's player.
+# Desktop files don't expand $HOME, so chezmoi writes the path in.
+# --no-first-run: a new data folder otherwise opens Chromium's first-run
+# page (an empty terms-of-service placeholder) instead of the app.
+Exec=/usr/bin/chromium --user-data-dir={{ .chezmoi.homeDir }}/.local/share/chromium-music --no-first-run --app=https://music.apple.com
+StartupNotify=true
+Terminal=false
+# By path: rofi's icon theme (Oranchelo) isn't installed, and its hicolor
+# fallback has no apple-music icon; Papirus does
+Icon=/usr/share/icons/Papirus/64x64/apps/apple-music.svg
+# The --app window's class, so it's matched to this entry
+StartupWMClass=chrome-music.apple.com__-Default
+Type=Application
+Categories=AudioVideo;Audio;Player;

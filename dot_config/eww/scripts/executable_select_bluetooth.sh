@@ -35,8 +35,8 @@ cleanup() {
 trap cleanup EXIT
 
 # Rather than notifications while connecting, pairing etc., mark the bar's
-# Bluetooth icon busy until the script exits: it turns the colour it has
-# during a scan.
+# Bluetooth icon busy until the script exits: it blinks, in a different
+# colour from a scan.
 mark_busy() {
     [[ -n $busy ]] && return
     busy=1

@@ -1,15 +1,16 @@
-;; Nerd Font icon: Bluetooth off, on, or connected to a device, and whether
-;; it's scanning for devices, updated on BlueZ events
-(deflisten bluetooth :initial '{"icon": "", "scanning": false}'
+;; Bluetooth off, on, or connected to a device, its Nerd Font icon, and
+;; whether it's scanning for devices, updated on BlueZ events
+(deflisten bluetooth :initial '{"state": "off", "icon": "", "scanning": false}'
     `./scripts/bluetooth.sh`)
 
-;; Set by select_bluetooth.sh while it connects, pairs etc.: shown like a scan
+;; Set by select_bluetooth.sh while it connects, pairs etc.: blinks, in a
+;; different colour from a scan
 (defvar bluetooth_busy false)
 
 (defwidget bluetooth_widget []
     (button
         :onclick `./scripts/select_bluetooth.sh &`
-        (label :class "net-icon ${bluetooth.scanning || bluetooth_busy ? 'busy' : ''}"
+        (label :class "net-icon ${bluetooth.state} ${bluetooth_busy ? 'busy' : bluetooth.scanning ? 'scanning' : ''}"
             :text {bluetooth.icon})
     )
 )

@@ -185,16 +185,35 @@
   margin-left: 5px;
 }
 
-// While an adapter scans for devices (the Bluetooth menu's Scan, which goes on
-// while the menu is shown again), or the menu connects, pairs etc.: blinks
-// between its usual colour and peach.
-.bluetooth .busy {
-  animation: bluetooth-blink 0.6s ease-in-out infinite alternate;
+// Off is greyed out; connected to a device stands out from merely on.
+.bluetooth .off {
+  color: $overlay1;
 }
 
-@keyframes bluetooth-blink {
+.bluetooth .connected {
+  color: $green;
+}
+
+// While an adapter scans for devices (the Bluetooth menu's Scan, which goes on
+// while the menu is shown again): blinks between blue and peach.
+.bluetooth .scanning {
+  animation: bluetooth-scan 0.6s ease-in-out infinite alternate;
+}
+
+@keyframes bluetooth-scan {
   from { color: $blue; }
   to { color: $peach; }
+}
+
+// While the menu connects, pairs, powers on etc.: blinks between blue and
+// mauve. Wins over a scan, which the menu keeps running meanwhile.
+.bluetooth .busy {
+  animation: bluetooth-busy 0.6s ease-in-out infinite alternate;
+}
+
+@keyframes bluetooth-busy {
+  from { color: $blue; }
+  to { color: $mauve; }
 }
 
 .notifications {

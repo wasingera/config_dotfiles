@@ -11,8 +11,8 @@ Comment=music.apple.com in its own Chromium window
 Exec=/usr/bin/chromium --user-data-dir={{ .chezmoi.homeDir }}/.local/share/chromium-music --no-first-run --app=https://music.apple.com
 StartupNotify=true
 Terminal=false
-# By path: rofi's icon theme (Oranchelo) isn't installed, and its hicolor
-# fallback has no apple-music icon; Papirus does
+# By path, so the icon shows whatever icon theme the program reading this
+# uses: hicolor has no apple-music icon, only Papirus (rofi's theme) does
 Icon=/usr/share/icons/Papirus/64x64/apps/apple-music.svg
 # The --app window's class, so it's matched to this entry
 StartupWMClass=chrome-music.apple.com__-Default

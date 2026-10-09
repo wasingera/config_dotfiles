@@ -217,7 +217,9 @@ Shell traps:
   Wi-Fi password prompt, a rescan) opens in the same place.
 - rofi 2.0's `click-to-exit` is **not implemented on Wayland**. So the dropdown window covers the
   screen transparently, and `rofi_menu` binds `MousePrimary` to `kb-cancel`. Clicks on an entry are
-  handled by the entry first; clicks on empty space cancel.
+  handled by the entry first; clicks on empty space cancel. The launcher does the same: its window
+  is full-screen with the box centred by filler widgets, `kb-cancel` is set in `config.rasi`, and
+  its height comes from `listview { lines }`.
 - Rasi limits found the hard way:
   - A variable can't go inside a multi-value property (`padding: 5px @x 0 0` fails to parse).
   - Boxes accept `width` but not `height`, so the row count is set with `-theme-str`.

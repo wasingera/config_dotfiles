@@ -7,13 +7,9 @@ element-text, element-icon , mode-switcher {
     text-color:       inherit;
 }
 
-window {
+mainbox {
     border: 3px;
     border-color: @base;
-    background-color: @base;
-}
-
-mainbox {
     background-color: @base;
 }
 
@@ -43,7 +39,6 @@ listview {
     border: 0px 0px 0px;
     padding: 6px 0px 0px;
     margin: 10px 0px 0px 20px;
-    lines: 5;
     background-color: @base;
 }
 

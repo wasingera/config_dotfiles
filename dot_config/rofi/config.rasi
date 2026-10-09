@@ -8,6 +8,8 @@ configuration{
     display-run: "   Run ";
     display-window: " 󰖳  Window";
     sidebar-mode: true;
+    /* MousePrimary: a click outside the launcher closes it (see window) */
+    kb-cancel: "Escape,Control+g,Control+bracketleft,MousePrimary";
 }
 
 @theme "catppuccin"
@@ -16,8 +18,30 @@ configuration{
     font: "Iosevka Term Extended Bold 15px";
 }
 
+/* rofi's click-to-exit does nothing on Wayland, so, like the bar menus
+ * (dropdown.rasi), the window covers the screen, transparent, with the
+ * launcher box in the middle. A click outside the box hits no entry and
+ * falls through to kb-cancel. */
 window {
-    height: 350px;
+    fullscreen: true;
+    background-color: transparent;
+    children: [ "launcher-above", "launcher-row", "launcher-below" ];
+}
+
+launcher-row {
+    orientation: horizontal;
+    expand: false;
+    background-color: transparent;
+    children: [ "launcher-left", mainbox, "launcher-right" ];
+}
+
+launcher-above, launcher-below, launcher-left, launcher-right {
+    expand: true;
+    background-color: transparent;
+}
+
+mainbox {
+    expand: false;
     width: 550px;
     border-radius: 3px;
 }
@@ -25,6 +49,8 @@ window {
 listview {
     layout: vertical;
     columns: 1;
+    /* A box can't be given a height, so the launcher's comes from this */
+    lines: 7;
 }
 
 element {

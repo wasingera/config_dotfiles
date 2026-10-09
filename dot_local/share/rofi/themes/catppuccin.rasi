@@ -2,18 +2,12 @@
  * see ~/.local/bin/colorscheme */
 @import "~/.local/state/colorscheme/current/rofi.rasi"
 
-* {
-    width: 600;
-    font: "JetBrainsMono Nerd Font 14";
-}
-
 element-text, element-icon , mode-switcher {
     background-color: inherit;
     text-color:       inherit;
 }
 
 window {
-    height: 360px;
     border: 3px;
     border-color: @base;
     background-color: @base;
@@ -38,11 +32,6 @@ prompt {
     margin: 20px 0px 0px 20px;
 }
 
-textbox-prompt-colon {
-    expand: false;
-    str: ":";
-}
-
 entry {
     padding: 6px;
     margin: 20px 0px 0px 10px;
@@ -54,7 +43,6 @@ listview {
     border: 0px 0px 0px;
     padding: 6px 0px 0px;
     margin: 10px 0px 0px 20px;
-    columns: 2;
     lines: 5;
     background-color: @base;
 }
@@ -70,7 +58,6 @@ element-icon {
 }
 
 element selected {
-    background-color:  @base ;
     text-color: @red  ;
 }
 

@@ -1,6 +1,10 @@
 ## Enable Extended Globbing ##
 setopt extended_glob
 
+## Allow # Comments at the Prompt ##
+## (without this, a pasted "cmd  # note" fails with "bad pattern: #" under extended_glob)
+setopt interactive_comments
+
 ## Set History File and Max Entries ##
 export HISTFILE="$HOME/.local/state/zsh/.zsh_history"
 export SAVEHIST=10000

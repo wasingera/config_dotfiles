@@ -206,8 +206,8 @@ Shell traps:
 ### rofi (`dot_config/rofi/`)
 
 - `config.rasi` is the app launcher; it uses the theme `~/.local/share/rofi/themes/catppuccin.rasi`.
-- The bar menus (wifi, VPN, Bluetooth, audio output, power) share the layout in `dropdown.rasi`.
-  Each menu's `theme.rasi` only sets `menu-color` and `menu-width`.
+- The bar menus (wifi, VPN, Bluetooth, audio output, media, power) share the layout in
+  `dropdown.rasi`. Each menu's `theme.rasi` only sets `menu-color` and `menu-width`.
 - **Menus are placed from the real widget geometry, never hand-measured offsets.**
   `eww/scripts/bar_anchor.py` finds the bar button under the pointer in eww's accessibility tree
   (AT-SPI, through python-gobject), and `rofi_menu` pads the menu to the button's bottom and right

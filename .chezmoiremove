@@ -25,7 +25,7 @@
 .xinitrc
 .fehbg
 
-{{- /* Unused rofi theme collection (only config.rasi, powerbutton and select_* are used) */}}
+{{- /* Unused rofi theme collection (only config.rasi, dropdown.rasi and the bar menus' folders are used) */}}
 .config/rofi/applets
 .config/rofi/bin
 .config/rofi/launcher

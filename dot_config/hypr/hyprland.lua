@@ -385,15 +385,6 @@ hl.window_rule({
     no_focus = true,
 })
 
-hl.window_rule({
-    -- Steam/Proton games: open fullscreen on workspace 3
-    name  = "steam-games",
-    match = { class = "^(steam_app_.*)$" },
-
-    workspace  = "3",
-    fullscreen = true,
-})
-
 -- Layer rules also return a handle.
 -- local overlayLayerRule = hl.layer_rule({
 --     name  = "no-anim-overlay",

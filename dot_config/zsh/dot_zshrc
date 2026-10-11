@@ -59,12 +59,6 @@ export NVM_DIR="$HOME/.nvm"
 # bun completions
 [ -s "$BUN_INSTALL/_bun" ] && source "$BUN_INSTALL/_bun"
 
-# yazi: hide Hyprland from it so it uses its built-in chafa previews
-# (its ueberzugpp mode puts the image mid-screen on this Hyprland)
-function yazi() {
-  env -u HYPRLAND_INSTANCE_SIGNATURE yazi "$@"
-}
-
 # yazi: cd into the last browsed directory on quit
 function y() {
   local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd

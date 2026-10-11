@@ -28,8 +28,8 @@ hl.monitor({
 ---------------------
 
 -- Set programs that you use
-local terminal    = "alacritty"
-local fileManager = "alacritty -e env -u HYPRLAND_INSTANCE_SIGNATURE yazi"
+local terminal    = "kitty"
+local fileManager = "kitty yazi"
 local menu        = "rofi -show drun"
 
 

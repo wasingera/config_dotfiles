@@ -311,9 +311,8 @@ The bar font is "Iosevka Term Extended"; icons come from "Iosevka Nerd Font".
 ### Shell (`dot_config/zsh/`)
 
 - `rm` is aliased to `rm -v`; inside functions use `command rm` to stay quiet.
-- `yazi` is wrapped by a function that hides `HYPRLAND_INSTANCE_SIGNATURE`, so yazi uses its
-  built-in chafa image previews. Its ueberzugpp mode puts the image mid-screen on this Hyprland.
-  The Win+E bind does the same with `env -u`.
+- yazi shows image previews through kitty's graphics protocol. Don't route it through ueberzugpp:
+  that puts the image mid-screen on this Hyprland.
 - `y` runs yazi and `cd`s to the last directory you browsed. zoxide (`z`, `zi`) is initialised
   last, only if it's installed.
 

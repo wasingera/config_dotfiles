@@ -54,7 +54,7 @@ Special files at the root:
 What each machine gets:
 
 - **Every machine:** zsh (`ZDOTDIR=~/.config/zsh` via `dot_zshenv`), nvim, clangd.
-- **Desktop only:** `hypr`, `eww`, `rofi` (+ `~/.local/share/rofi`), `dunst`, `alacritty`, `kitty`,
+- **Desktop only:** `hypr`, `eww`, `rofi` (+ `~/.local/share/rofi`), `dunst`, `kitty`,
   `gtk-3.0`, `gtk-4.0`, `satty`, `chromium-flags.conf`, `zsh/.zprofile` (starts Hyprland on tty1),
   and the light/dark switching: `~/.config/colorscheme/`, `~/.local/bin/colorscheme`,
   `~/.local/bin/colorscheme-solar` and `~/.config/systemd/`.
@@ -128,7 +128,7 @@ Shell traps:
 
 - `eww logs` follows the log forever; wrap it in `timeout`.
 - `pkill -f pattern` also matches your own shell, whose command line contains the pattern.
-  Anchor it (`pkill -f '^alacritty --class test'`) or use `pkill -x name`.
+  Anchor it (`pkill -f '^kitty --class test'`) or use `pkill -x name`.
 - Importing a Python script (e.g. `bar_anchor.py` in a test) writes `__pycache__/` next to it. In
   the source directory chezmoi would deploy that, so set `PYTHONDONTWRITEBYTECODE=1`.
 
@@ -263,7 +263,6 @@ How it fits together:
 
    | Tool | How |
    |------|-----|
-   | alacritty | `import` of `current/alacritty.toml`; live-reloads by itself |
    | kitty | `include` of `current/kitty.conf`; `colorscheme` sends it SIGUSR1 to reload |
    | eww | `@import "colors"`; `colors.scss` is a chezmoi symlink to `current/eww.scss` |
    | rofi | `@import "~/.local/state/colorscheme/current/rofi.rasi"` |
@@ -303,8 +302,6 @@ Details:
   `@define-color`. A plain selector like `.toolbar {}` in `gtk.css` loses to app CSS.
 - Don't force GTK4's built-in file chooser (`GDK_DEBUG=no-portals`): it fails here with "folder
   contents could not be displayed".
-- An alacritty window watches only the import paths it saw at startup; windows opened before an
-  import path changes won't live-switch until reopened.
 
 The bar font is "Iosevka Term Extended"; icons come from "Iosevka Nerd Font".
 

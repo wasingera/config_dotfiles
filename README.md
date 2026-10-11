@@ -3,7 +3,7 @@
 Dotfiles for Linux (Hyprland desktop), macOS and WSL, managed with [chezmoi](https://www.chezmoi.io).
 
 Every machine gets the shared baseline (zsh, nvim, clangd). The Hyprland desktop
-configs (hypr, eww, rofi, dunst, alacritty, GTK/satty theming, Chromium flags) are
+configs (hypr, eww, rofi, dunst, kitty, GTK/satty theming, Chromium flags) are
 only applied on native Linux.
 
 ## Install on a new machine

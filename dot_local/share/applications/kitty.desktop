@@ -1,0 +1,18 @@
+[Desktop Entry]
+# Overrides /usr/share/applications/kitty.desktop (same file name) so the
+# launcher lists it as "Terminal". Typing "kitty" still finds it by Exec.
+Version=1.0
+Type=Application
+Name=Terminal
+GenericName=Terminal emulator
+Comment=Fast, feature-rich, GPU based terminal
+TryExec=kitty
+StartupNotify=true
+Exec=kitty
+Icon=kitty
+Categories=System;TerminalEmulator;
+X-TerminalArgExec=--
+X-TerminalArgTitle=--title
+X-TerminalArgAppId=--class
+X-TerminalArgDir=--working-directory
+X-TerminalArgHold=--hold

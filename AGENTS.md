@@ -54,7 +54,7 @@ Special files at the root:
 What each machine gets:
 
 - **Every machine:** zsh (`ZDOTDIR=~/.config/zsh` via `dot_zshenv`), nvim, clangd.
-- **Desktop only:** `hypr`, `eww`, `rofi` (+ `~/.local/share/rofi`), `dunst`, `alacritty`,
+- **Desktop only:** `hypr`, `eww`, `rofi` (+ `~/.local/share/rofi`), `dunst`, `alacritty`, `kitty`,
   `gtk-3.0`, `gtk-4.0`, `satty`, `chromium-flags.conf`, `zsh/.zprofile` (starts Hyprland on tty1),
   and the light/dark switching: `~/.config/colorscheme/`, `~/.local/bin/colorscheme`,
   `~/.local/bin/colorscheme-solar` and `~/.config/systemd/`.
@@ -264,6 +264,7 @@ How it fits together:
    | Tool | How |
    |------|-----|
    | alacritty | `import` of `current/alacritty.toml`; live-reloads by itself |
+   | kitty | `include` of `current/kitty.conf`; `colorscheme` sends it SIGUSR1 to reload |
    | eww | `@import "colors"`; `colors.scss` is a chezmoi symlink to `current/eww.scss` |
    | rofi | `@import "~/.local/state/colorscheme/current/rofi.rasi"` |
    | dunst | `dunstrc.d/colors.conf`, a symlink to `current/dunst.conf` |

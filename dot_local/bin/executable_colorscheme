@@ -34,7 +34,7 @@ if [[ ! -d $modes/$mode ]]; then
 fi
 
 # Replace each file by renaming a full copy over it, so a tool that is watching
-# (alacritty) never reads a half-written file.
+# never reads a half-written file.
 mkdir -p "$state/current"
 for file in "$modes/$mode"/*; do
     cp "$file" "$state/current/.${file##*/}.tmp"
@@ -45,6 +45,8 @@ printf '%s\n' "$mode" >"$state/mode"
 # Reload what's running; anything that isn't is skipped quietly.
 if eww ping >/dev/null 2>&1; then eww reload >/dev/null 2>&1 || true; fi
 if pgrep -x dunst >/dev/null; then dunstctl reload || true; fi
+# SIGUSR1 makes kitty re-read its config, including the colours
+pkill -USR1 -x kitty || true
 if [[ -n ${HYPRLAND_INSTANCE_SIGNATURE:-} ]]; then hyprctl reload >/dev/null 2>&1 || true; fi
 gsettings set org.gnome.desktop.interface color-scheme "prefer-$mode" 2>/dev/null || true
 gtk_theme=$(sed -n 's/^gtk-theme-name=//p' "$state/current/gtk3.ini" 2>/dev/null)

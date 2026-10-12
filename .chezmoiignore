@@ -14,6 +14,7 @@ CLAUDE.md
 .config/gtk-3.0
 .config/gtk-4.0
 .config/satty
+.config/yazi
 .config/chromium-flags.conf
 .local/share/applications
 .config/colorscheme

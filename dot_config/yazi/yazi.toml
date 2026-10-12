@@ -1,0 +1,7 @@
+# Open images in imv. All selected files are passed, so h/l flips through them.
+# orphan detaches imv so yazi stays usable while it's open.
+[opener]
+image = [{ run = 'imv "$@"', orphan = true, desc = "imv", for = "unix" }]
+
+[open]
+prepend_rules = [{ mime = "image/*", use = "image" }]

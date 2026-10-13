@@ -32,6 +32,10 @@
 .config/rofi/launchers
 .config/rofi/powermenu
 
+{{- /* The rofi output menu, replaced by the eww volume mixer */}}
+.config/eww/scripts/select_output.sh
+.config/rofi/select_output
+
 {{- /* eww backups and a stray file */}}
 .config/eww/*.bak
 .config/eww/scripts/*.bak

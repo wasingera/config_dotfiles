@@ -158,6 +158,7 @@ Shell traps:
   | `rofi_menu_streamed THEME LINES` | The same, but rows arriving on stdin later are added while it's shown (room for LINES; rofi can't resize an open menu). |
   | `nm_connections TYPE [--active]` | Prints NetworkManager connection names of that type. |
   | `bluez_objects` | Prints BlueZ's objects (adapters, devices) as JSON, `{path: {interface: {property: value}}}`. |
+  | `popup_anchor` | Prints `RIGHT TOP` for an eww popup window hanging from the clicked button. |
   | `hypr_events` | Streams Hyprland's event socket. |
   | `drain_burst` | Waits out a burst of events (until 50ms of quiet). |
   | `emit` | Prints a widget's state only when it changed. |
@@ -168,7 +169,7 @@ Shell traps:
   - `network.sh` uses `nmcli monitor`.
   - `bluetooth.sh` uses `gdbus monitor --system --dest org.bluez` (`dbus-monitor --system` needs
     root), filtered to power, connection, scan (`Discovering`) and add/remove signals.
-  - `volume.sh` uses `pactl subscribe`.
+  - `volume.sh` and `mixer.sh` (the mixer popup) use `pactl subscribe`.
   - The clock is `formattime(EWW_TIME, ...)`.
   - `gpu.sh` streams `nvidia-smi --loop=2` (one long-lived process).
   - `notifications.sh` uses `gdbus monitor --session --dest org.freedesktop.Notifications`
@@ -189,6 +190,12 @@ Shell traps:
   the ID in `~/.local/state/eww/notifications-seen`, stored with dunst's D-Bus name so a restarted
   dunst (whose IDs start again at 1) counts from zero. dunst sends `NotificationClosed` only to the
   app that sent the notification, so a listener never sees it.
+- The volume mixer (right-click on the volume icon) is the same kind of popup, `volume_mixer` in
+  `volume.yuck`: outputs, then a slider and mute button per app. Its `mixer.sh` listener runs only
+  while the popup is open (eww starts a `deflisten` when a window uses it). App icons are passed
+  as file paths (Papirus first), because eww's GTK icon theme is Adwaita.
+- In a box, eww puts a `for`'s widgets after their siblings, not where the `for` is written. Give
+  each `for` a box of its own.
 - BlueZ: read its state and act through `busctl` (`bluez_objects` in lib.sh). Pairing needs an
   agent, which `bluetoothctl` registers only in interactive mode (`--agent` does nothing with a
   command), so `scripts/bt_pair.py` registers its own and calls Pair. Use `bluetoothctl` only to
@@ -206,7 +213,7 @@ Shell traps:
 ### rofi (`dot_config/rofi/`)
 
 - `config.rasi` is the app launcher; it uses the theme `~/.local/share/rofi/themes/catppuccin.rasi`.
-- The bar menus (wifi, VPN, Bluetooth, audio output, media, power) share the layout in
+- The bar menus (wifi, VPN, Bluetooth, media, power) share the layout in
   `dropdown.rasi`. Each menu's `theme.rasi` only sets `menu-color` and `menu-width`.
 - **Menus are placed from the real widget geometry, never hand-measured offsets.**
   `eww/scripts/bar_anchor.py` finds the bar button under the pointer in eww's accessibility tree

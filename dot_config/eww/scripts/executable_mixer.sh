@@ -1,13 +1,19 @@
 #!/usr/bin/env bash
 
-# Prints the volume mixer's state for eww, now and again whenever it changes:
+# Prints the volume mixer's state for eww, now and again whenever it changes,
+# in two parts, as eww rebuilds a for's widgets whenever its variable changes
+# at all: rebuilding the rows on each volume change would drop the slider
+# being dragged. So with "rows", what changes only as outputs and apps come
+# and go:
 #   {"outputs": [{"name", "label", "icon", "default"}],
-#    "apps": [{"id", "name", "detail", "icon", "volume", "muted", "glyph"}],
-#    "app_glyph": ...}
+#    "apps": [{"id", "name", "icon"}], "app_glyph": ...}
+# and with "levels", each app's volume by id (a string):
+#   {"<id>": {"volume", "muted", "glyph"}}
 # outputs are the sinks, apps the streams playing into them (sink inputs).
 # An app's icon is the path of its icon file, or "" when it has none, for
-# which the popup shows app_glyph instead; its glyph is the speaker icon for its
-# volume, as on the bar.
+# which the popup shows app_glyph instead; its glyph is the speaker icon for
+# its volume, as on the bar.
+mode=$1
 source "${BASH_SOURCE%/*}/lib.sh"
 
 # Nerd Font icons by the sink's active port: HDMI/DisplayPort, headphones,
@@ -44,7 +50,7 @@ icon_file() {
 
 render() {
     local state paths=() name
-    state=$(jq -cn --arg default "$(pactl get-default-sink)" \
+    state=$(jq -cn --arg mode "$mode" --arg default "$(pactl get-default-sink)" \
         --arg hdmi "$hdmi_icon" --arg headphones "$headphones_icon" \
         --arg speaker "$speaker_icon" --arg app "$app_icon" \
         --arg off "$off_icon" --arg low "$low_icon" \
@@ -52,7 +58,15 @@ render() {
         --argjson sinks "$(pactl -f json list sinks)" \
         --argjson inputs "$(pactl -f json list sink-inputs)" '
         def percent: first(.volume[]?.value_percent) // "0%" | rtrimstr("%") | tonumber;
-        {outputs: [$sinks[] |
+        if $mode == "levels" then
+            $inputs | map(percent as $volume |
+                {key: (.index | tostring),
+                 value: {muted: .mute, $volume,
+                         glyph: (if .mute or $volume == 0 then $off
+                                 elif $volume < 34 then $low
+                                 elif $volume < 67 then $medium
+                                 else $high end)}}) | from_entries
+        else {outputs: [$sinks[] |
             (.active_port as $p | first(.ports[] | select(.name == $p)).type // "none") as $type |
             {name, default: (.name == $default),
              label: (.properties["node.nick"] // .description),
@@ -60,15 +74,15 @@ render() {
                     elif $type == "Headphones" then $headphones
                     else $speaker end)}],
          app_glyph: $app,
-         apps: [$inputs[] | .properties as $p | percent as $volume |
-            {id: .index, muted: .mute, $volume,
-             glyph: (if .mute or $volume == 0 then $off
-                     elif $volume < 34 then $low
-                     elif $volume < 67 then $medium
-                     else $high end),
+         apps: [$inputs[] | .properties as $p |
+            {id: (.index | tostring),
              name: ($p["application.name"] // $p["node.name"] // "Unknown"),
-             detail: ($p["media.name"] // ""),
-             icon: ($p["application.icon_name"] // $p["application.process.binary"] // "")}]}')
+             icon: ($p["application.icon_name"] // $p["application.process.binary"] // "")}]}
+        end')
+    if [[ $mode == levels ]]; then
+        emit "$state"
+        return
+    fi
     # Icon names to files; "" (the fallback glyph) for those with none
     while read -r name; do
         REPLY=

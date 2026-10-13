@@ -196,6 +196,11 @@ Shell traps:
   as file paths (Papirus first), because eww's GTK icon theme is Adwaita.
 - In a box, eww puts a `for`'s widgets after their siblings, not where the `for` is written. Give
   each `for` a box of its own.
+- A `for` rebuilds all its widgets on **any** change to its variable, even to fields it doesn't
+  show; a slider being dragged is destroyed and the drag stops. Keep fast-changing values (the
+  mixer's volumes, `mixer_levels`) in a separate variable that the rows look up by key.
+- eww starts the listeners for the variables a window uses when it opens. A variable used only
+  inside a `for`'s rows, which don't exist yet, never starts, so use it in a static widget too.
 - BlueZ: read its state and act through `busctl` (`bluez_objects` in lib.sh). Pairing needs an
   agent, which `bluetoothctl` registers only in interactive mode (`--agent` does nothing with a
   command), so `scripts/bt_pair.py` registers its own and calls Pair. Use `bluetoothctl` only to

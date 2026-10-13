@@ -4,10 +4,14 @@
 (deflisten volume :initial '{"volume": 50, "muted": false, "icon": ""}'
     `./scripts/volume.sh`)
 
-;; The volume mixer popup's state: outputs and the apps playing; see
-;; scripts/mixer.sh
+;; The volume mixer popup's state, in two parts (see scripts/mixer.sh): the
+;; outputs and apps, which change only as they come and go, and the apps'
+;; volumes. A for rebuilds its rows on any change to its variable, which would
+;; drop a slider while it's dragged.
 (deflisten mixer :initial '{"outputs": [], "apps": [], "app_glyph": ""}'
-    `./scripts/mixer.sh`)
+    `./scripts/mixer.sh rows`)
+(deflisten mixer_levels :initial '{}'
+    `./scripts/mixer.sh levels`)
 
 ;; ==== Widgets ====
 (defwidget volume_mute []
@@ -54,10 +58,11 @@
     )
 )
 
-;; An app: its icon, name and volume over a slider, and a mute button
+;; An app: its icon, name and volume over a slider, and a mute button. A is
+;; the app's entry in mixer.apps; its volume comes from mixer_levels.
 (defwidget mixer_app [a]
     (box
-        :class "mixer-app ${a.muted ? 'muted' : ''}"
+        :class "mixer-app ${mixer_levels?.[a.id]?.muted ?: false ? 'muted' : ''}"
         :space-evenly false
         (box
             :class "mixer-icon"
@@ -72,10 +77,10 @@
                 :space-evenly false
                 (label :class "mixer-name" :xalign 0 :hexpand true :limit-width 26
                     :text {a.name})
-                (label :class "mixer-percent" :text "${a.volume}%"))
+                (label :class "mixer-percent" :text "${mixer_levels?.[a.id]?.volume ?: 0}%"))
             (scale
                 :class "mixer-slider"
-                :value {a.volume}
+                :value {mixer_levels?.[a.id]?.volume ?: 0}
                 :min 0
                 :max 100
                 :onchange "pactl set-sink-input-volume ${a.id} {}%")
@@ -83,7 +88,7 @@
         (button
             :class "mixer-mute"
             :onclick "pactl set-sink-input-mute ${a.id} toggle"
-            {a.glyph})
+            {mixer_levels?.[a.id]?.glyph ?: ""})
     )
 )
 
@@ -121,10 +126,13 @@
                         (mixer_output :o o)))
                 (box :class "mixer-divider")
                 (label :class "mixer-header" :xalign 0 :text "Applications")
+                ;; From mixer_levels rather than mixer.apps: eww starts the
+                ;; listeners of the variables the window uses as it opens,
+                ;; before the for has any rows using mixer_levels
                 (label
                     :class "mixer-empty"
                     :xalign 0
-                    :visible {arraylength(mixer.apps) == 0}
+                    :visible {objectlength(mixer_levels) == 0}
                     :text "Nothing playing")
                 (box
                     :orientation "v"

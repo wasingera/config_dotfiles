@@ -357,3 +357,107 @@
 .notif-dismiss:hover {
   color: $red;
 }
+
+// The volume mixer popup (volume.yuck), framed like the history popup
+.mixer-card {
+  background: $base;
+  color: $text;
+  font-family: "Iosevka Term Extended";
+  font-size: 15px;
+  font-weight: bold;
+  border: 2px solid $mauve;
+  border-radius: 3px;
+  padding: 6px 0px;
+  // 30 characters of the output names (0.6em each), plus the glyph and padding
+  min-width: 330px;
+}
+
+.mixer-header {
+  color: $mauve;
+  padding: 5px 15px;
+}
+
+.mixer-divider {
+  min-height: 1px;
+  background: $surface0;
+  margin: 4px 10px 6px 10px;
+}
+
+.mixer-empty {
+  color: $subtext0;
+  padding: 5px 15px;
+}
+
+.mixer-output {
+  color: $subtext0;
+  padding: 6px 10px;
+  margin: 0px 5px 2px 5px;
+  border-radius: 3px;
+}
+
+.mixer-output:hover {
+  background: $surface0;
+}
+
+.mixer-output.default {
+  color: $mauve;
+}
+
+// Nerd Font glyphs: an output's port, the mute button, an app without an icon
+.mixer-glyph, .mixer-mute, .mixer-icon {
+  font-family: "Iosevka Nerd Font";
+  font-size: 20px;
+  font-weight: normal;
+}
+
+.mixer-glyph {
+  margin-right: 10px;
+}
+
+.mixer-app {
+  padding: 6px 10px;
+  margin: 0px 5px 2px 5px;
+}
+
+// a fixed slot, so names line up whether there's an icon or the glyph
+.mixer-icon {
+  min-width: 24px;
+  margin-right: 12px;
+  color: $overlay1;
+}
+
+.mixer-percent {
+  color: $overlay1;
+  font-size: 13px;
+}
+
+.mixer-slider trough {
+  background-color: $overlay0;
+  border-radius: 10px;
+  min-height: 4px;
+  margin-top: 6px;
+}
+
+.mixer-slider trough highlight {
+  background-color: $mauve;
+  border-radius: 10px;
+}
+
+.mixer-app.muted .mixer-slider trough highlight {
+  background-color: $overlay1;
+}
+
+.mixer-mute {
+  color: $mauve;
+  margin-left: 12px;
+  padding: 0px 4px;
+  border-radius: 3px;
+}
+
+.mixer-mute:hover {
+  background: $surface0;
+}
+
+.mixer-app.muted .mixer-mute, .mixer-app.muted .mixer-name {
+  color: $overlay1;
+}

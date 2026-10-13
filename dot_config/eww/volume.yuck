@@ -4,12 +4,17 @@
 (deflisten volume :initial '{"volume": 50, "muted": false, "icon": ""}'
     `./scripts/volume.sh`)
 
+;; The volume mixer popup's state: outputs and the apps playing; see
+;; scripts/mixer.sh
+(deflisten mixer :initial '{"outputs": [], "apps": [], "app_glyph": ""}'
+    `./scripts/mixer.sh`)
+
 ;; ==== Widgets ====
 (defwidget volume_mute []
     (button
         :class "volume_button"
         :onclick "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"
-        :onrightclick "./scripts/select_output.sh &"
+        :onrightclick "./scripts/volume_mixer.sh &"
         {volume.icon}
     )
 )
@@ -32,5 +37,103 @@
         :halign "center"
         (volume_mute)
         (volume_slider)
+    )
+)
+;; ==== Mixer popup ====
+
+;; An output: click it to make it the default. PipeWire moves playing streams
+;; to it.
+(defwidget mixer_output [o]
+    (button
+        :class "mixer-output ${o.default ? 'default' : ''}"
+        :onclick "pactl set-default-sink '${o.name}'"
+        (box
+            :space-evenly false
+            (label :class "mixer-glyph" :text {o.icon})
+            (label :xalign 0 :hexpand true :limit-width 30 :text {o.label}))
+    )
+)
+
+;; An app: its icon, name and volume over a slider, and a mute button
+(defwidget mixer_app [a]
+    (box
+        :class "mixer-app ${a.muted ? 'muted' : ''}"
+        :space-evenly false
+        (box
+            :class "mixer-icon"
+            (image :visible {a.icon != ""} :path {a.icon}
+                :image-width 24 :image-height 24)
+            (label :visible {a.icon == ""} :text {mixer.app_glyph}))
+        (box
+            :orientation "v"
+            :hexpand true
+            :space-evenly false
+            (box
+                :space-evenly false
+                (label :class "mixer-name" :xalign 0 :hexpand true :limit-width 26
+                    :text {a.name})
+                (label :class "mixer-percent" :text "${a.volume}%"))
+            (scale
+                :class "mixer-slider"
+                :value {a.volume}
+                :min 0
+                :max 100
+                :onchange "pactl set-sink-input-volume ${a.id} {}%")
+        )
+        (button
+            :class "mixer-mute"
+            :onclick "pactl set-sink-input-mute ${a.id} toggle"
+            {a.glyph})
+    )
+)
+
+;; Hangs from the bar button like notification_history (see notifications.yuck),
+;; with transparent buttons around the card that close it
+(defwindow volume_mixer [top right]
+    :monitor 0
+    :geometry (geometry
+        :anchor "top left"
+        :width "100%"
+        :height "100%"
+    )
+    :stacking "overlay"
+    :exclusive false
+    :namespace "eww-mixer"
+
+    (box
+        :orientation "v"
+        :space-evenly false
+        (button :class "backdrop" :height {top + 5} :onclick "eww close volume_mixer")
+        (box
+            :space-evenly false
+            (button :class "backdrop" :hexpand true :onclick "eww close volume_mixer")
+            (box
+                :class "mixer-card"
+                :orientation "v"
+                :space-evenly false
+                (label :class "mixer-header" :xalign 0 :text "Output")
+                ;; Each list in its own box: eww adds a for's widgets after
+                ;; its siblings, not in its place
+                (box
+                    :orientation "v"
+                    :space-evenly false
+                    (for o in {mixer.outputs}
+                        (mixer_output :o o)))
+                (box :class "mixer-divider")
+                (label :class "mixer-header" :xalign 0 :text "Applications")
+                (label
+                    :class "mixer-empty"
+                    :xalign 0
+                    :visible {arraylength(mixer.apps) == 0}
+                    :text "Nothing playing")
+                (box
+                    :orientation "v"
+                    :space-evenly false
+                    (for a in {mixer.apps}
+                        (mixer_app :a a)))
+            )
+            (button :class "backdrop" :width right :onclick "eww close volume_mixer")
+        )
+        (button :class "backdrop" :vexpand true :onclick "eww close volume_mixer")
     )
 )

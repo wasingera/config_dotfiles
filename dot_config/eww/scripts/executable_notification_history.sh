@@ -2,6 +2,7 @@
 
 # Open the notification history popup under the bar button that was clicked,
 # or close it if it's open, and mark every notification in it seen.
+source "${BASH_SOURCE%/*}/lib.sh"
 seen_file=${XDG_STATE_HOME:-$HOME/.local/state}/eww/notifications-seen
 fifo=${XDG_RUNTIME_DIR:-/tmp}/eww-notifications.fifo
 
@@ -10,11 +11,7 @@ if eww active-windows | grep -q '^notification_history:'; then
     exit
 fi
 
-# Where the menus hang from the button: see bar_anchor.py
-read -r right top < <("${BASH_SOURCE%/*}/bar_anchor.py") || exit
-# The popup's window starts below the space the bar reserves (layer-shell
-# keeps it out of other surfaces' exclusive zones), not at the monitor's top
-top=$(( top - $(hyprctl -j monitors | jq '.[] | select(.id == 0).reserved[1]') ))
+read -r right top < <(popup_anchor) || exit
 
 # The ID notifications.sh shows as newest, with dunst's D-Bus name, so it
 # knows a restarted dunst's IDs aren't the ones seen

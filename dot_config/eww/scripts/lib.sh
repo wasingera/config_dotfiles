@@ -47,6 +47,17 @@ menu_anchor() {
     export MENU_ANCHOR="menu-row { padding: ${top}px ${right}px 0px 0px; }"
 }
 
+# Print an eww popup's "RIGHT TOP" offsets, from bar_anchor.py's gaps to the
+# button under the pointer: a popup's window starts below the space the bar
+# reserves (layer-shell keeps it out of other surfaces' exclusive zones), not
+# at the monitor's top, so TOP is shifted up by that.
+popup_anchor() {
+    local right top
+    read -r right top < <("${BASH_SOURCE%/*}/bar_anchor.py") || return
+    printf '%s %s\n' "$right" \
+        "$(( top - $(hyprctl -j monitors | jq '.[] | select(.id == 0).reserved[1]') ))"
+}
+
 # Print a menu row: a Nerd Font icon, enlarged to match the text, then TEXT.
 # The row is pango markup, so pass rofi_menu -markup-rows.
 icon_row() {

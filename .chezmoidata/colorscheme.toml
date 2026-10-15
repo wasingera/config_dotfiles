@@ -4,14 +4,17 @@
 dark  = "mocha"
 light = "latte"
 
-# Wallpapers for each mode, relative to $HOME (the images aren't tracked), and the lock
-# screen's accent (the greeting's colour), a palette name chosen to suit the lock-screen wallpaper
+# Wallpapers for each mode, relative to $HOME (the images aren't tracked), and the lock screen's
+# accent (the greeting's colour) and date colour: palette names chosen to suit its wallpaper.
+# Latte's accents are too pale for the small date on the light card, so it stays subtext1 there.
 [colorscheme.wallpaper.dark]
 desktop    = ".config/hypr/images/anime_wallpaper_night_2x.png"
 lockscreen = "images/wallpapers/Cloudsday.png"
 lockscreen_accent = "peach"
+lockscreen_date   = "rosewater"
 
 [colorscheme.wallpaper.light]
 desktop    = ".config/hypr/images/anime_girl_paper.jpg"
 lockscreen = "images/wallpapers/artisticlandscape.png"
 lockscreen_accent = "blue"
+lockscreen_date   = "subtext1"

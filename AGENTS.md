@@ -284,8 +284,8 @@ How it fits together:
 
 1. **Palette:** `.chezmoidata/catppuccin.toml` holds all four flavours. `.chezmoidata/colorscheme.toml`
    picks `dark` and `light`, and each mode's wallpapers (desktop and lock screen, relative to
-   `$HOME`; the images aren't tracked) and lock-screen accent, a palette name chosen to suit that
-   wallpaper. Change a flavour, wallpaper or accent there, nowhere else.
+   `$HOME`; the images aren't tracked) and lock-screen colours (greeting and date), palette names
+   chosen to suit that wallpaper. Change a flavour, wallpaper or colour there, nowhere else.
 2. **Templates:** `.chezmoitemplates/colors/<file>` renders one tool's colours. Its `.` is one
    flavour's map (`.base`, `.blue`, ..., plus `.name`, e.g. `"latte"`).
 3. **Per-mode files:** one-line stubs in `dot_config/colorscheme/{dark,light}/` render each
@@ -305,7 +305,7 @@ How it fits together:
    | rofi | `@import "~/.local/state/colorscheme/current/rofi.rasi"` |
    | dunst | `dunstrc.d/colors.conf`, a symlink to `current/dunst.conf` |
    | Hyprland | `pcall(dofile, ...current/hypr.lua)` returns hex without `#`, with a fallback |
-   | hyprlock | `source = ~/.local/state/colorscheme/current/hyprlock.conf` (`$blue` = `rgb(...)`, the card's translucent `$panel_rim` and `$panel_fill`, plus `$wallpaper` and `$accent`, the greeting's colour) |
+   | hyprlock | `source = ~/.local/state/colorscheme/current/hyprlock.conf` (`$blue` = `rgb(...)`, the card's translucent `$panel_rim` and `$panel_fill`, plus `$wallpaper`, and `$accent` and `$date_colour` for the greeting and the date) |
    | hyprpaper | `hypr/hyprpaper.conf` is a symlink to `current/hyprpaper.conf`; `colorscheme` sets the wallpaper over IPC |
    | GTK4 | `gtk-4.0/gtk.css` is a symlink to `current/gtk4.css` |
    | GTK3 | `gtk-3.0/settings.ini` is a symlink to `current/gtk3.ini`; the theme name also goes to gsettings |

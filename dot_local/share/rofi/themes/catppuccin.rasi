@@ -1,4 +1,4 @@
-/* Palette variables (@base, @blue, ...) of the active light/dark scheme;
+/* Palette variables (@base, @blue, ..., @accent) of the active light/dark scheme;
  * see ~/.local/bin/colorscheme */
 @import "~/.local/state/colorscheme/current/rofi.rasi"
 
@@ -21,7 +21,7 @@ inputbar {
 }
 
 prompt {
-    background-color: @blue;
+    background-color: @accent;
     padding: 6px;
     text-color: @base;
     border-radius: 3px;
@@ -53,7 +53,7 @@ element-icon {
 }
 
 element selected {
-    text-color: @red  ;
+    text-color: @accent;
 }
 
 mode-switcher {
@@ -70,5 +70,5 @@ button {
 
 button selected {
   background-color: @base;
-  text-color: @blue;
+  text-color: @accent;
 }

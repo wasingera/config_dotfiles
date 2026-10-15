@@ -4,4 +4,7 @@
 {{- range $name, $hex := . }}{{ if ne $name "name" }}
     {{ $name }}: {{ $hex }};
 {{- end }}{{ end }}
+    /* the accent pair: accent for highlights, accent2 beside it */
+    accent: @blue;
+    accent2: @mauve;
 }

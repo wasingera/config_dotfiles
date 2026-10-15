@@ -5,4 +5,7 @@ return {
 {{- range $name, $hex := . }}{{ if ne $name "name" }}
     {{ $name }} = "{{ trimPrefix "#" $hex }}",
 {{- end }}{{ end }}
+    -- the accent pair: accent for highlights, accent2 beside it
+    accent = "{{ trimPrefix "#" .blue }}",
+    accent2 = "{{ trimPrefix "#" .mauve }}",
 }

@@ -1,4 +1,4 @@
-// Palette variables ($base, $blue, ...) of the active light/dark scheme;
+// Palette variables ($base, $blue, ..., $accent) of the active light/dark scheme;
 // see ~/.local/bin/colorscheme
 @import "colors";
 
@@ -50,7 +50,7 @@
 }
 
 .workspaces {
-  color: $blue;
+  color: $accent;
   // Equal padding + fixed gaps (the yuck :spacing) keep the row centred.
   // Label is 21px tall (hinted ascent 16 + descent 5) with the circle at
   // 3.23px from the top and 3.76px from the bottom. min-height matches it so
@@ -73,11 +73,11 @@
 
 // Special workspace indicator: inset outline so the box doesn't resize
 .workspaces.special-occupied {
-  box-shadow: inset 0 0 0 1px $blue;
+  box-shadow: inset 0 0 0 1px $accent;
 }
 
 .workspaces.special-open {
-  box-shadow: inset 0 0 0 2px $blue;
+  box-shadow: inset 0 0 0 2px $accent;
 }
 
 .volume {

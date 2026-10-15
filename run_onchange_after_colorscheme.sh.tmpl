@@ -1,11 +1,13 @@
 {{- if .desktop -}}
 #!/bin/sh
-# Re-apply the current colour scheme whenever the palette or a colour template
-# changes, so ~/.local/state/colorscheme/current/ gets the new colours. Also when
-# hyprlock's layout or card script changes, to re-render the card's backdrop.
+# Re-apply the current colour scheme whenever the palette, a colour template or
+# the accent picker changes, so ~/.local/state/colorscheme/current/ gets the new
+# colours. Also when hyprlock's layout or card script changes, to re-render the
+# card's backdrop.
 # chezmoi re-runs this script when its rendered content changes:
 # {{ include ".chezmoidata/catppuccin.toml" | sha256sum }}
 # {{ include ".chezmoidata/colorscheme.toml" | sha256sum }}
+# {{ include "dot_local/bin/executable_colorscheme-accents" | sha256sum }}
 # {{ include "dot_config/hypr/hyprlock.conf" | sha256sum }}
 # {{ include "dot_config/hypr/scripts/executable_hyprlock_card.py" | sha256sum }}
 {{- range glob (joinPath .chezmoi.sourceDir ".chezmoitemplates/colors/*") }}

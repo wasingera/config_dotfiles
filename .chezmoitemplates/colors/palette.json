@@ -1,0 +1,2 @@
+{{- /* The palette as JSON, read by ~/.local/bin/colorscheme-accents. */ -}}
+{{ toPrettyJson . }}

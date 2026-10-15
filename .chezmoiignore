@@ -19,6 +19,7 @@ CLAUDE.md
 .local/share/applications
 .config/colorscheme
 .local/bin/colorscheme
+.local/bin/colorscheme-accents
 .local/bin/colorscheme-solar
 .config/systemd
 {{ end }}

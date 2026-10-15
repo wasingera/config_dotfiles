@@ -4,17 +4,8 @@
 dark  = "mocha"
 light = "latte"
 
-# Wallpapers for each mode, relative to $HOME (the images aren't tracked), and the lock screen's
-# accent (the greeting's colour) and date colour: palette names chosen to suit its wallpaper.
-# Latte's accents are too pale for the small date on the light card, so it stays subtext1 there.
-[colorscheme.wallpaper.dark]
-desktop    = "Pictures/wallpapers/anime-girl-train-station.png"
-lockscreen = "Pictures/wallpapers/anime-girl-train-station.png"
-lockscreen_accent = "peach"
-lockscreen_date   = "rosewater"
-
-[colorscheme.wallpaper.light]
-desktop    = "Pictures/wallpapers/anime-girl-train-station.png"
-lockscreen = "Pictures/wallpapers/anime-girl-train-station.png"
-lockscreen_accent = "blue"
-lockscreen_date   = "subtext1"
+# Each mode's wallpaper, relative to $HOME (the images aren't tracked), on the desktop and the
+# lock screen. The accents are picked to match it (dot_local/bin/executable_colorscheme-accents).
+[colorscheme.wallpaper]
+dark  = "Pictures/wallpapers/anime-girl-train-station.png"
+light = "Pictures/wallpapers/anime-girl-train-station.png"

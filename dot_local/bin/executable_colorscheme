@@ -7,7 +7,8 @@
 # chezmoi renders every mode's colour files into ~/.config/colorscheme/<mode>/
 # (from .chezmoitemplates/colors/ and the palette in .chezmoidata/). This copies
 # the chosen mode's files into ~/.local/state/colorscheme/current/, where the
-# tools' configs import them from, records the mode (nvim watches it) and
+# tools' configs import them from, with colorscheme-accents picking the accent
+# pair to match the wallpaper. Then it records the mode (nvim watches it) and
 # reloads whatever is running. colorscheme-solar calls it at sunrise/sunset.
 
 set -euo pipefail
@@ -33,12 +34,20 @@ if [[ ! -d $modes/$mode ]]; then
     exit 1
 fi
 
-# Replace each file by renaming a full copy over it, so a tool that is watching
-# never reads a half-written file.
+# Build the scheme in a staging directory: the mode's files, with the accents
+# picked to match its wallpaper (or blue and mauve if that fails). Then rename
+# each file over the current one, so a tool that is watching never reads a
+# half-written file.
 mkdir -p "$state/current"
-for file in "$modes/$mode"/*; do
-    cp "$file" "$state/current/.${file##*/}.tmp"
-    mv -f "$state/current/.${file##*/}.tmp" "$state/current/${file##*/}"
+staging=$(mktemp -d "$state/.staging.XXXXXX")
+trap 'rm -rf "$staging"' EXIT
+cp "$modes/$mode"/* "$staging"
+if ! colorscheme-accents "$staging"; then
+    echo "colorscheme: keeping the default accents" >&2
+    cp "$modes/$mode"/* "$staging"
+fi
+for file in "$staging"/*; do
+    mv -f "$file" "$state/current/${file##*/}"
 done
 printf '%s\n' "$mode" >"$state/mode"
 

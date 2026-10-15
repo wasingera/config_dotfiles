@@ -1,0 +1,279 @@
+#!/usr/bin/env python3
+"""Pick the colour scheme's accent pair to match the wallpaper.
+
+    colorscheme-accents DIR [WALLPAPER]       amend the scheme in DIR for WALLPAPER
+    colorscheme-accents --print WALLPAPER...  show what each mode would pick; change nothing
+
+colorscheme copies a light/dark mode's colour files (rendered by chezmoi from
+.chezmoitemplates/colors/) into a staging directory DIR and runs this before moving them
+into ~/.local/state/colorscheme/current/. The files come with a default accent pair, blue
+and mauve; this replaces it with the Catppuccin accents closest to the wallpaper's main
+colours, and points the files at the wallpaper. WALLPAPER defaults to the one in
+DIR/hyprpaper.conf.
+
+The wallpaper's main colours are the peaks of a hue histogram (OKLCH) weighted by chroma,
+so grey and washed-out areas count for little. $accent matches the strongest peak and
+$accent2 the next one at least SEPARATION degrees away, or else is $accent's nearest
+neighbour. Red is never picked, as it means an error, and an accent must reach
+MIN_CONTRAST on the scheme's base, which rules out Latte's paler ones. A nearly grey
+wallpaper keeps the defaults.
+"""
+
+import json
+import math
+import os
+import re
+import sys
+from pathlib import Path
+
+from PIL import Image
+
+HOME = Path.home()
+CONFIG = Path(os.environ.get("XDG_CONFIG_HOME", HOME / ".config"))
+MODES = CONFIG / "colorscheme"
+LAYOUT = CONFIG / "hypr/hyprlock.conf"
+THEMES = (HOME / ".themes", HOME / ".local/share/themes", Path("/usr/share/themes"))
+
+# Catppuccin's accents, without red
+ACCENTS = (
+    "rosewater", "flamingo", "pink", "mauve", "maroon", "peach", "yellow",
+    "green", "teal", "sky", "sapphire", "blue", "lavender",
+)  # fmt: skip
+DEFAULT = ("blue", "mauve")
+MIN_CONTRAST = 3  # WCAG's minimum for large text and UI parts such as borders
+GREY = 0.03  # pixels with less OKLCH chroma than this don't count towards a hue
+MIN_CHROMA = 0.01  # a wallpaper with less mean chroma than this is grey
+SEPARATION = 60  # degrees between the two hues
+SECOND = 0.15  # the least weight of the second hue's peak, relative to the first's
+CHROMA_WEIGHT = 300  # degrees of hue that a difference of 1 in chroma counts for in a match
+NOTE = "picked to match the wallpaper by ~/.local/bin/colorscheme-accents"
+
+
+def rgb(hex_colour):
+    return tuple(int(hex_colour[i : i + 2], 16) for i in (1, 3, 5))
+
+
+def linear(channel):
+    channel /= 255
+    return channel / 12.92 if channel <= 0.04045 else ((channel + 0.055) / 1.055) ** 2.4
+
+
+def contrast(a, b):
+    """WCAG contrast ratio of two sRGB colours, from 1 to 21."""
+
+    def luminance(colour):
+        r, g, b = (linear(channel) for channel in colour)
+        return 0.2126 * r + 0.7152 * g + 0.0722 * b
+
+    lighter, darker = sorted((luminance(a), luminance(b)), reverse=True)
+    return (lighter + 0.05) / (darker + 0.05)
+
+
+def oklch(colour):
+    """An sRGB colour as OKLCH: lightness, chroma and hue in degrees."""
+    r, g, b = (linear(channel) for channel in colour)
+    l = (0.4122214708 * r + 0.5363325363 * g + 0.0514459929 * b) ** (1 / 3)
+    m = (0.2119034982 * r + 0.6806995451 * g + 0.1073969566 * b) ** (1 / 3)
+    s = (0.0883024619 * r + 0.2817188376 * g + 0.6299787005 * b) ** (1 / 3)
+    lightness = 0.2104542553 * l + 0.7936177850 * m - 0.0040720468 * s
+    a = 1.9779984951 * l - 2.4285922050 * m + 0.4505937099 * s
+    b = 0.0259040371 * l + 0.7827717662 * m - 0.8086757660 * s
+    return lightness, math.hypot(a, b), math.degrees(math.atan2(b, a)) % 360
+
+
+def distance(a, b):
+    """Degrees between two hues."""
+    return min(abs(a - b) % 360, 360 - abs(a - b) % 360)
+
+
+def main_colours(path):
+    """The wallpaper's one or two main colours as (chroma, hue), strongest first; none
+    if it's grey."""
+    image = Image.open(path)
+    image.draft("RGB", (256, 256))  # JPEGs decode at a fraction of their size
+    image = image.convert("RGB")
+    image.thumbnail((128, 128))
+    pixels = [oklch(pixel)[1:] for pixel in image.get_flattened_data()]
+    if sum(chroma for chroma, _ in pixels) / len(pixels) < MIN_CHROMA:
+        return []
+
+    weights = [0.0] * 36  # 10 degrees each
+    for chroma, hue in pixels:
+        if chroma >= GREY:
+            weights[int(hue // 10) % 36] += chroma
+    smooth = [0.25 * weights[i - 1] + 0.5 * weights[i] + 0.25 * weights[(i + 1) % 36] for i in range(36)]
+    peaks = sorted(
+        (i for i in range(36) if 0 < smooth[i] >= max(smooth[i - 1], smooth[(i + 1) % 36])),
+        key=lambda i: -smooth[i],
+    )
+    if not peaks:
+        return []
+    chosen = [peaks[0]]
+    for peak in peaks[1:]:
+        if smooth[peak] < SECOND * smooth[peaks[0]]:
+            break
+        if distance(peak * 10, peaks[0] * 10) >= SEPARATION:
+            chosen.append(peak)
+            break
+
+    def mean(centre):
+        """The chroma-weighted mean colour of the pixels within 15 degrees of a hue."""
+        a = b = weight = 0
+        for chroma, hue in pixels:
+            if chroma >= GREY and distance(hue, centre) <= 15:
+                a += chroma * chroma * math.cos(math.radians(hue))
+                b += chroma * chroma * math.sin(math.radians(hue))
+                weight += chroma
+        return math.hypot(a, b) / weight, math.degrees(math.atan2(b, a)) % 360
+
+    return [mean(peak * 10 + 5) for peak in chosen]
+
+
+def pick(palette, colours):
+    """The accent pair for a wallpaper's main colours."""
+    if not colours:
+        return DEFAULT
+    base = rgb(palette["base"])
+    candidates = {
+        name: oklch(rgb(palette[name]))[1:]
+        for name in ACCENTS
+        if contrast(rgb(palette[name]), base) >= MIN_CONTRAST
+    }
+
+    def nearest(colour, taken=None):
+        chroma, hue = colour
+        return min(
+            (name for name in candidates if name != taken),
+            key=lambda name: distance(candidates[name][1], hue)
+            + CHROMA_WEIGHT * abs(candidates[name][0] - chroma),
+        )
+
+    accent = nearest(colours[0])
+    return accent, nearest(colours[-1], taken=accent)
+
+
+def card_contrast():
+    """The contrast that hyprlock's card gives its dimmest text ($card_contrast)."""
+    try:
+        return float(re.search(r"^\$card_contrast\s*=\s*([\d.]+)", LAYOUT.read_text(), re.M)[1])
+    except (OSError, TypeError):
+        return 4.5
+
+
+def date_colour(palette, accent2):
+    """The lock screen's date: $accent2 if it's readable even on an opaque card."""
+    readable = contrast(rgb(palette[accent2]), rgb(palette["base"])) >= card_contrast()
+    return accent2 if readable else "subtext1"
+
+
+def foreground(palette, accent):
+    """The text colour for an accent background: crust or text, whichever stands out more."""
+    return max(("crust", "text"), key=lambda name: contrast(rgb(palette[name]), rgb(palette[accent])))
+
+
+def append(text, *lines):
+    return text.rstrip("\n") + "\n" + "\n".join(lines) + "\n"
+
+
+def replace(text, pattern, line):
+    """Replace the line that matches pattern; its first group is kept in front."""
+    return re.sub(pattern, lambda match: match[1] + line, text, count=1, flags=re.M)
+
+
+def gtk3_theme(text, accent):
+    """Swap the accent in a Catppuccin GTK theme name, if that variant is installed."""
+    match = re.search(r"^gtk-theme-name=catppuccin-(\w+)-\w+-(.+)$", text, re.M)
+    if not match:
+        return text
+    theme = f"catppuccin-{match[1]}-{accent}-{match[2]}"
+    if not any((directory / theme).is_dir() for directory in THEMES):
+        return text
+    return replace(text, r"^(gtk-theme-name=).*$", theme)
+
+
+def amend(directory, wallpaper):
+    palette = json.loads((directory / "palette.json").read_text())
+    if wallpaper is None or not wallpaper.is_file():
+        if wallpaper is not None:
+            print(f"colorscheme-accents: no wallpaper at {wallpaper}", file=sys.stderr)
+        configured = re.search(r"^\s*path = (.+)$", (directory / "hyprpaper.conf").read_text(), re.M)
+        wallpaper = Path(configured[1])
+    accent, accent2 = pick(palette, main_colours(wallpaper)) if wallpaper.is_file() else DEFAULT
+    fg = foreground(palette, accent)
+
+    edits = {
+        "eww.scss": lambda text: append(text, f"// {NOTE}", f"$accent: ${accent};", f"$accent2: ${accent2};"),
+        "rofi.rasi": lambda text: append(
+            text, f"/* {NOTE} */", "* {", f"    accent: @{accent};", f"    accent2: @{accent2};", "}"
+        ),
+        "hypr.lua": lambda text: replace(
+            replace(text, r'^(\s*accent = ).*$', f'"{palette[accent][1:]}",'),
+            r'^(\s*accent2 = ).*$',
+            f'"{palette[accent2][1:]}",',
+        ),
+        "kitty.conf": lambda text: append(
+            text,
+            f"# {NOTE}",
+            f"active_tab_background {palette[accent]}",
+            f"active_tab_foreground {palette[fg]}",
+            f"active_border_color   {palette[accent]}",
+        ),
+        "gtk4.css": lambda text: append(
+            text,
+            f"/* {NOTE} */",
+            ":root {",
+            f"  --accent-bg-color: {palette[accent]};",
+            f"  --accent-fg-color: {palette[fg]};",
+            f"  --accent-color: {palette[accent]};",
+            "}",
+            f"@define-color accent_bg_color {palette[accent]};",
+            f"@define-color accent_fg_color {palette[fg]};",
+            f"@define-color accent_color {palette[accent]};",
+        ),
+        "gtk3.ini": lambda text: gtk3_theme(text, accent),
+        "hyprlock.conf": lambda text: append(
+            text,
+            f"# {NOTE}",
+            f"$wallpaper = {wallpaper}",
+            f"$accent = ${accent}",
+            f"$date_colour = ${date_colour(palette, accent2)}",
+        ),
+        "hyprpaper.conf": lambda text: replace(text, r"^(\s*path = ).*$", str(wallpaper)),
+    }
+    # work everything out before writing anything
+    amended = {
+        name: edit((directory / name).read_text())
+        for name, edit in edits.items()
+        if (directory / name).is_file()
+    }
+    for name, text in amended.items():
+        (directory / name).write_text(text)
+
+
+def show(wallpapers):
+    """Print what each mode would pick for each wallpaper."""
+    for wallpaper in wallpapers:
+        colours = main_colours(wallpaper)
+        hues = ", ".join(f"{hue:.0f}°" for _, hue in colours) or "grey"
+        picks = []
+        for mode in ("dark", "light"):
+            palette = json.loads((MODES / mode / "palette.json").read_text())
+            accent, accent2 = pick(palette, colours)
+            picks.append(f"{mode}: {accent}/{accent2}, date {date_colour(palette, accent2)}")
+        print(f"{Path(wallpaper).name} ({hues}): " + "; ".join(picks))
+
+
+def main(arguments):
+    if arguments and arguments[0] == "--print" and len(arguments) > 1:
+        show(arguments[1:])
+    elif 1 <= len(arguments) <= 2 and not arguments[0].startswith("-"):
+        amend(Path(arguments[0]), Path(arguments[1]) if len(arguments) == 2 else None)
+    else:
+        sys.exit("usage: colorscheme-accents DIR [WALLPAPER] | --print WALLPAPER...")
+
+
+if __name__ == "__main__":
+    try:
+        main(sys.argv[1:])
+    except (OSError, ValueError, KeyError) as error:
+        sys.exit(f"colorscheme-accents: {error}")

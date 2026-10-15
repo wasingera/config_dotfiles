@@ -41,7 +41,7 @@ Special files at the root:
 | `.chezmoiexternal.toml` | zsh plugins, as GitHub archives pinned to a commit hash. |
 | `.chezmoidata/` | Template data on every machine: the Catppuccin palette and the flavour per mode. See "Colours". |
 | `.chezmoitemplates/colors/` | One colour template per tool, rendered from the palette. See "Colours". |
-| `run_onchange_after_colorscheme.sh.tmpl` | Re-runs `colorscheme` when the palette or a colour template changes. Desktop only (renders empty elsewhere). |
+| `run_onchange_after_colorscheme.sh.tmpl` | Re-runs `colorscheme` when the palette, a colour template or the accent picker changes. Desktop only (renders empty elsewhere). |
 | `README.md`, `AGENTS.md`, `CLAUDE.md` | Docs, ignored by chezmoi (not deployed). |
 
 ## Machine types
@@ -57,7 +57,7 @@ What each machine gets:
 - **Desktop only:** `hypr`, `eww`, `rofi` (+ `~/.local/share/rofi`), `dunst`, `kitty`,
   `gtk-3.0`, `gtk-4.0`, `satty`, `chromium-flags.conf`, `zsh/.zprofile` (starts Hyprland on tty1),
   and the light/dark switching: `~/.config/colorscheme/`, `~/.local/bin/colorscheme`,
-  `~/.local/bin/colorscheme-solar` and `~/.config/systemd/`.
+  `~/.local/bin/colorscheme-accents`, `~/.local/bin/colorscheme-solar` and `~/.config/systemd/`.
 
 When adding a new desktop-only config, also add its path to the `{{ if not .desktop }}` block in
 `.chezmoiignore`. Then check it doesn't leak to other machines:
@@ -283,17 +283,17 @@ use palette names from the active scheme.
 How it fits together:
 
 1. **Palette:** `.chezmoidata/catppuccin.toml` holds all four flavours. `.chezmoidata/colorscheme.toml`
-   picks `dark` and `light`, and each mode's wallpapers (desktop and lock screen, relative to
-   `$HOME`; the images aren't tracked) and lock-screen colours (greeting and date), palette names
-   chosen to suit that wallpaper. Change a flavour, wallpaper or colour there, nowhere else.
+   picks `dark` and `light`, and each mode's wallpaper (desktop and lock screen, relative to
+   `$HOME`; the images aren't tracked). Change a flavour or wallpaper there, nowhere else.
 2. **Templates:** `.chezmoitemplates/colors/<file>` renders one tool's colours. Its `.` is one
    flavour's map (`.base`, `.blue`, ..., plus `.name`, e.g. `"latte"`).
 3. **Per-mode files:** one-line stubs in `dot_config/colorscheme/{dark,light}/` render each
    template into `~/.config/colorscheme/<mode>/`, e.g.
    `{{ template "colors/eww.scss" (index .catppuccin .colorscheme.dark) }}`.
 4. **Active scheme:** `colorscheme dark|light|toggle` (`dot_local/bin/executable_colorscheme`)
-   copies a mode's files into `~/.local/state/colorscheme/current/` (untracked state), writes
-   `~/.local/state/colorscheme/mode`, and reloads running tools. `colorscheme-solar` calls it from
+   copies a mode's files into `~/.local/state/colorscheme/current/` (untracked state), via a
+   staging directory where `colorscheme-accents` picks the accents (below). Then it writes
+   `~/.local/state/colorscheme/mode` and reloads running tools. `colorscheme-solar` calls it from
    a systemd timer. Switching therefore never touches a managed file.
 5. **Tools read `current/`** through their own include mechanism, so their main configs stay
    plain files:
@@ -321,9 +321,24 @@ How it fits together:
 4. If the tool doesn't re-read the file by itself, add its reload command to `colorscheme`.
 
 A template that needs a per-mode value besides colours gets it merged into the palette by its
-stub, e.g. hyprlock's
-`(merge (dict "wallpaper" ... "accent" ...) (index .catppuccin .colorscheme.dark))`. A template
-whose `.` is only a path (hyprpaper) is passed that directly.
+stub, e.g. hyprlock's `(merge (dict "wallpaper" ...) (index .catppuccin .colorscheme.dark))`. A
+template whose `.` is only a path (hyprpaper) is passed that directly.
+
+**Accents follow the wallpaper.** The scheme's main colours are an accent pair: `accent` for
+highlights (the workspaces pill, the launcher, GTK's accent, kitty's active tab, the lock screen's
+greeting) and `accent2` beside it (the second colour of the window border's gradient, the lock
+screen's date). The templates set them to blue and mauve. `dot_local/bin/executable_colorscheme-accents`
+then replaces them in the staged files with the Catppuccin accents nearest the wallpaper's main
+hues, and points the files at the wallpaper:
+
+- Formats with variables get palette names appended (`$accent: $peach;`, `accent: @peach;`,
+  `$accent = $peach`). kitty and GTK4 get hex appended, which wins over the earlier lines.
+  `hypr.lua`, `gtk3.ini` and `hyprpaper.conf` have a line rewritten.
+- The rules are in its docstring: never red (it means an error), at least 3:1 on `base` (which
+  leaves Latte only mauve, maroon, blue, green and teal), and blue/mauve for a grey wallpaper.
+- `colorscheme-accents --print ~/Pictures/wallpapers/*` shows what it would pick for each mode.
+- If it fails, `colorscheme` keeps the defaults. Use `$accent`/`@accent`/`c.accent` for anything
+  that should match the wallpaper; a tool without variables needs a line in `colorscheme-accents`.
 
 `chezmoi apply` runs `run_onchange_after_colorscheme.sh` when templates or palette change; it
 re-applies the current mode.
@@ -333,7 +348,7 @@ Details:
 - nvim on every machine reads `~/.local/state/colorscheme/mode` (dark if missing) and flips
   live when it changes. On the Mac or WSL something else may write it, or nothing.
 - GTK3 needs the AUR themes `catppuccin-gtk-theme-mocha` and `catppuccin-gtk-theme-latte`
-  (`catppuccin-<flavour>-blue-standard+default`). They're also used by the
+  (`catppuccin-<flavour>-<accent>-standard+default`, every accent). They're also used by the
   xdg-desktop-portal-gtk file dialog, which follows gsettings live.
 - GTK4: some apps' own CSS uses libadwaita's old named colours (satty's toolbar uses
   `@headerbar_bg_color`), so `gtk4.css` sets every colour both as a CSS variable and with

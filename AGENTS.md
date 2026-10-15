@@ -116,7 +116,7 @@ The desktop is live while you work. Check each change in the real session:
 | any shell script | `bash -n <file>` |
 | nvim | `nvim --headless +qa` prints nothing; `nvim --headless "+checkhealth <plugin>" "+w! out.txt" +qa` |
 | colours | `colorscheme light`, check, `colorscheme dark`; `chezmoi diff` must be empty in both modes |
-| hyprlock | `hyprlock --grace 60 &` (any input unlocks), screenshot, then `pkill -USR1 -x hyprlock` to unlock |
+| hyprlock | never the real config (see the trap below): `hyprlock -c test.conf --grace 60 &`, screenshot, then `pkill -USR1 -x hyprlock`; `faillock --user $USER` lists no new failures |
 | visual result | `grim -g "x,y wxh" out.png` (screen scale is 1.5, so the image is in physical px) |
 | bar widget geometry | `~/.config/eww/scripts/bar_anchor.py` prints where a menu would hang from the button under the pointer |
 
@@ -131,6 +131,12 @@ Shell traps:
   Anchor it (`pkill -f '^kitty --class test'`) or use `pkill -x name`.
 - Importing a Python script (e.g. `bar_anchor.py` in a test) writes `__pycache__/` next to it. In
   the source directory chezmoi would deploy that, so set `PYTHONDONTWRITEBYTECODE=1`.
+- Ending a real `hyprlock` with `SIGUSR1` or the grace period aborts its PAM password prompt, which
+  pam_faillock can count as a failed login. Three of those lock the account, `sudo` included,
+  for 10 minutes. So test with a `test.conf` (anywhere outside this directory) that turns PAM off:
+  `source = ~/.config/hypr/hyprlock.conf`, `auth:pam:enabled = false` and
+  `auth:fingerprint:enabled = true` (hyprlock needs one method; without fprintd it authenticates
+  nothing). Any input during the grace period unlocks too, so screenshot after about a second.
 
 ## Component notes and gotchas
 

@@ -4,7 +4,12 @@
 image = [{ run = 'imv %s', orphan = true, desc = "imv", for = "unix" }]
 
 [open]
-prepend_rules = [{ mime = "image/*", use = "image" }]
+# HTML matches the default text/* rule, which opens $EDITOR. Send it to
+# xdg-open (the browser) instead; edit stays available under O.
+prepend_rules = [
+	{ mime = "image/*", use = "image" },
+	{ mime = "text/html", use = ["open", "edit", "reveal"] },
+]
 
 [preview]
 # Big enough that previews fill the pane; the default 600x900 leaves a gap.

@@ -28,6 +28,10 @@ if [[ $OSTYPE == darwin* ]]; then
 else
     alias ls="ls --color -h"
 fi
+# macOS has open built in; elsewhere use xdg-open when it's installed
+if [[ $OSTYPE != darwin* ]] && (( $+commands[xdg-open] )); then
+    alias open="xdg-open"
+fi
 alias ll="ls -l"
 alias rm="rm -v"
 alias cp="cp -v"

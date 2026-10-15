@@ -8,13 +8,13 @@ light = "latte"
 # accent (the greeting's colour) and date colour: palette names chosen to suit its wallpaper.
 # Latte's accents are too pale for the small date on the light card, so it stays subtext1 there.
 [colorscheme.wallpaper.dark]
-desktop    = ".config/hypr/images/anime_wallpaper_night_2x.png"
-lockscreen = "images/wallpapers/Cloudsday.png"
+desktop    = "Pictures/wallpapers/anime-girl-train-station.png"
+lockscreen = "Pictures/wallpapers/anime-girl-train-station.png"
 lockscreen_accent = "peach"
 lockscreen_date   = "rosewater"
 
 [colorscheme.wallpaper.light]
-desktop    = ".config/hypr/images/anime_girl_paper.jpg"
-lockscreen = "images/wallpapers/artisticlandscape.png"
+desktop    = "Pictures/wallpapers/anime-girl-train-station.png"
+lockscreen = "Pictures/wallpapers/anime-girl-train-station.png"
 lockscreen_accent = "blue"
 lockscreen_date   = "subtext1"

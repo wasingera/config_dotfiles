@@ -1,1 +1,1 @@
-{{ template "colors/hyprlock.conf" (merge (dict "wallpaper" (joinPath .chezmoi.homeDir .colorscheme.wallpaper.light.lockscreen)) (index .catppuccin .colorscheme.light)) }}
+{{ template "colors/hyprlock.conf" (merge (dict "wallpaper" (joinPath .chezmoi.homeDir .colorscheme.wallpaper.light.lockscreen) "accent" .colorscheme.wallpaper.light.lockscreen_accent) (index .catppuccin .colorscheme.light)) }}

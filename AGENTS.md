@@ -151,6 +151,21 @@ Shell traps:
   use `border_size = 0`, not `no_border`.
 - Wallpapers in `hypr/images/` are intentionally untracked (large files).
 
+### Lock screen (`dot_config/hypr/hyprlock.conf`)
+
+- Positions and sizes are in physical pixels. With `valign = center` a widget's y is its centre's
+  distance above the screen's centre.
+- The layout is computed from `$` variables at the top with hyprlang arithmetic: `{{a + b}}`,
+  one operation per pair of braces, on numbers or variable names without the `$`.
+- The text sits on a frosted card. hyprlock can only blur its whole background, so
+  `hypr/scripts/hyprlock_card.py` renders the wallpaper behind the card, blurred, to
+  `~/.local/state/colorscheme/current/hyprlock-card.png`. hyprlock draws that as an image under
+  the card's translucent panel. `colorscheme` re-renders it on every switch, and
+  `run_onchange_after_colorscheme.sh` re-runs when `hyprlock.conf` or the script changes. The
+  script reads the `$card_*` variables itself, so keep them as plain numbers or `{{a op b}}`.
+- hyprlock draws images after shapes unless `zindex` says otherwise. An image's `size` is its
+  shorter side.
+
 ### eww bar (`dot_config/eww/`)
 
 - The `eww` binary is `~/.local/bin/eww`, built from the source checkout in `~/eww`. That checkout
@@ -286,7 +301,7 @@ How it fits together:
    | rofi | `@import "~/.local/state/colorscheme/current/rofi.rasi"` |
    | dunst | `dunstrc.d/colors.conf`, a symlink to `current/dunst.conf` |
    | Hyprland | `pcall(dofile, ...current/hypr.lua)` returns hex without `#`, with a fallback |
-   | hyprlock | `source = ~/.local/state/colorscheme/current/hyprlock.conf` (`$blue` = `rgb(...)`, plus `$wallpaper`) |
+   | hyprlock | `source = ~/.local/state/colorscheme/current/hyprlock.conf` (`$blue` = `rgb(...)`, the card's translucent `$panel...`, plus `$wallpaper`) |
    | hyprpaper | `hypr/hyprpaper.conf` is a symlink to `current/hyprpaper.conf`; `colorscheme` sets the wallpaper over IPC |
    | GTK4 | `gtk-4.0/gtk.css` is a symlink to `current/gtk4.css` |
    | GTK3 | `gtk-3.0/settings.ini` is a symlink to `current/gtk3.ini`; the theme name also goes to gsettings |

@@ -57,3 +57,6 @@ wallpaper=$(sed -n 's/^ *path = //p' "$state/current/hyprpaper.conf" 2>/dev/null
 if [[ -n $wallpaper ]] && pgrep -x hyprpaper >/dev/null; then
     hyprctl hyprpaper wallpaper ",$wallpaper" >/dev/null 2>&1 || true
 fi
+# hyprlock's glass card shows this mode's wallpaper blurred; render it for the next lock
+card=${XDG_CONFIG_HOME:-$HOME/.config}/hypr/scripts/hyprlock_card.py
+if [[ -x $card ]]; then "$card" || true; fi

@@ -300,6 +300,7 @@ hl.bind(mainMod .. " + E", hl.dsp.exec_cmd(fileManager))
 hl.bind(mainMod .. " + V", hl.dsp.window.float({ action = "toggle" }))
 hl.bind(mainMod .. " + F", hl.dsp.window.fullscreen({ action = "toggle" }))
 hl.bind(mainMod .. " + R", hl.dsp.exec_cmd(menu))
+hl.bind(mainMod .. " + SHIFT + W", hl.dsp.exec_cmd("${HOME}/.local/bin/wallpaper"))  -- the picker
 hl.bind(mainMod .. " + P",         hl.dsp.window.pseudo())
 hl.bind(mainMod .. " + ALT + P",   hl.dsp.window.pin())   -- toggle pin (manual PiP)
 hl.bind(mainMod .. " + T", hl.dsp.layout("togglesplit"))    -- dwindle only

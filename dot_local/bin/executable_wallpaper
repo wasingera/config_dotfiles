@@ -1,0 +1,145 @@
+#!/usr/bin/env python3
+"""Set the desktop's wallpaper; the colour scheme's accents follow it.
+
+    wallpaper                      choose one from ~/Pictures/wallpapers in a rofi menu
+    wallpaper FILE                 use FILE in light and dark mode
+    wallpaper --mode MODE FILE     use FILE in MODE (dark or light) only
+
+In the menu, Enter picks a wallpaper for both modes and Shift+Enter for the current mode
+only. Each mode's wallpaper is a path in ~/.local/state/colorscheme/wallpaper/<mode>; a mode
+without one has its default from .chezmoidata/colorscheme.toml. Setting one re-applies the
+current mode with colorscheme, which shows it on the desktop and the lock screen, and picks
+the accents to match it (colorscheme-accents).
+"""
+
+import hashlib
+import os
+import re
+import subprocess
+import sys
+from concurrent.futures import ThreadPoolExecutor
+from pathlib import Path
+
+from PIL import Image, ImageOps
+
+HOME = Path.home()
+CONFIG = Path(os.environ.get("XDG_CONFIG_HOME", HOME / ".config"))
+STATE = Path(os.environ.get("XDG_STATE_HOME", HOME / ".local/state")) / "colorscheme"
+CACHE = Path(os.environ.get("XDG_CACHE_HOME", HOME / ".cache")) / "wallpaper"
+FOLDER = HOME / "Pictures/wallpapers"
+THEME = CONFIG / "rofi/wallpaper/theme.rasi"
+COLORSCHEME = HOME / ".local/bin/colorscheme"
+MODES = ("dark", "light")
+EXTENSIONS = {".jpg", ".jpeg", ".png", ".webp"}
+# Square, cropped from the middle: rofi fits an icon into a square, so anything wider
+# leaves gaps. In physical pixels; the theme shows them 240px wide at a scale of 1.5.
+THUMBNAIL = (360, 360)
+
+
+def current_mode():
+    try:
+        mode = (STATE / "mode").read_text().strip()
+    except OSError:
+        return "dark"
+    return mode if mode in MODES else "dark"
+
+
+def current_wallpaper(mode):
+    """The mode's wallpaper: the one set here, else its default as chezmoi rendered it."""
+    try:
+        return Path((STATE / "wallpaper" / mode).read_text().strip())
+    except OSError:
+        try:
+            conf = (CONFIG / "colorscheme" / mode / "hyprpaper.conf").read_text()
+            return Path(re.search(r"^\s*path = (.+)$", conf, re.M)[1])
+        except (OSError, TypeError):
+            return None
+
+
+def set_wallpaper(path, modes):
+    path = Path(os.path.abspath(os.path.expanduser(path)))
+    if not path.is_file():
+        sys.exit(f"wallpaper: no such file: {path}")
+    (STATE / "wallpaper").mkdir(parents=True, exist_ok=True)
+    for mode in modes:
+        temporary = STATE / "wallpaper" / f".{mode}.tmp"
+        temporary.write_text(f"{path}\n")
+        temporary.replace(STATE / "wallpaper" / mode)
+    os.execv(COLORSCHEME, [str(COLORSCHEME)])
+
+
+def thumbnail(path):
+    """A cached thumbnail of the image, or None if it can't be read."""
+    stat = path.stat()
+    key = hashlib.sha1(f"{path}\0{stat.st_mtime_ns}\0{stat.st_size}\0{THUMBNAIL}".encode()).hexdigest()
+    cached = CACHE / f"{key}.png"
+    if not cached.is_file():
+        try:
+            image = Image.open(path)
+            image.draft("RGB", THUMBNAIL)  # JPEGs decode at a fraction of their size
+            image = ImageOps.fit(image.convert("RGB"), THUMBNAIL)
+        except OSError:
+            return None
+        temporary = cached.with_name(f".{cached.name}.tmp")
+        image.save(temporary, "PNG")
+        temporary.replace(cached)
+    return cached
+
+
+def choose():
+    images = sorted(
+        (path for path in FOLDER.iterdir() if path.suffix.lower() in EXTENSIONS and path.is_file()),
+        key=lambda path: path.name.lower(),
+    )
+    CACHE.mkdir(parents=True, exist_ok=True)
+    with ThreadPoolExecutor() as pool:
+        entries = [(image, thumb) for image, thumb in zip(images, pool.map(thumbnail, images)) if thumb]
+    if not entries:
+        sys.exit(f"wallpaper: no images in {FOLDER}")
+    # forget the thumbnails of images that are gone or have changed
+    for stale in set(CACHE.glob("*.png")) - {thumb for _, thumb in entries}:
+        stale.unlink(missing_ok=True)
+
+    mode = current_mode()
+    current = current_wallpaper(mode)
+    selected = next((i for i, (image, _) in enumerate(entries) if image == current), 0)
+    rows = "".join(f"{image.stem}\0icon\x1f{thumb}\n" for image, thumb in entries)
+    result = subprocess.run(
+        [
+            "rofi", "-dmenu", "-i", "-p", "Wallpaper", "-show-icons", "-format", "i",
+            "-theme", THEME, "-selected-row", str(selected),
+            "-mesg", f"Enter: light and dark mode · Shift+Enter: {mode} mode only",
+            # a click on a thumbnail picks it; a click anywhere else closes the menu
+            "-hover-select", "-me-select-entry", "", "-me-accept-entry", "MousePrimary",
+            "-kb-cancel", "Escape,Control+g,Control+bracketleft,MousePrimary",
+            "-kb-accept-alt", "", "-kb-custom-1", "Shift+Return",
+        ],
+        input=rows,
+        capture_output=True,
+        text=True,
+    )  # fmt: skip
+    if result.returncode == 0:
+        modes = MODES
+    elif result.returncode == 10:  # kb-custom-1
+        modes = (mode,)
+    else:
+        return
+    set_wallpaper(entries[int(result.stdout)][0], modes)
+
+
+def main(arguments):
+    if not arguments:
+        choose()
+    elif len(arguments) == 1 and not arguments[0].startswith("-"):
+        set_wallpaper(arguments[0], MODES)
+    elif len(arguments) == 3 and arguments[0] == "--mode" and arguments[1] in MODES:
+        set_wallpaper(arguments[2], (arguments[1],))
+    else:
+        sys.exit("usage: wallpaper [[--mode dark|light] FILE]")
+
+
+if __name__ == "__main__":
+    try:
+        main(sys.argv[1:])
+    except OSError as error:
+        sys.exit(f"wallpaper: {error}")

@@ -12,8 +12,8 @@ $card_contrast : 1. A light card over a dark wallpaper needs much more than a da
 The card's geometry ($card_x, $card_y, $card_w, $card_h), blur radius ($card_blur) and
 those settings are read from ~/.config/hypr/hyprlock.conf; the palette and wallpaper
 from the current colour scheme's hyprlock.conf; the screen size from Hyprland (one
-monitor assumed). colorscheme runs this whenever it switches mode, since each mode has
-its own wallpaper and colours.
+monitor assumed). colorscheme runs this whenever it switches mode or wallpaper, which
+change the card's colours.
 """
 
 import json

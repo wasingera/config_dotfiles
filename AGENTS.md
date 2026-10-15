@@ -57,7 +57,8 @@ What each machine gets:
 - **Desktop only:** `hypr`, `eww`, `rofi` (+ `~/.local/share/rofi`), `dunst`, `kitty`,
   `gtk-3.0`, `gtk-4.0`, `satty`, `chromium-flags.conf`, `zsh/.zprofile` (starts Hyprland on tty1),
   and the light/dark switching: `~/.config/colorscheme/`, `~/.local/bin/colorscheme`,
-  `~/.local/bin/colorscheme-accents`, `~/.local/bin/colorscheme-solar` and `~/.config/systemd/`.
+  `~/.local/bin/colorscheme-accents`, `~/.local/bin/colorscheme-solar`, `~/.local/bin/wallpaper`
+  and `~/.config/systemd/`.
 
 When adding a new desktop-only config, also add its path to the `{{ if not .desktop }}` block in
 `.chezmoiignore`. Then check it doesn't leak to other machines:
@@ -130,7 +131,8 @@ Shell traps:
 - `pkill -f pattern` also matches your own shell, whose command line contains the pattern.
   Anchor it (`pkill -f '^kitty --class test'`) or use `pkill -x name`.
 - Importing a Python script (e.g. `bar_anchor.py` in a test) writes `__pycache__/` next to it. In
-  the source directory chezmoi would deploy that, so set `PYTHONDONTWRITEBYTECODE=1`.
+  the source directory chezmoi would deploy that, so set `PYTHONDONTWRITEBYTECODE=1`, and don't
+  combine it with `python3 -I`, which ignores it.
 - Ending a real `hyprlock` with `SIGUSR1` or the grace period aborts its PAM password prompt, which
   pam_faillock can count as a failed login. Three of those lock the account, `sudo` included,
   for 10 minutes. So test with a `test.conf` (anywhere outside this directory) that turns PAM off:
@@ -146,7 +148,8 @@ Shell traps:
   string dispatchers (`movewindowpixel exact ...`) fail, which also breaks third-party tools that
   use them, such as ueberzugpp positioning.
 - `mainMod` is SUPER. Check for conflicts before binding a key: Win+Shift+S already moves a
-  window to the special workspace, and Win+V toggles floating.
+  window to the special workspace, Win+V toggles floating, and Win+Shift+W opens the wallpaper
+  picker. Binds are `hl.bind(...)`; a bare `bind` is nil and stops the config at that line.
 - Window and layer rules use `hl.window_rule({...})`. Some field names differ from the old config:
   use `border_size = 0`, not `no_border`.
 - Wallpapers in `hypr/images/` are intentionally untracked (large files).
@@ -283,8 +286,8 @@ use palette names from the active scheme.
 How it fits together:
 
 1. **Palette:** `.chezmoidata/catppuccin.toml` holds all four flavours. `.chezmoidata/colorscheme.toml`
-   picks `dark` and `light`, and each mode's wallpaper (desktop and lock screen, relative to
-   `$HOME`; the images aren't tracked). Change a flavour or wallpaper there, nowhere else.
+   picks `dark` and `light`, and each mode's default wallpaper (desktop and lock screen, relative
+   to `$HOME`; the images aren't tracked). Change a flavour there, nowhere else.
 2. **Templates:** `.chezmoitemplates/colors/<file>` renders one tool's colours. Its `.` is one
    flavour's map (`.base`, `.blue`, ..., plus `.name`, e.g. `"latte"`).
 3. **Per-mode files:** one-line stubs in `dot_config/colorscheme/{dark,light}/` render each
@@ -340,6 +343,14 @@ hues, and points the files at the wallpaper:
 - If it fails, `colorscheme` keeps the defaults. Use `$accent`/`@accent`/`c.accent` for anything
   that should match the wallpaper; a tool without variables needs a line in `colorscheme-accents`.
 
+**Changing the wallpaper** doesn't touch the repo. `wallpaper FILE` (`dot_local/bin/executable_wallpaper`)
+writes the path to `~/.local/state/colorscheme/wallpaper/dark` and `.../light` (`--mode MODE` for
+one of them) and re-runs `colorscheme`, which passes the current mode's to `colorscheme-accents`. A
+mode without one gets the default from `colorscheme.toml`. Win+Shift+W, or `wallpaper` with no
+arguments, opens a rofi grid of `~/Pictures/wallpapers` (`rofi/wallpaper/theme.rasi`, laid out like
+the launcher): Enter sets both modes, Shift+Enter the current one. Its thumbnails are square,
+because rofi fits an icon into a square, and cached in `~/.cache/wallpaper/`.
+
 `chezmoi apply` runs `run_onchange_after_colorscheme.sh` when templates or palette change; it
 re-applies the current mode.
 
@@ -391,7 +402,8 @@ Full usage and implementation docs: `dot_config/nvim/README.md` (also deployed t
 ## Not tracked here (on purpose)
 
 - `~/.config/zsh/local.zsh`: per-machine settings.
-- `~/.local/state/colorscheme/`: the active scheme and mode, written by `colorscheme`.
+- `~/.local/state/colorscheme/`: the active scheme and mode, written by `colorscheme`, and each
+  mode's wallpaper, written by `wallpaper`.
 - `~/.config/systemd/user/colorscheme-solar-transition.timer`: rewritten by `colorscheme-solar`
   for each sunrise and sunset.
 - `~/.claude/`: Claude Code settings and hooks, including the desktop notification hook.

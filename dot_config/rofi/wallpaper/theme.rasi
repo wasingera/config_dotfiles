@@ -1,0 +1,114 @@
+/* The wallpaper picker (~/.local/bin/wallpaper): a grid of thumbnails in the
+ * middle of the screen, framed like the bar menus (dropdown.rasi) but in the
+ * accent, which follows the wallpaper.
+ *
+ * rofi's click-to-exit does nothing on Wayland, so, like the launcher, the
+ * window covers the screen, transparent, with the box in the middle. A click
+ * outside the box hits no entry and falls through to kb-cancel, which the
+ * script binds to MousePrimary. */
+
+/* Palette variables (@base, @blue, ..., @accent) of the active light/dark
+ * scheme; see ~/.local/bin/colorscheme */
+@import "~/.local/state/colorscheme/current/rofi.rasi"
+
+* {
+    background-color: @base;
+    text-color: @text;
+    font: "Iosevka Term Extended Bold 15px";
+}
+
+window {
+    fullscreen: true;
+    background-color: transparent;
+    children: [ "picker-above", "picker-row", "picker-below" ];
+}
+
+picker-row {
+    orientation: horizontal;
+    expand: false;
+    background-color: transparent;
+    children: [ "picker-left", mainbox, "picker-right" ];
+}
+
+picker-above, picker-below, picker-left, picker-right {
+    expand: true;
+    background-color: transparent;
+}
+
+mainbox {
+    expand: false;
+    /* 4 columns of 240px thumbnails: elements of 240 + 2 * (8 padding + 2
+     * border) = 260px, 10px apart, in 10px of padding and a 2px border */
+    width: 1094px;
+    padding: 10px;
+    spacing: 10px;
+    /* the width of Hyprland's window borders */
+    border: 2px;
+    border-color: @accent;
+    border-radius: 3px;
+    children: [ inputbar, listview, message ];
+}
+
+inputbar {
+    padding: 5px;
+    spacing: 10px;
+    children: [ prompt, entry ];
+}
+
+prompt {
+    text-color: @accent;
+}
+
+entry {
+    placeholder: "type to filter";
+    placeholder-color: @overlay0;
+}
+
+message {
+    padding: 0px 5px;
+}
+
+textbox {
+    text-color: @subtext0;
+}
+
+listview {
+    layout: vertical;
+    columns: 4;
+    /* A box can't be given a height, so the picker's comes from this */
+    lines: 3;
+    fixed-columns: true;
+    spacing: 10px;
+}
+
+element {
+    orientation: vertical;
+    padding: 8px;
+    spacing: 6px;
+    border: 2px;
+    border-color: @base;
+    border-radius: 3px;
+    children: [ element-icon, element-text ];
+}
+
+element selected {
+    background-color: @surface0;
+    border-color: @accent;
+}
+
+element-icon {
+    background-color: inherit;
+    size: 240px;
+}
+
+/* 13px: the longest name, 28 characters of 0.6em, fits in 240px */
+element-text {
+    background-color: inherit;
+    text-color: inherit;
+    font: "Iosevka Term Extended Bold 13px";
+    horizontal-align: 0.5;
+}
+
+element selected element-text {
+    text-color: @accent;
+}

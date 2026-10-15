@@ -5,7 +5,8 @@ dark  = "mocha"
 light = "latte"
 
 # Each mode's wallpaper, relative to $HOME (the images aren't tracked), on the desktop and the
-# lock screen. The accents are picked to match it (dot_local/bin/executable_colorscheme-accents).
+# lock screen, until the wallpaper command (dot_local/bin/executable_wallpaper) sets another. The
+# accents are picked to match it (dot_local/bin/executable_colorscheme-accents).
 [colorscheme.wallpaper]
 dark  = "Pictures/wallpapers/anime-girl-train-station.png"
 light = "Pictures/wallpapers/anime-girl-train-station.png"

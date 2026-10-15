@@ -2,7 +2,8 @@
 # Switch the desktop between its light and dark colour schemes.
 #
 #   colorscheme dark|light|toggle
-#   colorscheme                     re-apply the current mode
+#   colorscheme                     re-apply the current mode (wallpaper does, after
+#                                   setting one)
 #
 # chezmoi renders every mode's colour files into ~/.config/colorscheme/<mode>/
 # (from .chezmoitemplates/colors/ and the palette in .chezmoidata/). This copies
@@ -35,14 +36,16 @@ if [[ ! -d $modes/$mode ]]; then
 fi
 
 # Build the scheme in a staging directory: the mode's files, with the accents
-# picked to match its wallpaper (or blue and mauve if that fails). Then rename
-# each file over the current one, so a tool that is watching never reads a
-# half-written file.
+# picked to match its wallpaper (or blue and mauve if that fails). That's the
+# one set with the wallpaper command, else the default chezmoi rendered. Then
+# rename each file over the current one, so a tool that is watching never
+# reads a half-written file.
 mkdir -p "$state/current"
 staging=$(mktemp -d "$state/.staging.XXXXXX")
 trap 'rm -rf "$staging"' EXIT
 cp "$modes/$mode"/* "$staging"
-if ! colorscheme-accents "$staging"; then
+chosen=$(cat "$state/wallpaper/$mode" 2>/dev/null || true)
+if ! colorscheme-accents "$staging" ${chosen:+"$chosen"}; then
     echo "colorscheme: keeping the default accents" >&2
     cp "$modes/$mode"/* "$staging"
 fi

@@ -158,11 +158,14 @@ Shell traps:
 - The layout is computed from `$` variables at the top with hyprlang arithmetic: `{{a + b}}`,
   one operation per pair of braces, on numbers or variable names without the `$`.
 - The text sits on a frosted card. hyprlock can only blur its whole background, so
-  `hypr/scripts/hyprlock_card.py` renders the wallpaper behind the card, blurred, to
-  `~/.local/state/colorscheme/current/hyprlock-card.png`. hyprlock draws that as an image under
-  the card's translucent panel. `colorscheme` re-renders it on every switch, and
+  `hypr/scripts/hyprlock_card.py` renders the wallpaper behind the card, blurred and tinted with
+  `$base`, to `~/.local/state/colorscheme/current/hyprlock-card.png`. hyprlock draws that as an
+  image inside the card's rim. `colorscheme` re-renders it on every switch, and
   `run_onchange_after_colorscheme.sh` re-runs when `hyprlock.conf` or the script changes. The
   script reads the `$card_*` variables itself, so keep them as plain numbers or `{{a op b}}`.
+- The tint's opacity adapts to the wallpaper: at least `$card_opacity`, and as much more as
+  `$dim_text` (the date's colour) needs to reach `$card_contrast` : 1 everywhere on the card. A
+  light card over a dark wallpaper needs far more than a dark one.
 - hyprlock draws images after shapes unless `zindex` says otherwise. An image's `size` is its
   shorter side.
 
@@ -301,7 +304,7 @@ How it fits together:
    | rofi | `@import "~/.local/state/colorscheme/current/rofi.rasi"` |
    | dunst | `dunstrc.d/colors.conf`, a symlink to `current/dunst.conf` |
    | Hyprland | `pcall(dofile, ...current/hypr.lua)` returns hex without `#`, with a fallback |
-   | hyprlock | `source = ~/.local/state/colorscheme/current/hyprlock.conf` (`$blue` = `rgb(...)`, the card's translucent `$panel...`, plus `$wallpaper`) |
+   | hyprlock | `source = ~/.local/state/colorscheme/current/hyprlock.conf` (`$blue` = `rgb(...)`, the card's translucent `$panel_rim` and `$panel_fill`, plus `$wallpaper`) |
    | hyprpaper | `hypr/hyprpaper.conf` is a symlink to `current/hyprpaper.conf`; `colorscheme` sets the wallpaper over IPC |
    | GTK4 | `gtk-4.0/gtk.css` is a symlink to `current/gtk4.css` |
    | GTK3 | `gtk-3.0/settings.ini` is a symlink to `current/gtk3.ini`; the theme name also goes to gsettings |

@@ -19,8 +19,8 @@
   padding-right: 5px;
 }
 
-.clock, .metrics, .workspaces, .volume, .powerbar, .keyboard, .wifi, .vpn, .bluetooth,
-.notifications, .media {
+.clock, .weather, .metrics, .workspaces, .volume, .powerbar, .keyboard, .wifi, .vpn,
+.bluetooth, .notifications, .media {
   background: $base;
   // The size of the rofi menus' text. Set here rather than taken from GTK's
   // default font, so em widths below come out in whole pixels: every
@@ -37,6 +37,44 @@
   color: $maroon;
   padding-left: 10px;
   padding-right: 10px;
+}
+
+.weather {
+  color: $peach;
+  padding-left: 10px;
+  padding-right: 10px;
+  margin-left: 5px;
+}
+
+// Propo and regular weight, like .net-icon
+.weather-icon {
+  font-family: "FiraCode Nerd Font Propo";
+  font-size: 18px;
+  font-weight: normal;
+  margin-right: 8px;
+}
+
+// Fits "105°F" (5 characters of 0.6em), so the pill keeps its width as the
+// temperature changes
+.weather-temp {
+  min-width: 3em;
+}
+
+// The weather's tooltip. "* { all: unset; }" strips GTK's own look, so it's
+// framed here like the popups (.notif-card)
+tooltip {
+  background: $base;
+  color: $text;
+  font-family: "Iosevka Term Extended";
+  font-size: 15px;
+  font-weight: bold;
+  border: 2px solid $peach;
+  border-radius: 3px;
+}
+
+// GTK ignores padding on the tooltip window itself, so it goes on its box
+tooltip > box {
+  padding: 6px 10px;
 }
 
 .metrics {

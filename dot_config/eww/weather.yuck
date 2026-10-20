@@ -1,0 +1,15 @@
+;; current weather from Open-Meteo: {"icon": ..., "temp": ..., "tooltip": ...},
+;; refreshed every 15 minutes and when the network comes online
+(deflisten weather :initial '{"icon": "", "temp": "--", "tooltip": ""}'
+    `./scripts/weather.sh`)
+
+(defwidget weather_widget []
+    (box
+        :class "weather"
+        :space-evenly false
+        :tooltip {weather.tooltip}
+
+        (label :class "weather-icon" :text {weather.icon})
+        (label :class "weather-temp" :text {weather.temp})
+    )
+)

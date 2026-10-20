@@ -199,6 +199,9 @@ Shell traps:
   - `volume.sh` and `mixer.sh` (the mixer popup) use `pactl subscribe`.
   - The clock is `formattime(EWW_TIME, ...)`.
   - `gpu.sh` streams `nvidia-smi --loop=2` (one long-lived process).
+  - `weather.sh` is the one that has to poll: it fetches Open-Meteo (no API key) every 15 minutes
+    in its own loop, at the location `colorscheme-solar` caches, and early when `nmcli monitor`
+    reports the network coming online (e.g. after a suspend). The details are its tooltip.
   - `notifications.sh` uses `gdbus monitor --session --dest org.freedesktop.Notifications`
     (dunst's `displayedLength` changes as a notification moves into the history), plus a FIFO in
     `$XDG_RUNTIME_DIR` that `notification_history.sh` writes to after marking them seen, and

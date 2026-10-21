@@ -52,6 +52,53 @@ function venv() {
     source "$HOME/venv/$1/bin/activate"
 }
 
+## tmux ##
+# t: attach to the last session, or start tmux (continuum restores the saved
+# sessions); inside tmux, the session picker. t NAME: go to session NAME,
+# making it in this directory if needed. tn [NAME]: the same, named after this
+# directory by default. tl lists sessions; tk [NAME] kills one (the current one
+# by default; tmux then switches to another).
+if (( $+commands[tmux] )); then
+    function _t_go() {
+        if [[ -n $TMUX ]]; then tmux switch-client -t "=$1"; else tmux attach -t "=$1"; fi
+    }
+    function t() {
+        if [[ -n $1 ]]; then
+            tmux has-session -t "=$1" 2>/dev/null || tmux new-session -d -s "$1" || return
+            _t_go "$1"
+        elif [[ -n $TMUX ]]; then
+            tmux display-popup -E -w 60% -h 50% ~/.config/tmux/scripts/pick-session.sh
+        elif tmux has-session 2>/dev/null; then
+            tmux attach
+        else
+            tmux
+        fi
+    }
+    function tn() {
+        # tmux doesn't allow . or : in a session name (as in pick-session.sh)
+        t "${1:-${${PWD:t}//[.:]/_}}"
+    }
+    alias tl="tmux ls"
+    function tk() {
+        if [[ -n $1 ]]; then
+            tmux kill-session -t "=$1"
+        elif [[ -n $TMUX ]]; then
+            tmux kill-session
+        else
+            print -u2 "tk: not in tmux; name a session"
+            return 1
+        fi
+    }
+    # complete session names
+    if (( $+functions[compdef] )); then
+        function _t_sessions() {
+            local -a sessions=(${(f)"$(tmux list-sessions -F '#S' 2>/dev/null)"})
+            _describe session sessions
+        }
+        compdef _t_sessions t tk
+    fi
+fi
+
 ## Path Variables ##
 export PATH="$HOME/.local/bin:$PATH"
 

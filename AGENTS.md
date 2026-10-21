@@ -379,6 +379,10 @@ The bar font is "Iosevka Term Extended"; icons come from "Iosevka Nerd Font".
 - `rm` is aliased to `rm -v`; inside functions use `command rm` to stay quiet.
 - yazi shows image previews through kitty's graphics protocol. Don't route it through ueberzugpp:
   that puts the image mid-screen on this Hyprland.
+- tmux commands: `t` attaches to the last session or starts tmux (inside tmux, the session
+  picker); `t NAME` goes to a session, making it if needed; `tn` does that for a session named
+  after the current directory; `tl` lists them; `tk [NAME]` kills one, the current one by default.
+  Inside tmux they switch the client rather than nesting.
 - `y` runs yazi and `cd`s to the last directory you browsed. zoxide (`z`, `zi`) is initialised
   last, only if it's installed.
 

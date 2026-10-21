@@ -34,6 +34,8 @@ return {
         config = function()
             local splits = require("smart-splits")
             splits.setup({
+                -- at the last split (or tmux pane) in that direction, stay put instead of wrapping
+                move = { at_edge = "stop" },
                 mux = {
                     backend = "smart-splits-backend-tmux",
                     -- outside tmux it just moves between splits; that's not worth a warning

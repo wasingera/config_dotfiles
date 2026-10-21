@@ -62,7 +62,7 @@ The leader is **Space**. Press it and wait to see every leader key; which-key do
 | `<leader>sr` | Reopen the last picker where you left it |
 | `<C-n>` | Toggle the file explorer (from inside it too) |
 | `<C-Space>` | Toggle the floating terminal (works from inside it too) |
-| `<C-h/j/k/l>` | Go to the split on the left/below/above/right, and on into the next tmux pane at the edge |
+| `<C-h/j/k/l>` | Go to the split on the left/below/above/right, and on into the next tmux pane at the edge; stops at the last one |
 | `<A-h/j/k/l>` | Resize the split (or tmux pane) towards the left/down/up/right |
 | `<Esc>` | Clear search highlighting |
 

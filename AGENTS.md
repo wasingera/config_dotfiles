@@ -391,6 +391,14 @@ The bar font is "Iosevka Term Extended"; icons come from "Iosevka Nerd Font".
   sends the key itself, e.g. to clear the screen.
 - Colours: the status formats use only `@thm_subtext0`, `@accent`, `@accent2` and `@accent_fg`,
   set first to ANSI names, then overridden by `current/tmux.conf` where it exists (see "Colours").
+- Plugins are pinned archives in `.chezmoiexternal.toml` (no TPM), loaded with `run-shell` at the
+  end of `tmux.conf`, after `status-right` is set (continuum adds its autosave to it):
+  - tmux-resurrect + continuum: `prefix C-s`/`C-r` save and restore by hand; continuum saves
+    every 15 minutes and restores on server start, but neither while a second tmux server runs.
+  - extrakto: `prefix Tab` picks text from the window (Tab inserts, Enter copies over OSC 52).
+- `prefix f` runs `scripts/pick-session.sh` in a popup: fzf over the other sessions and zoxide's
+  directories, creating a session named after the directory. Inside a popup `#S` is the server's
+  default session, not the client's; use `#{client_session}`.
 - Claude Code may itself be running inside the user's tmux. Test on a private server (`-L test`);
   never kill the default one.
 

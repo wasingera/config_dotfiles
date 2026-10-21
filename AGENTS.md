@@ -385,6 +385,9 @@ The bar font is "Iosevka Term Extended"; icons come from "Iosevka Nerd Font".
   Inside tmux they switch the client rather than nesting.
 - `y` runs yazi and `cd`s to the last directory you browsed. zoxide (`z`, `zi`) is initialised
   last, only if it's installed.
+- `help [NAME]` lists the custom commands from their `#? USAGE - DESCRIPTION` comment lines in
+  `.zshrc` and `local.zsh`, skipping commands that aren't defined on this machine. Give every new
+  function or alias a `#?` line above it (not the ones that only add flags, like `rm -v`).
 
 ### tmux (`dot_config/tmux/tmux.conf`)
 

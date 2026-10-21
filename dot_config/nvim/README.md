@@ -156,6 +156,12 @@ Commands from vim-eunuch: `:Rename`, `:Move`, `:Delete`, `:Chmod`, `:Mkdir`, `:S
 Markdown buffers are rendered in place: headings, bullets, checkboxes, tables, code blocks and
 callouts. The raw text shows on the cursor line. `<leader>um` toggles rendering for the buffer.
 
+### Writing
+
+`<leader>uz` toggles zen mode: the current buffer in one centred window, 90 columns wide, with the
+sign column, statusline and other windows hidden and every paragraph but the cursor's dimmed. The
+same key, or `:q` in the zen window, goes back to the normal layout.
+
 ## Formatting
 
 `<leader>cf` always formats. Format on save is more careful, because clang-format, stylua and
@@ -231,7 +237,7 @@ dot_config/nvim/
 │   │   ├── git.lua              gitsigns
 │   │   ├── lsp.lua              mason, mason-lspconfig, nvim-lspconfig, LSP keymaps, lazydev
 │   │   ├── markdown.lua         render-markdown
-│   │   ├── snacks.lua           picker, explorer, terminal, indent guides, input, bigfile
+│   │   ├── snacks.lua           picker, explorer, terminal, indent guides, input, bigfile, zen
 │   │   ├── treesitter.lua       nvim-treesitter
 │   │   └── ui.lua               lualine
 │   ├── utils.lua                reads and watches the light/dark mode file
@@ -298,8 +304,8 @@ temporary directory and write `light` or `dark` into `colorscheme/mode` there.
 
 ## snacks.nvim (`snacks.lua`)
 
-One plugin provides the picker, explorer, floating terminal, indent guides, `vim.ui.input` and
-large-file handling (`bigfile`). It's loaded at startup with high priority because other specs call
+One plugin provides the picker, explorer, floating terminal, indent guides, `vim.ui.input`,
+large-file handling (`bigfile`) and zen mode. It's loaded at startup with high priority because other specs call
 the `Snacks` global.
 
 - **Picker:** with `picker.enabled`, snacks also replaces `vim.ui.select`, so code actions and
@@ -318,6 +324,10 @@ the `Snacks` global.
   `picker:close()` only removes the windows on the next tick, after `:q` has already decided what
   to do, so the autocommand also calls `picker.layout:close()`, which closes them immediately. It's
   safe to call twice.
+- **Zen:** `Snacks.zen()` opens the buffer in a centred float and turns on `Snacks.dim` while it's
+  open. `zen.win.width = 90` narrows it from snacks' default 120, so wrapped prose keeps a readable
+  line length. The `<leader>uz` toggle is created on `VeryLazy`, because a spec's `init` runs
+  before the `Snacks` global exists.
 
 ## LSP (`lsp.lua`)
 

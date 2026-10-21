@@ -28,8 +28,18 @@ return {
             bigfile = { enabled = true },
             -- Floating terminal
             terminal = { win = { position = "float" } },
+            -- Distraction-free mode: one centred window, the rest hidden, other paragraphs dimmed.
+            -- 90 columns keeps wrapped prose at a readable line length.
+            zen = { win = { width = 90 } },
         },
         init = function()
+            -- After startup, once the Snacks global exists
+            vim.api.nvim_create_autocmd("User", {
+                pattern = "VeryLazy",
+                once = true,
+                callback = function() Snacks.toggle.zen():map("<leader>uz") end,
+            })
+
             -- :q in the last editor window also closes the explorer, so Neovim exits
             vim.api.nvim_create_autocmd("QuitPre", {
                 callback = function()

@@ -23,6 +23,7 @@ unless a section says otherwise.
 - [Git](#git)
 - [Terminal](#terminal)
 - [Markdown](#markdown)
+- [Writing](#writing)
 - [Maintenance](#maintenance)
 - [When something's wrong](#when-somethings-wrong)
 
@@ -315,6 +316,14 @@ under the cursor shows the raw text so you can edit it.
 |---------|------|
 | Toggle rendering | `<leader>um` |
 | Open a link | `gx` |
+
+## Writing
+
+| Do this | Keys |
+|---------|------|
+| Zen mode: one centred window, everything else hidden | `<leader>uz` (again to leave) |
+
+Zen mode also dims every paragraph except the one you're in.
 
 ## Maintenance
 

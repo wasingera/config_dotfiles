@@ -53,7 +53,7 @@ Special files at the root:
 
 What each machine gets:
 
-- **Every machine:** zsh (`ZDOTDIR=~/.config/zsh` via `dot_zshenv`), nvim, clangd.
+- **Every machine:** zsh (`ZDOTDIR=~/.config/zsh` via `dot_zshenv`), nvim, tmux, clangd.
 - **Desktop only:** `hypr`, `eww`, `rofi` (+ `~/.local/share/rofi`), `dunst`, `kitty`,
   `gtk-3.0`, `gtk-4.0`, `satty`, `chromium-flags.conf`, `zsh/.zprofile` (starts Hyprland on tty1),
   and the light/dark switching: `~/.config/colorscheme/`, `~/.local/bin/colorscheme`,
@@ -114,6 +114,7 @@ The desktop is live while you work. Check each change in the real session:
 | dunst | `dunstctl reload`, then `notify-send -u low/normal/critical ...` |
 | rofi theme | `rofi -theme <file> -dump-theme 2>&1 \| grep 'Failed to parse'` (no output = OK) |
 | zsh | `zsh -n <file>`, then `zsh -ic exit` |
+| tmux | a private server: `tmux -L test -f ~/.config/tmux/tmux.conf new -d`, `tmux -L test show-messages` for errors; `tmux -L test send-keys -K -c CLIENT KEY` presses a key through the bindings (needs an attached client, e.g. `kitty --class test -e tmux -L test attach`) |
 | any shell script | `bash -n <file>` |
 | nvim | `nvim --headless +qa` prints nothing; `nvim --headless "+checkhealth <plugin>" "+w! out.txt" +qa` |
 | colours | `colorscheme light`, check, `colorscheme dark`; `chezmoi diff` must be empty in both modes |
@@ -380,6 +381,18 @@ The bar font is "Iosevka Term Extended"; icons come from "Iosevka Nerd Font".
   that puts the image mid-screen on this Hyprland.
 - `y` runs yazi and `cd`s to the last directory you browsed. zoxide (`z`, `zi`) is initialised
   last, only if it's installed.
+
+### tmux (`dot_config/tmux/tmux.conf`)
+
+- The prefix is Ctrl+a. `prefix |` and `prefix -` split in the current directory, `prefix r` reloads.
+- Ctrl+h/j/k/l move between panes and Alt+h/j/k/l resize them, shared with nvim through
+  smart-splits.nvim and its `backend-tmux` plugin: the bindings pass the key on when the pane's
+  `@pane-is-vim` is set, which nvim sets when it starts. In a shell, `prefix C-l` (or `C-h/j/k`)
+  sends the key itself, e.g. to clear the screen.
+- Colours: the status formats use only `@thm_subtext0`, `@accent`, `@accent2` and `@accent_fg`,
+  set first to ANSI names, then overridden by `current/tmux.conf` where it exists (see "Colours").
+- Claude Code may itself be running inside the user's tmux. Test on a private server (`-L test`);
+  never kill the default one.
 
 ### Neovim (`dot_config/nvim/`)
 

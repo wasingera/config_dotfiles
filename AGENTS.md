@@ -387,8 +387,9 @@ The bar font is "Iosevka Term Extended"; icons come from "Iosevka Nerd Font".
 - The prefix is Ctrl+a. `prefix |` and `prefix -` split in the current directory, `prefix r` reloads.
 - Ctrl+h/j/k/l move between panes and Alt+h/j/k/l resize them, shared with nvim through
   smart-splits.nvim and its `backend-tmux` plugin: the bindings pass the key on when the pane's
-  `@pane-is-vim` is set, which nvim sets when it starts. In a shell, `prefix C-l` (or `C-h/j/k`)
-  sends the key itself, e.g. to clear the screen.
+  `@pane-is-vim` is set, which nvim sets when it starts. With no pane to the right, Ctrl+l goes to
+  the program, so it clears a shell; the others do nothing at the edge (Ctrl+j would be Enter).
+  `prefix C-h/j/k/l` sends the key itself anywhere.
 - Each pane has a header on its top border (`pane-border-status`), the active one in an accent
   pill. A `window-layout-changed` hook turns them off in a window with one pane. The borders are
   all one colour: tmux's default `pane-border-indicators` colours only half

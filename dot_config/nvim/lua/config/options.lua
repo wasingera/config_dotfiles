@@ -41,6 +41,23 @@ vim.opt.confirm = true
 -- Faster CursorHold, used by gitsigns and LSP document highlights
 vim.opt.updatetime = 250
 
+-- Spelling, for the buffers where autocmds.lua turns it on: English with every region's spellings
+-- accepted (colour and color), each part of a camelCase word checked on its own, and no complaint
+-- about a lowercase word after a full stop (common with file names like init.lua in docs)
+vim.opt.spelllang = "en"
+vim.opt.spelloptions = "camel"
+vim.opt.spellcapcheck = ""
+
+-- Words added with zg go to a list that chezmoi links into the repo, so every machine shares it.
+-- Neovim reads the list's compiled .spl file and only rebuilds it after zg, so rebuild it here
+-- when the list is newer, e.g. after a git pull.
+local spellfile = vim.fn.stdpath("config") .. "/spell/en.utf-8.add"
+vim.opt.spellfile = spellfile
+local words, compiled = vim.uv.fs_stat(spellfile), vim.uv.fs_stat(spellfile .. ".spl")
+if words and (not compiled or words.mtime.sec > compiled.mtime.sec) then
+    vim.cmd.mkspell({ args = { spellfile }, bang = true, mods = { silent = true } })
+end
+
 -- Rounded borders on every floating window (hover, signature help, diagnostics)
 vim.opt.winborder = "rounded"
 

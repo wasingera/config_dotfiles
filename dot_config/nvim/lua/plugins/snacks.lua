@@ -28,8 +28,32 @@ return {
             bigfile = { enabled = true },
             -- Floating terminal
             terminal = { win = { position = "float" } },
+            -- Distraction-free mode: one centred window, the rest hidden, other paragraphs dimmed.
+            -- 90 columns keeps wrapped prose at a readable line length. border = true uses
+            -- 'winborder' (rounded), like the other floats. Zen's own full height ignores the
+            -- border, which would push the bottom edge off screen, so leave room for it here.
+            zen = {
+                win = {
+                    width = 90,
+                    border = true,
+                    height = function() return vim.o.lines - vim.o.cmdheight - 2 end,
+                    -- A quiet border in the line numbers' colour instead of FloatBorder's blue.
+                    -- NormalFloat:Normal is snacks' default for zen, kept so the text background matches.
+                    wo = { winhighlight = "NormalFloat:Normal,FloatBorder:LineNr" },
+                },
+            },
         },
         init = function()
+            -- After startup, once the Snacks global exists
+            vim.api.nvim_create_autocmd("User", {
+                pattern = "VeryLazy",
+                once = true,
+                callback = function()
+                    Snacks.toggle.zen():map("<leader>uz")
+                    Snacks.toggle.option("spell", { name = "Spelling" }):map("<leader>us")
+                end,
+            })
+
             -- :q in the last editor window also closes the explorer, so Neovim exits
             vim.api.nvim_create_autocmd("QuitPre", {
                 callback = function()

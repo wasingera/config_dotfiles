@@ -393,6 +393,10 @@ Full usage and implementation docs: `dot_config/nvim/README.md` (also deployed t
   (`nvim: update plugins`). On the other machines, `chezmoi apply`, then `:Lazy restore` to check
   out the same commits. If highlighting then fails with "Invalid node type", the queries are
   newer than the parsers: run `:TSUpdate`.
+- **Spelling:** `~/.config/nvim/spell/en.utf-8.add` is a symlink to
+  `dot_config/nvim/spell/.en.utf-8.add` the same way, so `zg` writes into the repo. Commit it as
+  `nvim: add words to the spell list`. `options.lua` recompiles it at startup when it's newer than
+  its untracked `.spl`.
 - **Removing a plugin spec file:** also list it in `.chezmoiremove`. lazy.nvim loads every file in
   `lua/plugins/`, and chezmoi leaves deleted files behind on the other machines.
 - **Formatting:** conform formats on save only when the project has that formatter's config (the

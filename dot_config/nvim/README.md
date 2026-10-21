@@ -162,8 +162,8 @@ callouts. The raw text shows on the cursor line. `<leader>um` toggles rendering 
 sign column, statusline and other windows hidden and every paragraph but the cursor's dimmed. The
 same key, or `:q` in the zen window, goes back to the normal layout.
 
-Markdown, plain text and commit messages are spellchecked in British English, and long lines wrap
-between words. Only prose is checked: inline code, code blocks (apart from their comments) and URLs
+Markdown, plain text and commit messages are spellchecked, accepting both British and American
+spellings, and long lines wrap between words. Only prose is checked: inline code, code blocks (apart from their comments) and URLs
 are skipped. `<leader>us` toggles spelling for the window, e.g. for a file that's mostly jargon.
 
 | Key | Action |
@@ -306,8 +306,9 @@ Spelling is set up here but turned on per buffer: a `FileType` autocommand in `c
 sets `spell` and `linebreak` locally for `markdown`, `text` and `gitcommit`, so code buffers never
 get them. Treesitter's `@spell`/`@nospell` captures decide which parts of the buffer are checked.
 
-- `spelllang = "en_gb"`. Neovim ships one English file covering every region, so nothing is
-  downloaded; `en_gb` flags American spellings such as "color".
+- `spelllang = "en"`. Neovim ships one English file covering every region, so nothing is
+  downloaded. Plain `en` accepts every region's spellings ("colour" and "color"); `en_gb` or
+  `en_us` would flag the other's.
 - `spelloptions = "camel"` checks each part of `camelCase` separately, and `spellcapcheck = ""`
   stops lowercase words after a full stop (`init.lua`) being flagged.
 - `spellfile` is `~/.config/nvim/spell/en.utf-8.add`, a symlink to `spell/.en.utf-8.add` in the

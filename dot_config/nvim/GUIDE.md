@@ -329,9 +329,10 @@ under the cursor shows the raw text so you can edit it.
 
 Zen mode also dims every paragraph except the one you're in.
 
-Markdown, text files and commit messages are spellchecked (British English), and only the prose:
-code and links are skipped. Words added with `zg` go into the dotfiles repo, so every machine gets
-them; commit `dot_config/nvim/spell/.en.utf-8.add` now and then.
+Markdown, text files and commit messages are spellchecked, accepting British and American
+spellings, and only the prose: code and links are skipped. Words added with `zg` go into the
+dotfiles repo, so every machine gets them; commit `dot_config/nvim/spell/.en.utf-8.add` now and
+then.
 
 ## Maintenance
 

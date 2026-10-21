@@ -41,10 +41,10 @@ vim.opt.confirm = true
 -- Faster CursorHold, used by gitsigns and LSP document highlights
 vim.opt.updatetime = 250
 
--- Spelling, for the buffers where autocmds.lua turns it on: British English, each part of a
--- camelCase word checked on its own, and no complaint about a lowercase word after a full stop
--- (common with file names like init.lua in docs)
-vim.opt.spelllang = "en_gb"
+-- Spelling, for the buffers where autocmds.lua turns it on: English with every region's spellings
+-- accepted (colour and color), each part of a camelCase word checked on its own, and no complaint
+-- about a lowercase word after a full stop (common with file names like init.lua in docs)
+vim.opt.spelllang = "en"
 vim.opt.spelloptions = "camel"
 vim.opt.spellcapcheck = ""
 

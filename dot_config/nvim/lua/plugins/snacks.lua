@@ -37,6 +37,9 @@ return {
                     width = 90,
                     border = true,
                     height = function() return vim.o.lines - vim.o.cmdheight - 2 end,
+                    -- A quiet border in the line numbers' colour instead of FloatBorder's blue.
+                    -- NormalFloat:Normal is snacks' default for zen, kept so the text background matches.
+                    wo = { winhighlight = "NormalFloat:Normal,FloatBorder:LineNr" },
                 },
             },
         },

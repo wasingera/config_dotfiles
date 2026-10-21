@@ -364,6 +364,9 @@ the `Snacks` global.
 - **Zen border:** `zen.win.border = true` takes `'winborder'`, so the window is rounded like the
   other floats. Zen's own full height fills the editor without counting the border, which pushes
   the bottom edge off screen, so `zen.win.height` is a function that leaves two rows for it.
+  `zen.win.wo.winhighlight` maps `FloatBorder` to `LineNr` (catppuccin's `surface1`), a quiet
+  grey in both flavours instead of the usual blue. It replaces snacks' default `winhighlight` for
+  zen, so it repeats that default's `NormalFloat:Normal`.
 
 ## LSP (`lsp.lua`)
 

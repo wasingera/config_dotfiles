@@ -52,7 +52,7 @@ return {
                                 "List references",
                                 { nowait = true }
                             )
-                            map("n", "<C-k>", vim.lsp.buf.signature_help, "Signature help")
+                            map("n", "gK", vim.lsp.buf.signature_help, "Signature help")
                             map("n", "<F2>", vim.lsp.buf.rename, "Rename symbol")
                             map({ "n", "x" }, "<F4>", vim.lsp.buf.code_action, "Code action")
                             map("n", "gl", vim.diagnostic.open_float, "Show diagnostics")

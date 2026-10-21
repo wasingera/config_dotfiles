@@ -86,7 +86,7 @@ hidden files, `I` shows git-ignored files, `<BS>` goes up a folder.
 | `go` | Type definition |
 | `gr` | References |
 | `K` | Hover documentation (Neovim default) |
-| `<C-k>` | Signature help (`<C-s>` in insert mode, Neovim default) |
+| `gK` | Signature help (`<C-s>` in insert mode, Neovim default) |
 | `<F2>` | Rename symbol |
 | `<F4>` | Code actions, for the cursor or the selection |
 | `gl` | Show the diagnostics on this line |

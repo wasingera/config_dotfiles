@@ -307,6 +307,7 @@ How it fits together:
    | Tool | How |
    |------|-----|
    | kitty | `include` of `current/kitty.conf`; `colorscheme` sends it SIGUSR1 to reload |
+   | tmux | `source-file -q` of `current/tmux.conf` (`@thm_<name>`, `@accent`... and the style options in hex), after ANSI fallbacks; `colorscheme` sources it into the running server |
    | eww | `@import "colors"`; `colors.scss` is a chezmoi symlink to `current/eww.scss` |
    | rofi | `@import "~/.local/state/colorscheme/current/rofi.rasi"` |
    | dunst | `dunstrc.d/colors.conf`, a symlink to `current/dunst.conf` |
@@ -331,14 +332,14 @@ stub, e.g. hyprlock's `(merge (dict "wallpaper" ...) (index .catppuccin .colorsc
 template whose `.` is only a path (hyprpaper) is passed that directly.
 
 **Accents follow the wallpaper.** The scheme's main colours are an accent pair: `accent` for
-highlights (the workspaces pill, the launcher, GTK's accent, kitty's active tab, the lock screen's
-greeting) and `accent2` beside it (the second colour of the window border's gradient, the lock
-screen's date). The templates set them to blue and mauve. `dot_local/bin/executable_colorscheme-accents`
+highlights (the workspaces pill, the launcher, GTK's accent, kitty's active tab, tmux's session
+pill, the lock screen's greeting) and `accent2` beside it (the second colour of the window border's
+gradient, the lock screen's date). The templates set them to blue and mauve. `dot_local/bin/executable_colorscheme-accents`
 then replaces them in the staged files with the Catppuccin accents nearest the wallpaper's main
 hues, and points the files at the wallpaper:
 
 - Formats with variables get palette names appended (`$accent: $peach;`, `accent: @peach;`,
-  `$accent = $peach`). kitty and GTK4 get hex appended, which wins over the earlier lines.
+  `$accent = $peach`). kitty, tmux and GTK4 get hex appended, which wins over the earlier lines.
   `hypr.lua`, `gtk3.ini` and `hyprpaper.conf` have a line rewritten.
 - The rules are in its docstring: never red (it means an error), at least 3:1 on `base` (which
   leaves Latte only mauve, maroon, blue, green and teal), and blue/mauve for a grey wallpaper.

@@ -17,6 +17,10 @@ setopt SHARE_HISTORY
 fpath+=($ZDOTDIR/plugins/pure)
 source $ZDOTDIR/plugins/load-plugins.zsh
 
+## Completion ##
+# after the plugins, which add to fpath (zsh-completions)
+autoload -U compinit && compinit
+
 ## Prompt Setup ##
 autoload -U promptinit; promptinit
 prompt pure

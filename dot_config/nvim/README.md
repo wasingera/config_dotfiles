@@ -361,6 +361,9 @@ the `Snacks` global.
   open. `zen.win.width = 90` narrows it from snacks' default 120, so wrapped prose keeps a readable
   line length. The `<leader>uz` toggle is created on `VeryLazy`, because a spec's `init` runs
   before the `Snacks` global exists.
+- **Zen border:** `zen.win.border = true` takes `'winborder'`, so the window is rounded like the
+  other floats. Zen's own full height fills the editor without counting the border, which pushes
+  the bottom edge off screen, so `zen.win.height` is a function that leaves two rows for it.
 
 ## LSP (`lsp.lua`)
 

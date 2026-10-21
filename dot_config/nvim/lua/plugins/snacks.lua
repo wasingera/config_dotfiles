@@ -29,8 +29,16 @@ return {
             -- Floating terminal
             terminal = { win = { position = "float" } },
             -- Distraction-free mode: one centred window, the rest hidden, other paragraphs dimmed.
-            -- 90 columns keeps wrapped prose at a readable line length.
-            zen = { win = { width = 90 } },
+            -- 90 columns keeps wrapped prose at a readable line length. border = true uses
+            -- 'winborder' (rounded), like the other floats. Zen's own full height ignores the
+            -- border, which would push the bottom edge off screen, so leave room for it here.
+            zen = {
+                win = {
+                    width = 90,
+                    border = true,
+                    height = function() return vim.o.lines - vim.o.cmdheight - 2 end,
+                },
+            },
         },
         init = function()
             -- After startup, once the Snacks global exists

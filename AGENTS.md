@@ -334,7 +334,7 @@ template whose `.` is only a path (hyprpaper) is passed that directly.
 
 **Accents follow the wallpaper.** The scheme's main colours are an accent pair: `accent` for
 highlights (the workspaces pill, the launcher, GTK's accent, kitty's active tab, tmux's session
-pill, the lock screen's greeting) and `accent2` beside it (the second colour of the window border's
+pill and active pane header, the lock screen's greeting) and `accent2` beside it (the second colour of the window border's
 gradient, the lock screen's date). The templates set them to blue and mauve. `dot_local/bin/executable_colorscheme-accents`
 then replaces them in the staged files with the Catppuccin accents nearest the wallpaper's main
 hues, and points the files at the wallpaper:
@@ -389,6 +389,10 @@ The bar font is "Iosevka Term Extended"; icons come from "Iosevka Nerd Font".
   smart-splits.nvim and its `backend-tmux` plugin: the bindings pass the key on when the pane's
   `@pane-is-vim` is set, which nvim sets when it starts. In a shell, `prefix C-l` (or `C-h/j/k`)
   sends the key itself, e.g. to clear the screen.
+- Each pane has a header on its top border (`pane-border-status`), the active one in an accent
+  pill. A `window-layout-changed` hook turns them off in a window with one pane. The borders are
+  all one colour: tmux's default `pane-border-indicators` colours only half
+  of the border between two panes.
 - Colours: the status formats use only `@thm_subtext0`, `@accent`, `@accent2` and `@accent_fg`,
   set first to ANSI names, then overridden by `current/tmux.conf` where it exists (see "Colours").
 - Plugins are pinned archives in `.chezmoiexternal.toml` (no TPM), loaded with `run-shell` at the

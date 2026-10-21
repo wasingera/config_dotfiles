@@ -224,7 +224,6 @@ def amend(directory, wallpaper):
             f'set -g @accent "{palette[accent]}"',
             f'set -g @accent2 "{palette[accent2]}"',
             f'set -g @accent_fg "{palette[fg]}"',
-            f'set -g pane-active-border-style "fg={palette[accent]}"',
             f'set -g mode-style "bg={palette[accent]},fg={palette[fg]}"',
             f'set -g popup-border-style "fg={palette[accent]}"',
             f'set -g display-panes-active-colour "{palette[accent]}"',

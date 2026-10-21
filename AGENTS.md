@@ -53,7 +53,7 @@ Special files at the root:
 
 What each machine gets:
 
-- **Every machine:** zsh (`ZDOTDIR=~/.config/zsh` via `dot_zshenv`), nvim, clangd.
+- **Every machine:** zsh (`ZDOTDIR=~/.config/zsh` via `dot_zshenv`), nvim, tmux, clangd.
 - **Desktop only:** `hypr`, `eww`, `rofi` (+ `~/.local/share/rofi`), `dunst`, `kitty`,
   `gtk-3.0`, `gtk-4.0`, `satty`, `chromium-flags.conf`, `zsh/.zprofile` (starts Hyprland on tty1),
   and the light/dark switching: `~/.config/colorscheme/`, `~/.local/bin/colorscheme`,
@@ -114,6 +114,7 @@ The desktop is live while you work. Check each change in the real session:
 | dunst | `dunstctl reload`, then `notify-send -u low/normal/critical ...` |
 | rofi theme | `rofi -theme <file> -dump-theme 2>&1 \| grep 'Failed to parse'` (no output = OK) |
 | zsh | `zsh -n <file>`, then `zsh -ic exit` |
+| tmux | a private server: `tmux -L test -f ~/.config/tmux/tmux.conf new -d`, `tmux -L test show-messages` for errors; `tmux -L test send-keys -K -c CLIENT KEY` presses a key through the bindings (needs an attached client, e.g. `kitty --class test -e tmux -L test attach`) |
 | any shell script | `bash -n <file>` |
 | nvim | `nvim --headless +qa` prints nothing; `nvim --headless "+checkhealth <plugin>" "+w! out.txt" +qa` |
 | colours | `colorscheme light`, check, `colorscheme dark`; `chezmoi diff` must be empty in both modes |
@@ -307,6 +308,7 @@ How it fits together:
    | Tool | How |
    |------|-----|
    | kitty | `include` of `current/kitty.conf`; `colorscheme` sends it SIGUSR1 to reload |
+   | tmux | `source-file -q` of `current/tmux.conf` (`@thm_<name>`, `@accent`... and the style options in hex), after ANSI fallbacks; `colorscheme` sources it into the running server |
    | eww | `@import "colors"`; `colors.scss` is a chezmoi symlink to `current/eww.scss` |
    | rofi | `@import "~/.local/state/colorscheme/current/rofi.rasi"` |
    | dunst | `dunstrc.d/colors.conf`, a symlink to `current/dunst.conf` |
@@ -331,14 +333,14 @@ stub, e.g. hyprlock's `(merge (dict "wallpaper" ...) (index .catppuccin .colorsc
 template whose `.` is only a path (hyprpaper) is passed that directly.
 
 **Accents follow the wallpaper.** The scheme's main colours are an accent pair: `accent` for
-highlights (the workspaces pill, the launcher, GTK's accent, kitty's active tab, the lock screen's
-greeting) and `accent2` beside it (the second colour of the window border's gradient, the lock
-screen's date). The templates set them to blue and mauve. `dot_local/bin/executable_colorscheme-accents`
+highlights (the workspaces pill, the launcher, GTK's accent, kitty's active tab, tmux's session
+pill and active pane header, the lock screen's greeting) and `accent2` beside it (the second colour of the window border's
+gradient, the lock screen's date). The templates set them to blue and mauve. `dot_local/bin/executable_colorscheme-accents`
 then replaces them in the staged files with the Catppuccin accents nearest the wallpaper's main
 hues, and points the files at the wallpaper:
 
 - Formats with variables get palette names appended (`$accent: $peach;`, `accent: @peach;`,
-  `$accent = $peach`). kitty and GTK4 get hex appended, which wins over the earlier lines.
+  `$accent = $peach`). kitty, tmux and GTK4 get hex appended, which wins over the earlier lines.
   `hypr.lua`, `gtk3.ini` and `hyprpaper.conf` have a line rewritten.
 - The rules are in its docstring: never red (it means an error), at least 3:1 on `base` (which
   leaves Latte only mauve, maroon, blue, green and teal), and blue/mauve for a grey wallpaper.
@@ -377,8 +379,39 @@ The bar font is "Iosevka Term Extended"; icons come from "Iosevka Nerd Font".
 - `rm` is aliased to `rm -v`; inside functions use `command rm` to stay quiet.
 - yazi shows image previews through kitty's graphics protocol. Don't route it through ueberzugpp:
   that puts the image mid-screen on this Hyprland.
+- tmux commands: `t` attaches to the last session or starts tmux (inside tmux, the session
+  picker); `t NAME` goes to a session, making it if needed; `tn` does that for a session named
+  after the current directory; `tl` lists them; `tk [NAME]` kills one, the current one by default.
+  Inside tmux they switch the client rather than nesting.
 - `y` runs yazi and `cd`s to the last directory you browsed. zoxide (`z`, `zi`) is initialised
   last, only if it's installed.
+
+### tmux (`dot_config/tmux/tmux.conf`)
+
+- The prefix is Ctrl+a. `prefix |` and `prefix -` split in the current directory, `prefix r` reloads.
+- Ctrl+h/j/k/l move between panes and Alt+h/j/k/l resize them, shared with nvim through
+  smart-splits.nvim and its `backend-tmux` plugin: the bindings pass the key on when the pane's
+  `@pane-is-vim` is set, which nvim sets when it starts. With no pane to the right, Ctrl+l goes to
+  the program, so it clears a shell; the others do nothing at the edge (Ctrl+j would be Enter).
+  `prefix C-h/j/k/l` sends the key itself anywhere.
+- Each pane has a header on its top border (`pane-border-status`), the active one in an accent
+  pill. A `window-layout-changed` hook turns them off in a window with one pane. The borders are
+  all one colour: tmux's default `pane-border-indicators` colours only half
+  of the border between two panes.
+- Colours: the status formats use only `@thm_subtext0`, `@accent`, `@accent2` and `@accent_fg`,
+  set first to ANSI names, then overridden by `current/tmux.conf` where it exists (see "Colours").
+- Plugins are pinned archives in `.chezmoiexternal.toml` (no TPM), loaded with `run-shell` at the
+  end of `tmux.conf`, after `status-right` is set (continuum adds its autosave to it):
+  - tmux-resurrect + continuum: `prefix C-s`/`C-r` save and restore by hand; continuum saves
+    every 15 minutes and restores on server start, but neither while a second tmux server runs.
+  - extrakto: `prefix Tab` picks text from the window (Tab inserts, Enter copies over OSC 52).
+- `prefix f` runs `scripts/pick-session.sh` in a popup: fzf over the other sessions and zoxide's
+  directories, creating a session named after the directory. Inside a popup `#S` is the server's
+  default session, not the client's; use `#{client_session}`.
+- Both popups run fzf through `scripts/fzf.sh` (extrakto via `@extrakto_fzf_tool`), which adds
+  the scheme's colours from tmux's `@thm_*` and `@accent`. Style fzf there, not per caller.
+- Claude Code may itself be running inside the user's tmux. Test on a private server (`-L test`);
+  never kill the default one.
 
 ### Neovim (`dot_config/nvim/`)
 
@@ -411,6 +444,7 @@ Full usage and implementation docs: `dot_config/nvim/README.md` (also deployed t
 - `~/.config/zsh/local.zsh`: per-machine settings.
 - `~/.local/state/colorscheme/`: the active scheme and mode, written by `colorscheme`, and each
   mode's wallpaper, written by `wallpaper`.
+- `~/.local/share/tmux/resurrect/`: tmux sessions saved by tmux-resurrect and continuum.
 - `~/.config/systemd/user/colorscheme-solar-transition.timer`: rewritten by `colorscheme-solar`
   for each sunrise and sunset.
 - `~/.claude/`: Claude Code settings and hooks, including the desktop notification hook.

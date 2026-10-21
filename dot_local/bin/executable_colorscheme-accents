@@ -218,6 +218,17 @@ def amend(directory, wallpaper):
             f"active_tab_foreground {palette[fg]}",
             f"active_border_color   {palette[accent]}",
         ),
+        "tmux.conf": lambda text: append(
+            text,
+            f"# {NOTE}",
+            f'set -g @accent "{palette[accent]}"',
+            f'set -g @accent2 "{palette[accent2]}"',
+            f'set -g @accent_fg "{palette[fg]}"',
+            f'set -g mode-style "bg={palette[accent]},fg={palette[fg]}"',
+            f'set -g popup-border-style "fg={palette[accent]}"',
+            f'set -g display-panes-active-colour "{palette[accent]}"',
+            f'setw -g clock-mode-colour "{palette[accent]}"',
+        ),
         "gtk4.css": lambda text: append(
             text,
             f"/* {NOTE} */",

@@ -62,6 +62,8 @@ The leader is **Space**. Press it and wait to see every leader key; which-key do
 | `<leader>sr` | Reopen the last picker where you left it |
 | `<C-n>` | Toggle the file explorer (from inside it too) |
 | `<C-Space>` | Toggle the floating terminal (works from inside it too) |
+| `<C-h/j/k/l>` | Go to the split on the left/below/above/right, and on into the next tmux pane at the edge; stops at the last one |
+| `<A-h/j/k/l>` | Resize the split (or tmux pane) towards the left/down/up/right |
 | `<Esc>` | Clear search highlighting |
 
 In a picker:
@@ -86,7 +88,7 @@ hidden files, `I` shows git-ignored files, `<BS>` goes up a folder.
 | `go` | Type definition |
 | `gr` | References |
 | `K` | Hover documentation (Neovim default) |
-| `<C-k>` | Signature help (`<C-s>` in insert mode, Neovim default) |
+| `gK` | Signature help (`<C-s>` in insert mode, Neovim default) |
 | `<F2>` | Rename symbol |
 | `<F4>` | Code actions, for the cursor or the selection |
 | `gl` | Show the diagnostics on this line |
@@ -248,7 +250,7 @@ dot_config/nvim/
 │   ├── plugins/                 one lazy.nvim spec file per area; each returns a list of specs
 │   │   ├── colorscheme.lua      catppuccin + live light/dark switching
 │   │   ├── completion.lua       blink.cmp
-│   │   ├── editor.lua           autopairs, vim-eunuch, mini.ai, mini.surround, which-key
+│   │   ├── editor.lua           autopairs, vim-eunuch, mini.ai, mini.surround, smart-splits, which-key
 │   │   ├── formatting.lua       conform.nvim
 │   │   ├── git.lua              gitsigns
 │   │   ├── lsp.lua              mason, mason-lspconfig, nvim-lspconfig, LSP keymaps, lazydev
@@ -276,7 +278,7 @@ dot_config/nvim/
    `{ import = "plugins" }`, which loads **every file** in `lua/plugins/`.
 4. lazy.nvim runs each spec's `init`, then loads the non-lazy plugins in priority order: catppuccin
    and snacks first (`priority = 1000`), then nvim-treesitter, mason, lspconfig, blink.cmp, lualine,
-   gitsigns and eunuch.
+   gitsigns, eunuch and smart-splits.
 5. The rest load on demand:
 
 | Plugin | Loads on |
@@ -443,6 +445,10 @@ experimental.
   in a git repo. `]c`/`[c` fall back to Vim's own `]c`/`[c` in diff mode.
 - **mini.ai / mini.surround** (`editor.lua`): defaults. mini.surround is loaded by its `keys`
   entries, which also give which-key their descriptions.
+- **smart-splits** (`editor.lua`): with the separate `backend-tmux` plugin, `<C-h/j/k/l>` and
+  `<A-h/j/k/l>` cross from nvim's splits into tmux's panes. tmux.conf binds the same keys and passes
+  them to nvim when the pane's `@pane-is-vim` is set, which the backend does when nvim starts. So it
+  must not be lazy-loaded. Outside tmux it only moves between splits, without a warning.
 - **which-key** (`editor.lua`): the `spec` only names the leader groups. Every mapping's `desc` is
   what it displays, so give new mappings a `desc`.
 - **render-markdown** (`markdown.lua`): defaults with LaTeX disabled, since that needs the latex

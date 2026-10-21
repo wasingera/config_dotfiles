@@ -14,6 +14,9 @@
 {{- /* Replaced by render-markdown.nvim */}}
 .config/nvim/lua/plugins/markdown-preview.lua
 
+{{- /* tmux reads it before ~/.config/tmux/tmux.conf, so it would shadow the config */}}
+.tmux.conf
+
 {{ if .desktop }}
 {{- /* Old bspwm/X11 setup, replaced by Hyprland */}}
 .config/bspwm

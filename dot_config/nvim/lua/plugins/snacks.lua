@@ -37,7 +37,10 @@ return {
             vim.api.nvim_create_autocmd("User", {
                 pattern = "VeryLazy",
                 once = true,
-                callback = function() Snacks.toggle.zen():map("<leader>uz") end,
+                callback = function()
+                    Snacks.toggle.zen():map("<leader>uz")
+                    Snacks.toggle.option("spell", { name = "Spelling" }):map("<leader>us")
+                end,
             })
 
             -- :q in the last editor window also closes the explorer, so Neovim exits

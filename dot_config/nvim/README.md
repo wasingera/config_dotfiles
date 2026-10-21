@@ -162,6 +162,22 @@ callouts. The raw text shows on the cursor line. `<leader>um` toggles rendering 
 sign column, statusline and other windows hidden and every paragraph but the cursor's dimmed. The
 same key, or `:q` in the zen window, goes back to the normal layout.
 
+Markdown, plain text and commit messages are spellchecked in British English, and long lines wrap
+between words. Only prose is checked: inline code, code blocks (apart from their comments) and URLs
+are skipped. `<leader>us` toggles spelling for the window, e.g. for a file that's mostly jargon.
+
+| Key | Action |
+|-----|--------|
+| `]s` / `[s` | Next/previous misspelled word |
+| `z=` | Suggest corrections |
+| `zg` | Add the word to the shared word list |
+| `zw` | Mark the word as wrong |
+| `zug` / `zuw` | Undo `zg` / `zw` |
+
+`zg` writes to `spell/.en.utf-8.add` in this repo, so commit it now and then (`nvim: add words to
+the spell list`). Add a word in lowercase to accept any capitalisation; `WSL` only matches itself.
+Possessives of added words ("eww's") are still flagged.
+
 ## Formatting
 
 `<leader>cf` always formats. Format on save is more careful, because clang-format, stylua and
@@ -243,6 +259,9 @@ dot_config/nvim/
 │   ├── utils.lua                reads and watches the light/dark mode file
 │   └── flavours.lua.tmpl        chezmoi template: Catppuccin flavour per mode
 ├── stylua.toml                  Lua style for this config
+├── spell/
+│   ├── symlink_en.utf-8.add.tmpl  chezmoi: ~/.config/nvim/spell/en.utf-8.add → .en.utf-8.add
+│   └── .en.utf-8.add            the shared spelling word list (not deployed)
 ├── symlink_lazy-lock.json.tmpl  chezmoi: ~/.config/nvim/lazy-lock.json → .lazy-lock.json
 ├── .lazy-lock.json              the real lockfile (not deployed; see "Lockfile")
 └── README.md                    this file
@@ -282,6 +301,20 @@ Each option has a comment explaining it. A few are there for a plugin:
   appear.
 - `updatetime = 250` makes `CursorHold` fire sooner, which gitsigns uses.
 - `winborder = "rounded"` gives every floating window a border without per-plugin settings.
+
+Spelling is set up here but turned on per buffer: a `FileType` autocommand in `config/autocmds.lua`
+sets `spell` and `linebreak` locally for `markdown`, `text` and `gitcommit`, so code buffers never
+get them. Treesitter's `@spell`/`@nospell` captures decide which parts of the buffer are checked.
+
+- `spelllang = "en_gb"`. Neovim ships one English file covering every region, so nothing is
+  downloaded; `en_gb` flags American spellings such as "color".
+- `spelloptions = "camel"` checks each part of `camelCase` separately, and `spellcapcheck = ""`
+  stops lowercase words after a full stop (`init.lua`) being flagged.
+- `spellfile` is `~/.config/nvim/spell/en.utf-8.add`, a symlink to `spell/.en.utf-8.add` in the
+  repo, set up like the lockfile. Neovim checks against the compiled `en.utf-8.add.spl` next to the
+  symlink (untracked), and only recompiles it after `zg`/`zw`. So at startup `options.lua` runs
+  `:mkspell!` when the word list is newer than the `.spl` or there is none, which picks up words
+  that arrived with a `git pull`.
 
 Diagnostics show inline (`virtual_text`), sorted by severity, with the source in the float.
 `jump.on_jump` opens the float after `[d`/`]d`. That's the behaviour the old

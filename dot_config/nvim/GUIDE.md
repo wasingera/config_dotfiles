@@ -322,8 +322,16 @@ under the cursor shows the raw text so you can edit it.
 | Do this | Keys |
 |---------|------|
 | Zen mode: one centred window, everything else hidden | `<leader>uz` (again to leave) |
+| Next / previous misspelled word | `]s` / `[s` |
+| Suggest corrections | `z=` |
+| Add the word to the dictionary | `zg` (undo: `zug`) |
+| Turn spelling off/on in this window | `<leader>us` |
 
 Zen mode also dims every paragraph except the one you're in.
+
+Markdown, text files and commit messages are spellchecked (British English), and only the prose:
+code and links are skipped. Words added with `zg` go into the dotfiles repo, so every machine gets
+them; commit `dot_config/nvim/spell/.en.utf-8.add` now and then.
 
 ## Maintenance
 

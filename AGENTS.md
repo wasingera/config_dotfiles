@@ -399,6 +399,8 @@ The bar font is "Iosevka Term Extended"; icons come from "Iosevka Nerd Font".
 - `prefix f` runs `scripts/pick-session.sh` in a popup: fzf over the other sessions and zoxide's
   directories, creating a session named after the directory. Inside a popup `#S` is the server's
   default session, not the client's; use `#{client_session}`.
+- Both popups run fzf through `scripts/fzf.sh` (extrakto via `@extrakto_fzf_tool`), which adds
+  the scheme's colours from tmux's `@thm_*` and `@accent`. Style fzf there, not per caller.
 - Claude Code may itself be running inside the user's tmux. Test on a private server (`-L test`);
   never kill the default one.
 

@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # Switch to a tmux session, or to one in a directory zoxide knows, made if it
-# doesn't exist yet. tmux.conf runs this in a popup on prefix f.
+# doesn't exist yet. tmux.conf runs this in a popup on prefix f. Ctrl+x twice
+# kills the highlighted session; fzf's key bindings call this script back
+# with the --options below.
 set -euo pipefail
 
 # the client's session (#S in a popup is the server's default session, not the client's)
@@ -32,9 +34,34 @@ list() {
     fi
 }
 
-# fzf.sh beside this script is fzf in the colour scheme's colours
+self=${BASH_SOURCE[0]}
+prompt='session> '
+case ${1-} in
+    --list) list; exit 0 ;;
+    # Ctrl+x on a session asks for a second Ctrl+x, which kills it. Prints fzf
+    # actions; FZF_PROMPT shows whether the first press was on this session.
+    --ctrl-x)
+        [[ $2 == s ]] || exit 0
+        if [[ ${FZF_PROMPT-} == "kill $3? ctrl-x again> " ]]; then
+            printf 'execute-silent(%q --kill {3})+reload(%q --list)+change-prompt:%s' "$self" "$self" "$prompt"
+        else
+            printf 'change-prompt:kill %s? ctrl-x again> ' "$3"
+        fi
+        exit 0 ;;
+    --kill) tmux kill-session -t "=$2"; exit 0 ;;
+    # Escape cancels a first Ctrl+x, or else closes the picker
+    --esc)
+        if [[ ${FZF_PROMPT-} == "$prompt" ]]; then printf abort; else printf 'change-prompt:%s' "$prompt"; fi
+        exit 0 ;;
+esac
+
+# fzf.sh beside this script is fzf in the colour scheme's colours. {1} and {3}
+# are a row's KIND and VALUE. Typing or moving cancels a first Ctrl+x.
 choice=$(list | "${BASH_SOURCE%/*}/fzf.sh" --ansi --delimiter '\t' --with-nth 2.. --nth 2 --tabstop 2 \
-    --tiebreak index --reverse --prompt 'session> ' --header "$session_mark session  $dir_mark directory") || exit 0
+    --tiebreak index --reverse --prompt "$prompt" \
+    --header "$session_mark session  $dir_mark directory  ctrl-x kill" \
+    --bind "ctrl-x:transform('$self' --ctrl-x {1} {3})" --bind "esc:transform('$self' --esc)" \
+    --bind "change:change-prompt:$prompt" --bind "focus:change-prompt:$prompt") || exit 0
 kind=${choice%%$'\t'*}
 value=${choice##*$'\t'}
 

@@ -406,7 +406,8 @@ The bar font is "Iosevka Term Extended"; icons come from "Iosevka Nerd Font".
     every 15 minutes and restores on server start, but neither while a second tmux server runs.
   - extrakto: `prefix Tab` picks text from the window (Tab inserts, Enter copies over OSC 52).
 - `prefix f` runs `scripts/pick-session.sh` in a popup: fzf over the other sessions (marked ●)
-  and zoxide's directories (○), creating a session named after the directory. Inside a popup `#S` is the server's
+  and zoxide's directories (○), creating a session named after the directory. Ctrl+x twice kills
+  the highlighted session. Inside a popup `#S` is the server's
   default session, not the client's; use `#{client_session}`.
 - Both popups run fzf through `scripts/fzf.sh` (extrakto via `@extrakto_fzf_tool`), which adds
   the scheme's colours from tmux's `@thm_*` and `@accent`. Style fzf there, not per caller.

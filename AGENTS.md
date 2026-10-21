@@ -425,6 +425,7 @@ Full usage and implementation docs: `dot_config/nvim/README.md` (also deployed t
 - `~/.config/zsh/local.zsh`: per-machine settings.
 - `~/.local/state/colorscheme/`: the active scheme and mode, written by `colorscheme`, and each
   mode's wallpaper, written by `wallpaper`.
+- `~/.local/share/tmux/resurrect/`: tmux sessions saved by tmux-resurrect and continuum.
 - `~/.config/systemd/user/colorscheme-solar-transition.timer`: rewritten by `colorscheme-solar`
   for each sunrise and sunset.
 - `~/.claude/`: Claude Code settings and hooks, including the desktop notification hook.

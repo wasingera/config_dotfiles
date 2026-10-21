@@ -2,6 +2,9 @@ README.md
 AGENTS.md
 CLAUDE.md
 
+{{- /* Python's bytecode cache, written by extrakto into its plugin directory */}}
+.config/tmux/plugins/*/__pycache__
+
 {{- /* Hyprland desktop configs: only on native Linux, not macOS or WSL */}}
 {{ if not .desktop }}
 .config/zsh/.zprofile

@@ -389,6 +389,7 @@ The bar font is "Iosevka Term Extended"; icons come from "Iosevka Nerd Font".
 ### tmux (`dot_config/tmux/tmux.conf`)
 
 - The prefix is Ctrl+a. `prefix |` and `prefix -` split in the current directory, `prefix r` reloads.
+  Alt+1..9 go to a window without the prefix.
 - Ctrl+h/j/k/l move between panes and Alt+h/j/k/l resize them, shared with nvim through
   smart-splits.nvim and its `backend-tmux` plugin: the bindings pass the key on when the pane's
   `@pane-is-vim` is set, which nvim sets when it starts. With no pane to the right, Ctrl+l goes to

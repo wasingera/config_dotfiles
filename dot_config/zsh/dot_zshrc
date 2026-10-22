@@ -26,6 +26,7 @@ autoload -U promptinit; promptinit
 prompt pure
 
 ## Aliases ##
+# A "#? USAGE - DESCRIPTION" line above a command lists it in `help` (below).
 # macOS's BSD ls uses -G for colour; GNU ls (Linux, WSL) uses --color
 if [[ $OSTYPE == darwin* ]]; then
     alias ls="ls -Gh"
@@ -34,20 +35,26 @@ else
 fi
 # macOS has open built in; elsewhere use xdg-open when it's installed
 if [[ $OSTYPE != darwin* ]] && (( $+commands[xdg-open] )); then
+    #? open FILE - open with its default app (xdg-open)
     alias open="xdg-open"
 fi
+#? ll - long listing (ls -l)
 alias ll="ls -l"
 alias rm="rm -v"
 alias cp="cp -v"
 alias mv="mv -v"
+#? vim - nvim
 alias vim="nvim"
+#? arduino - arduino-cli
 alias arduino="arduino-cli"
+#? dc - docker container
 alias dc="docker container"
 # alias gcc="gcc -Wall -Wconversion -Wextra -std=gnu99"
 # alias g++="g++ -Wall -Wconversion -Wextra -Werror -Wshadow -std=c++11 -Weffc++ -m64"
 alias g++="g++ -std=c++17"
 
-## Functions ## 
+## Functions ##
+#? venv NAME - activate the Python venv ~/venv/NAME
 function venv() {
     source "$HOME/venv/$1/bin/activate"
 }
@@ -62,6 +69,7 @@ if (( $+commands[tmux] )); then
     function _t_go() {
         if [[ -n $TMUX ]]; then tmux switch-client -t "=$1"; else tmux attach -t "=$1"; fi
     }
+    #? t [NAME] - go to tmux session NAME (made if needed); alone, attach or pick one
     function t() {
         if [[ -n $1 ]]; then
             tmux has-session -t "=$1" 2>/dev/null || tmux new-session -d -s "$1" || return
@@ -74,11 +82,14 @@ if (( $+commands[tmux] )); then
             tmux
         fi
     }
+    #? tn [NAME] - like t, named after this directory by default
     function tn() {
         # tmux doesn't allow . or : in a session name (as in pick-session.sh)
         t "${1:-${${PWD:t}//[.:]/_}}"
     }
+    #? tl - list tmux sessions
     alias tl="tmux ls"
+    #? tk [NAME] - kill tmux session NAME, or the current one
     function tk() {
         if [[ -n $1 ]]; then
             tmux kill-session -t "=$1"
@@ -115,6 +126,7 @@ export NVM_DIR="$HOME/.nvm"
 [ -s "$BUN_INSTALL/_bun" ] && source "$BUN_INSTALL/_bun"
 
 # yazi: cd into the last browsed directory on quit
+#? y [DIR] - browse files in yazi, then cd to where you left off
 function y() {
   local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
   yazi "$@" --cwd-file="$tmp"
@@ -123,8 +135,44 @@ function y() {
   command rm -f -- "$tmp"
 }
 
+## Help ##
+# Lists the "#?" lines of this file and local.zsh, skipping commands this
+# machine doesn't define (e.g. the tmux ones without tmux).
+#? help [NAME] - list these commands, or only NAME
+function help() {
+    emulate -L zsh
+    setopt extended_glob
+    local file line usage name b= n=
+    local -a usages descs
+    local -i i w=0
+    for file in $ZDOTDIR/.zshrc $ZDOTDIR/local.zsh; do
+        [[ -r $file ]] || continue
+        for line in "${(@f)$(<$file)}"; do
+            [[ $line == [[:space:]]#'#? '* ]] || continue
+            line=${line#*'#? '}
+            usage=${line%% - *}
+            name=${usage%% *}
+            [[ -z $1 || $name == $1 ]] || continue
+            (( $+functions[$name] || $+aliases[$name] )) || continue
+            usages+=$usage
+            descs+=${line#* - }
+            (( w = $#usage > w ? $#usage : w ))
+        done
+    done
+    if (( ! $#usages )); then
+        print -u2 "help: ${${1:+no command $1}:-nothing to list}"
+        return 1
+    fi
+    [[ -t 1 ]] && b=${(%):-%B} n=${(%):-%b}
+    for i in {1..$#usages}; do
+        print -r -- "$b${(r:w:)usages[i]}$n  ${descs[i]}"
+    done
+}
+
 ## Machine-specific settings (untracked; see README) ##
 [ -f "$ZDOTDIR/local.zsh" ] && source "$ZDOTDIR/local.zsh"
 
 # zoxide: z <dir>, zi for interactive picker (keep near end of file)
+#? z DIR - jump to a directory you've visited (zoxide)
+#? zi - pick a visited directory to jump to (zoxide)
 (( $+commands[zoxide] )) && eval "$(zoxide init zsh)"

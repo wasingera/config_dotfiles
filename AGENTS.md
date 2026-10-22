@@ -389,6 +389,7 @@ The bar font is "Iosevka Term Extended"; icons come from "Iosevka Nerd Font".
 ### tmux (`dot_config/tmux/tmux.conf`)
 
 - The prefix is Ctrl+a. `prefix |` and `prefix -` split in the current directory, `prefix r` reloads.
+  Alt+1..9 go to a window without the prefix.
 - Ctrl+h/j/k/l move between panes and Alt+h/j/k/l resize them, shared with nvim through
   smart-splits.nvim and its `backend-tmux` plugin: the bindings pass the key on when the pane's
   `@pane-is-vim` is set, which nvim sets when it starts. With no pane to the right, Ctrl+l goes to
@@ -405,8 +406,9 @@ The bar font is "Iosevka Term Extended"; icons come from "Iosevka Nerd Font".
   - tmux-resurrect + continuum: `prefix C-s`/`C-r` save and restore by hand; continuum saves
     every 15 minutes and restores on server start, but neither while a second tmux server runs.
   - extrakto: `prefix Tab` picks text from the window (Tab inserts, Enter copies over OSC 52).
-- `prefix f` runs `scripts/pick-session.sh` in a popup: fzf over the other sessions and zoxide's
-  directories, creating a session named after the directory. Inside a popup `#S` is the server's
+- `prefix f` runs `scripts/pick-session.sh` in a popup: fzf over the other sessions (marked ●)
+  and zoxide's directories (○), creating a session named after the directory. Ctrl+x twice kills
+  the highlighted session. Inside a popup `#S` is the server's
   default session, not the client's; use `#{client_session}`.
 - Both popups run fzf through `scripts/fzf.sh` (extrakto via `@extrakto_fzf_tool`), which adds
   the scheme's colours from tmux's `@thm_*` and `@accent`. Style fzf there, not per caller.

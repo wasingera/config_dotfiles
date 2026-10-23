@@ -31,11 +31,11 @@ chezmoi apply
 `~/.config/.gitmodules`, and replaces the plugin submodule checkouts with plain copies.
 Once everything works, delete `~/config-git-backup`.
 
-## Machine types
+## Machine flags
 
 `.chezmoi.toml.tmpl` detects these when you run `chezmoi init`:
 
-| data      | true when                                   |
+| flag      | true when                                   |
 |-----------|---------------------------------------------|
 | `wsl`     | Linux whose kernel release mentions Microsoft |
 | `desktop` | Linux and not WSL (the Hyprland machine)    |

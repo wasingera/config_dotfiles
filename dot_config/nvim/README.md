@@ -21,6 +21,7 @@ Neovim 0.12+ with [lazy.nvim](https://github.com/folke/lazy.nvim). It's deployed
 | `tree-sitter` CLI and a C compiler | building treesitter parsers |
 | `rg` (ripgrep), `fd` | the snacks grep and file pickers |
 | A Nerd Font in the terminal | icons in the picker, explorer, statusline and completion menu |
+| `lazygit` (optional) | `<leader>gg` |
 | `clang-format`, `rustfmt` (optional) | C/C++ and Rust formatting; they come from the system toolchains |
 
 Everything else installs itself: lazy.nvim installs the plugins, and Mason installs the language
@@ -152,6 +153,7 @@ Commands from vim-eunuch: `:Rename`, `:Move`, `:Delete`, `:Chmod`, `:Mkdir`, `:S
 | `<leader>hd` | Diff the file against the index |
 | `<leader>gs` | Git status picker |
 | `<leader>gl` | Git log picker |
+| `<leader>gg` | lazygit in a floating window, in the theme's colours |
 
 ### Markdown
 
@@ -230,7 +232,7 @@ To undo an update, check out the old lockfile from git and run `:Lazy restore`.
 | Something else | `:checkhealth`, `:Lazy` (errors are shown per plugin), `:messages` |
 
 `:checkhealth snacks` also reports errors for snacks modules this config doesn't use (image,
-lazygit, notifier, and so on). Those are expected.
+notifier, and so on), and for lazygit where it isn't installed. Those are expected.
 
 ---
 
@@ -255,7 +257,7 @@ dot_config/nvim/
 │   │   ├── git.lua              gitsigns
 │   │   ├── lsp.lua              mason, mason-lspconfig, nvim-lspconfig, LSP keymaps, lazydev
 │   │   ├── markdown.lua         render-markdown
-│   │   ├── snacks.lua           picker, explorer, terminal, indent guides, input, bigfile, zen
+│   │   ├── snacks.lua           picker, explorer, terminal, lazygit, indent guides, input, bigfile, zen
 │   │   ├── treesitter.lua       nvim-treesitter
 │   │   └── ui.lua               lualine
 │   ├── utils.lua                reads and watches the light/dark mode file
@@ -340,7 +342,7 @@ temporary directory and write `light` or `dark` into `colorscheme/mode` there.
 
 ## snacks.nvim (`snacks.lua`)
 
-One plugin provides the picker, explorer, floating terminal, indent guides, `vim.ui.input`,
+One plugin provides the picker, explorer, floating terminal, lazygit window, indent guides, `vim.ui.input`,
 large-file handling (`bigfile`) and zen mode. It's loaded at startup with high priority because other specs call
 the `Snacks` global.
 

@@ -1,5 +1,5 @@
 return {
-    { -- Picker, file explorer, terminal and indent guides in one plugin
+    { -- Picker, file explorer, terminal, lazygit and indent guides in one plugin
         "folke/snacks.nvim",
         priority = 1000,
         lazy = false,
@@ -100,6 +100,7 @@ return {
 
             { "<leader>gs", function() Snacks.picker.git_status() end, desc = "Git status" },
             { "<leader>gl", function() Snacks.picker.git_log() end, desc = "Git log" },
+            { "<leader>gg", function() Snacks.lazygit() end, desc = "Lazygit" },
         },
     },
 }

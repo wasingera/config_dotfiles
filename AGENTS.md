@@ -42,6 +42,7 @@ Special files at the root:
 | `.chezmoidata/` | Template data on every machine: the Catppuccin palette and the flavour per mode. See "Colours". |
 | `.chezmoitemplates/colors/` | One colour template per tool, rendered from the palette. See "Colours". |
 | `run_onchange_after_colorscheme.sh.tmpl` | Re-runs `colorscheme` when the palette, a colour template or the accent picker changes. Desktop only (renders empty elsewhere). |
+| `run_onchange_after_colorscheme-macos.sh.tmpl` | Restarts the macOS appearance agent when it or its script changes. macOS only. |
 | `README.md`, `AGENTS.md`, `CLAUDE.md` | Docs, ignored by chezmoi (not deployed). |
 
 ## Machine types
@@ -59,6 +60,8 @@ What each machine gets:
   and the light/dark switching: `~/.config/colorscheme/`, `~/.local/bin/colorscheme`,
   `~/.local/bin/colorscheme-accents`, `~/.local/bin/colorscheme-solar`, `~/.local/bin/wallpaper`
   and `~/.config/systemd/`.
+- **macOS only:** `~/.local/bin/colorscheme-macos` and its LaunchAgent in `~/Library/LaunchAgents/`,
+  which write the mode file from the system appearance (see "Colours").
 
 When adding a new desktop-only config, also add its path to the `{{ if not .desktop }}` block in
 `.chezmoiignore`. Then check it doesn't leak to other machines:
@@ -362,7 +365,10 @@ re-applies the current mode.
 Details:
 
 - nvim on every machine reads `~/.local/state/colorscheme/mode` (dark if missing) and flips
-  live when it changes. On the Mac or WSL something else may write it, or nothing.
+  live when it changes. On the Mac, `colorscheme-macos` (a Swift script, run as the LaunchAgent
+  `local.colorscheme-macos`) writes it at login and on every change of the system appearance;
+  iTerm switches its own colours (separate light and dark presets in its profile). On WSL
+  nothing writes it.
 - GTK3 needs the AUR themes `catppuccin-gtk-theme-mocha` and `catppuccin-gtk-theme-latte`
   (`catppuccin-<flavour>-<accent>-standard+default`, every accent). They're also used by the
   xdg-desktop-portal-gtk file dialog, which follows gsettings live.

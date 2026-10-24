@@ -203,7 +203,8 @@ applies to the current buffer, and `<leader>uf` turns format on save off for the
 
 Catppuccin, following the light/dark mode in `~/.local/state/colorscheme/mode`. On the desktop the
 `colorscheme` command writes that file at sunrise and sunset, and every running Neovim switches
-within a moment. Elsewhere it's dark unless something writes the file. The flavours (Mocha and
+within a moment. On macOS a LaunchAgent writes it whenever the system appearance changes. Elsewhere
+it's dark unless something writes the file. The flavours (Mocha and
 Latte) come from `.chezmoidata/colorscheme.toml` at the repo root.
 
 ## Updating plugins

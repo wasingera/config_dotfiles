@@ -1,0 +1,10 @@
+{{ if eq .chezmoi.os "darwin" -}}
+#!/bin/bash
+# (Re)starts the LaunchAgent that follows the macOS appearance whenever it or
+# its script changes.
+# agent: {{ include "private_Library/private_LaunchAgents/local.colorscheme-macos.plist.tmpl" | sha256sum }}
+# script: {{ include "dot_local/bin/executable_colorscheme-macos" | sha256sum }}
+plist=~/Library/LaunchAgents/local.colorscheme-macos.plist
+launchctl bootout "gui/$UID" "$plist" 2>/dev/null
+launchctl bootstrap "gui/$UID" "$plist"
+{{ end -}}

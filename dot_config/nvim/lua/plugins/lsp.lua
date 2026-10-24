@@ -3,7 +3,7 @@ return {
         "mason-org/mason-lspconfig.nvim",
         opts = {
             -- Installed on a fresh machine
-            ensure_installed = { "clangd", "lua_ls", "basedpyright", "rust_analyzer", "neocmake" },
+            ensure_installed = { "clangd", "lua_ls", "basedpyright", "rust_analyzer", "neocmake", "jsonls" },
             -- stylua is installed as a formatter, not a language server
             automatic_enable = { exclude = { "stylua" } },
         },
@@ -29,7 +29,21 @@ return {
             },
             { -- Base LSP configurations
                 "neovim/nvim-lspconfig",
+                dependencies = {
+                    -- JSON schemas from schemastore.org, for jsonls
+                    { "b0o/SchemaStore.nvim", lazy = true },
+                },
                 config = function()
+                    -- Completion and validation for JSON files with a known schema
+                    -- (package.json, CMakePresets.json, ...). The catalog is loaded
+                    -- only when jsonls starts.
+                    vim.lsp.config("jsonls", {
+                        before_init = function(_, config)
+                            config.settings.json.schemas = require("schemastore").json.schemas()
+                        end,
+                        settings = { json = { validate = { enable = true } } },
+                    })
+
                     -- Keymaps for buffers with an LSP attached. K (hover), [d and ]d
                     -- (diagnostics) are Neovim defaults.
                     vim.api.nvim_create_autocmd("LspAttach", {

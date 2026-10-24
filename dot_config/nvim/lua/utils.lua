@@ -1,5 +1,6 @@
 -- ~/.local/state/colorscheme/mode holds "dark" or "light". On the desktop it's
--- written by `colorscheme` (switched at sunrise/sunset); elsewhere by whatever
+-- written by `colorscheme` (switched at sunrise/sunset), on macOS by
+-- `colorscheme-macos` (following the system appearance); elsewhere by whatever
 -- the machine uses, if anything.
 local mode_dir = (os.getenv("XDG_STATE_HOME") or (os.getenv("HOME") .. "/.local/state")) .. "/colorscheme"
 

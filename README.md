@@ -87,7 +87,8 @@ systemctl --user enable --now colorscheme-solar.timer   # once, on a new desktop
 The desktop needs the AUR packages `catppuccin-gtk-theme-mocha` and
 `catppuccin-gtk-theme-latte` (GTK3 apps and file dialogs), plus `papirus-icon-theme`.
 nvim follows `~/.local/state/colorscheme/mode` on every machine, and defaults to
-dark when nothing writes it.
+dark when nothing writes it. On macOS a LaunchAgent writes it from the system's light/dark
+appearance.
 
 ## Neovim
 

@@ -25,7 +25,8 @@ Neovim 0.12+ with [lazy.nvim](https://github.com/folke/lazy.nvim). It's deployed
 | `clang-format`, `rustfmt` (optional) | C/C++ and Rust formatting; they come from the system toolchains |
 
 Everything else installs itself: lazy.nvim installs the plugins, and Mason installs the language
-servers (clangd, lua_ls, basedpyright, rust-analyzer) and formatters (stylua, ruff, shfmt).
+servers (clangd, lua_ls, basedpyright, rust-analyzer, neocmakelsp, jsonls) and formatters (stylua,
+ruff, shfmt).
 
 ## Setting up a machine
 
@@ -255,7 +256,7 @@ dot_config/nvim/
 │   │   ├── editor.lua           autopairs, vim-eunuch, mini.ai, mini.surround, smart-splits, which-key
 │   │   ├── formatting.lua       conform.nvim
 │   │   ├── git.lua              gitsigns
-│   │   ├── lsp.lua              mason, mason-lspconfig, nvim-lspconfig, LSP keymaps, lazydev
+│   │   ├── lsp.lua              mason, mason-lspconfig, nvim-lspconfig, LSP keymaps, SchemaStore, lazydev
 │   │   ├── markdown.lua         render-markdown
 │   │   ├── snacks.lua           picker, explorer, terminal, lazygit, indent guides, input, bigfile, zen
 │   │   ├── treesitter.lua       nvim-treesitter
@@ -288,6 +289,7 @@ dot_config/nvim/
 | nvim-autopairs | `InsertEnter` |
 | conform.nvim | `BufWritePre`, `:ConformInfo`, `<leader>cf` |
 | lazydev.nvim | a Lua buffer |
+| SchemaStore.nvim | jsonls starting |
 | render-markdown | a markdown buffer |
 | mini.surround | its `s…` keys |
 | mini.ai, which-key | `VeryLazy` (just after the UI is drawn) |
@@ -378,7 +380,8 @@ the `Snacks` global.
 - **mason.nvim** installs packages into `stdpath("data")/mason` and puts its `bin/` first on
   `$PATH` inside Neovim. Its `config` also installs the conform formatters (stylua, ruff, shfmt)
   through `mason-registry`, skipping any that are installed or installing.
-- **mason-lspconfig** `ensure_installed` installs clangd, lua_ls, basedpyright and rust-analyzer.
+- **mason-lspconfig** `ensure_installed` installs clangd, lua_ls, basedpyright, rust-analyzer,
+  neocmakelsp (CMake) and jsonls (JSON).
   `automatic_enable` calls `vim.lsp.enable()` for every installed server it knows about. That
   includes `ruff`, which runs next to basedpyright for lint diagnostics and fixes. It excludes
   `stylua`, whose Mason package would otherwise also start stylua as a language server.
@@ -387,6 +390,10 @@ the `Snacks` global.
   Neovim waits `timeoutlen` to see whether you meant the built-in `grn`/`gra`/`grr`/....
 - **blink.cmp** sets `vim.lsp.config("*", { capabilities = ... })` itself, so no server config
   needs completion capabilities passed in.
+- **SchemaStore.nvim** gives jsonls the [schemastore.org](https://www.schemastore.org) catalog, so
+  JSON files with a known schema (`package.json`, `tsconfig.json`, `CMakePresets.json`...) get
+  key and value completion, hover docs and validation. It's `lazy`, and jsonls's `before_init`
+  requires it, so the catalog loads only when jsonls starts.
 - **lazydev.nvim** configures lua_ls when it edits Neovim Lua: the runtime, the plugins, luv types
   (when `vim.uv` appears in the file) and snacks types (when `Snacks` appears). It also acts as a
   blink.cmp source.

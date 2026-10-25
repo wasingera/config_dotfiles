@@ -19,13 +19,16 @@ Neovim 0.12+ with [lazy.nvim](https://github.com/folke/lazy.nvim). It's deployed
 | Neovim **0.12** or newer | nvim-treesitter's main branch, `winborder`, the `vim.diagnostic.jump` options |
 | `git`, `curl` | lazy.nvim, Mason, parser downloads |
 | `tree-sitter` CLI and a C compiler | building treesitter parsers |
+| kitty, or another terminal with the kitty graphics protocol | images and rendered math |
+| `pdflatex` (or `tectonic`) and ImageMagick (`magick`) | rendered math |
+| `latexmk` and a PDF viewer: zathura on Linux, Skim on macOS (optional) | LaTeX documents (vimtex) |
 | `rg` (ripgrep), `fd` | the snacks grep and file pickers |
 | A Nerd Font in the terminal | icons in the picker, explorer, statusline and completion menu |
 | `lazygit` (optional) | `<leader>gg` |
 | `clang-format`, `rustfmt` (optional) | C/C++ and Rust formatting; they come from the system toolchains |
 
 Everything else installs itself: lazy.nvim installs the plugins, and Mason installs the language
-servers (clangd, lua_ls, basedpyright, rust-analyzer, neocmakelsp, jsonls) and formatters (stylua,
+servers (clangd, lua_ls, basedpyright, rust-analyzer, neocmakelsp, jsonls, texlab) and formatters (stylua,
 ruff, shfmt).
 
 ## Setting up a machine
@@ -161,6 +164,29 @@ Commands from vim-eunuch: `:Rename`, `:Move`, `:Delete`, `:Chmod`, `:Mkdir`, `:S
 Markdown buffers are rendered in place: headings, bullets, checkboxes, tables, code blocks and
 callouts. The raw text shows on the cursor line. `<leader>um` toggles rendering for the buffer.
 
+LaTeX math (`$...$`, `$$...$$`) is rendered as an image in place, in markdown and `.tex` files, and
+so are images the file links to. Moving the cursor onto an equation shows its source. Image files
+(PNG, JPEG, PDF, ...) open as images.
+
+### LaTeX
+
+vimtex handles `.tex` files. Its keys start with the local leader, `\`:
+
+| Key | Action |
+|-----|--------|
+| `\ll` | Start or stop continuous compiling: latexmk rebuilds the PDF on every save |
+| `\lv` | Show the cursor's position in the PDF (forward search), opening the viewer if needed |
+| `\le` | Show compile errors and warnings in the quickfix list |
+| `\lk` | Stop compiling |
+| `\lc` | Delete the build files (`\lC` also deletes the PDF) |
+| `\lt` | Table of contents |
+| `\li` | vimtex's status: the main file, compiler and viewer |
+
+Ctrl+click in zathura jumps back to that line in Neovim (inverse search). Math is drawn as images,
+like in markdown; vimtex still conceals quotes, accents and `\emph{}` in text. vimtex also adds
+text objects for environments (`ie`/`ae`), commands (`ic`/`ac`), math (`i$`/`a$`) and delimiters
+(`id`/`ad`), and `%` jumps between `\begin` and `\end`.
+
 ### Writing
 
 `<leader>uz` toggles zen mode: the current buffer in one centred window, 90 columns wide, with the
@@ -233,8 +259,8 @@ To undo an update, check out the old lockfile from git and run `:Lazy restore`.
 | Icons show as boxes | The terminal font isn't a Nerd Font |
 | Something else | `:checkhealth`, `:Lazy` (errors are shown per plugin), `:messages` |
 
-`:checkhealth snacks` also reports errors for snacks modules this config doesn't use (image,
-notifier, and so on), and for lazygit where it isn't installed. Those are expected.
+`:checkhealth snacks` also reports errors for snacks modules this config doesn't use (notifier,
+and so on), and for lazygit where it isn't installed. Those are expected.
 
 ---
 
@@ -257,9 +283,10 @@ dot_config/nvim/
 │   │   ├── editor.lua           autopairs, vim-eunuch, mini.ai, mini.surround, smart-splits, which-key
 │   │   ├── formatting.lua       conform.nvim
 │   │   ├── git.lua              gitsigns
+│   │   ├── latex.lua            vimtex
 │   │   ├── lsp.lua              mason, mason-lspconfig, nvim-lspconfig, LSP keymaps, SchemaStore, lazydev
 │   │   ├── markdown.lua         render-markdown
-│   │   ├── snacks.lua           picker, explorer, terminal, lazygit, indent guides, input, bigfile, zen
+│   │   ├── snacks.lua           picker, explorer, terminal, lazygit, indent guides, input, bigfile, zen, image
 │   │   ├── treesitter.lua       nvim-treesitter
 │   │   └── ui.lua               lualine
 │   ├── utils.lua                reads and watches the light/dark mode file
@@ -282,7 +309,7 @@ dot_config/nvim/
    `{ import = "plugins" }`, which loads **every file** in `lua/plugins/`.
 4. lazy.nvim runs each spec's `init`, then loads the non-lazy plugins in priority order: catppuccin
    and snacks first (`priority = 1000`), then nvim-treesitter, mason, lspconfig, blink.cmp, lualine,
-   gitsigns, eunuch and smart-splits.
+   gitsigns, eunuch, smart-splits and vimtex.
 5. The rest load on demand:
 
 | Plugin | Loads on |
@@ -346,7 +373,7 @@ temporary directory and write `light` or `dark` into `colorscheme/mode` there.
 ## snacks.nvim (`snacks.lua`)
 
 One plugin provides the picker, explorer, floating terminal, lazygit window, indent guides, `vim.ui.input`,
-large-file handling (`bigfile`) and zen mode. It's loaded at startup with high priority because other specs call
+large-file handling (`bigfile`), zen mode and images. It's loaded at startup with high priority because other specs call
 the `Snacks` global.
 
 - **Picker:** with `picker.enabled`, snacks also replaces `vim.ui.select`, so code actions and
@@ -375,6 +402,13 @@ the `Snacks` global.
   `zen.win.wo.winhighlight` maps `FloatBorder` to `LineNr` (catppuccin's `surface1`), a quiet
   grey in both flavours instead of the usual blue. It replaces snacks' default `winhighlight` for
   zen, so it repeats that default's `NormalFloat:Normal`.
+- **Images:** `image.enabled` draws images with the kitty graphics protocol. Inside tmux snacks
+  wraps them in passthrough sequences, which needs `allow-passthrough` (set in `tmux.conf`). Math
+  is found with the `latex` treesitter parser (also injected into markdown), compiled with
+  `pdflatex` and cropped with `magick`; the images are cached in `stdpath("cache")/snacks/image`.
+  The text colour comes from the `@markup.math.latex` highlight when an equation is first
+  rendered, so after a light/dark switch cached equations keep the old colour until the buffer
+  is reopened. render-markdown's own LaTeX support stays off (`markdown.lua`).
 
 ## LSP (`lsp.lua`)
 
@@ -382,7 +416,8 @@ the `Snacks` global.
   `$PATH` inside Neovim. Its `config` also installs the conform formatters (stylua, ruff, shfmt)
   through `mason-registry`, skipping any that are installed or installing.
 - **mason-lspconfig** `ensure_installed` installs clangd, lua_ls, basedpyright, rust-analyzer,
-  neocmakelsp (CMake) and jsonls (JSON).
+  neocmakelsp (CMake), jsonls (JSON) and texlab (LaTeX). texlab completes commands, environments,
+  `\ref` labels and `\cite` keys; its own build-on-save is off by default, so only vimtex compiles.
   `automatic_enable` calls `vim.lsp.enable()` for every installed server it knows about. That
   includes `ruff`, which runs next to basedpyright for lint diagnostics and fixes. It excludes
   `stylua`, whose Mason package would otherwise also start stylua as a language server.
@@ -441,7 +476,9 @@ highlighting itself. So:
   bundles (`lua`, `vim`, `vimdoc`, `query`, `markdown`), so their queries match the
   nvim-treesitter versions.
 - A `FileType` autocommand calls `vim.treesitter.start()` in a `pcall`. Highlighting starts for
-  any filetype with a parser, and filetypes without one are skipped quietly.
+  any filetype with a parser, and filetypes without one are skipped quietly. `tex` is skipped on
+  purpose: vimtex's own syntax highlights it, and its conceal and math text objects depend on that
+  syntax. The `latex` parser is still installed, because snacks.image parses math with it.
 - `build = ":TSUpdate"` rebuilds parsers when lazy.nvim updates the plugin. When an update runs
   headless and exits early, the queries can end up newer than the parsers ("Invalid node type").
   `:TSUpdate` fixes it.
@@ -452,7 +489,11 @@ experimental.
 ## Git, editing and UI plugins
 
 - **gitsigns** (`git.lua`): the keys are set in `on_attach`, so they exist only in buffers that are
-  in a git repo. `]c`/`[c` fall back to Vim's own `]c`/`[c` in diff mode.
+  in a git repo. `]c`/`[c` fall back to Vim's own `]c`/`[c` in diff mode. Neovim checks a buffer's
+  mappings newest first, so when gitsigns attaches after which-key has added its `<leader>` trigger
+  to the buffer (it does in `.tex` files), the `<leader>h…` maps would make `<leader>` wait
+  `'timeoutlen'` (1s) before the menu opens. `on_attach` re-creates the trigger with `mapset()` so
+  it stays the newest.
 - **mini.ai / mini.surround** (`editor.lua`): defaults. mini.surround is loaded by its `keys`
   entries, which also give which-key their descriptions.
 - **smart-splits** (`editor.lua`): with the separate `backend-tmux` plugin, `<C-h/j/k/l>` and
@@ -461,9 +502,20 @@ experimental.
   must not be lazy-loaded. Outside tmux it only moves between splits, without a warning.
 - **which-key** (`editor.lua`): the `spec` only names the leader groups. Every mapping's `desc` is
   what it displays, so give new mappings a `desc`.
-- **render-markdown** (`markdown.lua`): defaults with LaTeX disabled, since that needs the latex
-  parser plus `utftex` or `latex2text`. It uses the `markdown`, `markdown_inline`, `html` and
+- **render-markdown** (`markdown.lua`): defaults with LaTeX disabled, since snacks.image renders
+  math as images instead. It uses the `markdown`, `markdown_inline`, `html` and
   `yaml` parsers.
+- **vimtex** (`latex.lua`): must not be lazy-loaded; it loads itself for `.tex` files, and inverse
+  search calls it from outside. The settings go in `init`, before it loads:
+  - `vimtex_view_method` is `zathura_simple` on Linux. Plain `zathura` finds the viewer's window
+    with `xdotool`, which doesn't work on Wayland. `zathura --synctex-forward` still reaches the
+    open window over D-Bus, so forward search doesn't open a second one. On macOS it's `skim`.
+  - The compiler is vimtex's default, latexmk in continuous mode, with build files next to the
+    source.
+  - `vimtex_syntax_conceal` turns off the math conceals (Greek letters, symbols, `^2` as ²,
+    `$` bounds). snacks.image draws math as images, and vimtex's replacement characters showed
+    beside them. A `FileType tex` autocommand sets `conceallevel = 2`, which is what hides the
+    source under snacks' images.
 - **lualine** (`ui.lua`): defaults. It picks up catppuccin's colours by itself.
 - **Commenting**: there's no plugin; Neovim 0.10+ has `gc` built in, using `'commentstring'` and
   treesitter injections.

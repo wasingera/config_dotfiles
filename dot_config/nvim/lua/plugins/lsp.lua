@@ -3,7 +3,7 @@ return {
         "mason-org/mason-lspconfig.nvim",
         opts = {
             -- Installed on a fresh machine
-            ensure_installed = { "clangd", "lua_ls", "basedpyright", "rust_analyzer", "neocmake", "jsonls" },
+            ensure_installed = { "clangd", "lua_ls", "basedpyright", "rust_analyzer", "neocmake", "jsonls", "texlab" },
             -- stylua is installed as a formatter, not a language server
             automatic_enable = { exclude = { "stylua" } },
         },

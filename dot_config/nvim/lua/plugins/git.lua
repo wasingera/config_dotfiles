@@ -43,6 +43,20 @@ return {
 
                 -- "ih" selects the hunk under the cursor, e.g. dih, yih
                 map({ "o", "x" }, "ih", gitsigns.select_hunk, "Select hunk")
+
+                -- Neovim checks a buffer's mappings newest first. When gitsigns attaches after
+                -- which-key has put its <leader> trigger on the buffer, the <leader>h... maps
+                -- come first, and Neovim waits 'timeoutlen' for more keys before the menu
+                -- opens. Re-creating the trigger makes it the newest again.
+                vim.api.nvim_buf_call(bufnr, function()
+                    for _, mode in ipairs({ "n", "x" }) do
+                        local trigger = vim.fn.maparg(vim.g.mapleader, mode, false, true)
+                        if trigger.buffer == 1 and (trigger.desc or ""):find("which-key-trigger", 1, true) then
+                            vim.keymap.del(mode, vim.g.mapleader, { buffer = bufnr })
+                            vim.fn.mapset(mode, false, trigger)
+                        end
+                    end
+                end)
             end,
         },
     },

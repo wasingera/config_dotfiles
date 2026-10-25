@@ -59,6 +59,10 @@ if eww ping >/dev/null 2>&1; then eww reload >/dev/null 2>&1 || true; fi
 if pgrep -x dunst >/dev/null; then dunstctl reload || true; fi
 # SIGUSR1 makes kitty re-read its config, including the colours
 pkill -USR1 -x kitty || true
+# zathura re-reads its config, colours included, when asked over D-Bus
+for name in $(busctl --user list --no-legend 2>/dev/null | awk '$1 ~ /^org\.pwmt\.zathura\./ { print $1 }'); do
+    busctl --user call "$name" /org/pwmt/zathura org.pwmt.zathura SourceConfig >/dev/null 2>&1 || true
+done
 # tmux only reads its config at startup, so source the colours into the running server
 if tmux info >/dev/null 2>&1; then
     tmux source-file "$state/current/tmux.conf" \; refresh-client -S >/dev/null 2>&1 || true

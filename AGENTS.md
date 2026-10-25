@@ -56,7 +56,7 @@ What each machine gets:
 
 - **Every machine:** zsh (`ZDOTDIR=~/.config/zsh` via `dot_zshenv`), nvim, tmux, clangd.
 - **Desktop only:** `hypr`, `eww`, `rofi` (+ `~/.local/share/rofi`), `dunst`, `kitty`,
-  `gtk-3.0`, `gtk-4.0`, `satty`, `chromium-flags.conf`, `zsh/.zprofile` (starts Hyprland on tty1),
+  `gtk-3.0`, `gtk-4.0`, `satty`, `zathura`, `chromium-flags.conf`, `zsh/.zprofile` (starts Hyprland on tty1),
   and the light/dark switching: `~/.config/colorscheme/`, `~/.local/bin/colorscheme`,
   `~/.local/bin/colorscheme-accents`, `~/.local/bin/colorscheme-solar`, `~/.local/bin/wallpaper`
   and `~/.config/systemd/`.
@@ -322,6 +322,7 @@ How it fits together:
    | GTK3 | `gtk-3.0/settings.ini` is a symlink to `current/gtk3.ini`; the theme name also goes to gsettings |
    | nvim | `lua/flavours.lua.tmpl` (flavour names) and a watcher on the mode file |
    | satty | `config.toml.tmpl`: annotation colours from the dark flavour, not switched |
+   | zathura | `include colors`, a symlink to `current/zathurarc` (`include` doesn't expand `~`); `colorscheme` calls each window's `SourceConfig` over D-Bus |
 
 **To add a tool:**
 
@@ -343,7 +344,7 @@ then replaces them in the staged files with the Catppuccin accents nearest the w
 hues, and points the files at the wallpaper:
 
 - Formats with variables get palette names appended (`$accent: $peach;`, `accent: @peach;`,
-  `$accent = $peach`). kitty, tmux and GTK4 get hex appended, which wins over the earlier lines.
+  `$accent = $peach`). kitty, tmux, zathura and GTK4 get hex appended, which wins over the earlier lines.
   `hypr.lua`, `gtk3.ini` and `hyprpaper.conf` have a line rewritten.
 - The rules are in its docstring: never red (it means an error), at least 3:1 on `base` (which
   leaves Latte only mauve, maroon, blue, green and teal), and blue/mauve for a grey wallpaper.

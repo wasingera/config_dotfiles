@@ -1,0 +1,9 @@
+# zathura, the PDF viewer vimtex opens. Colours come from the active scheme
+# (see "Colours" in AGENTS.md); `colorscheme` re-sources them in open windows.
+# include doesn't expand ~, so `colors` is a symlink to current/zathurarc.
+include colors
+
+# Copy selected text to the clipboard, not only the primary selection
+set selection-clipboard clipboard
+# Open documents fitted to the window's width
+set adjust-open width

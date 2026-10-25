@@ -241,6 +241,15 @@ def amend(directory, wallpaper):
             f"@define-color accent_fg_color {palette[fg]};",
             f"@define-color accent_color {palette[accent]};",
         ),
+        "zathurarc": lambda text: append(
+            text,
+            f"# {NOTE}",
+            f'set completion-highlight-bg "{palette[accent]}"',
+            f'set completion-highlight-fg "{palette[fg]}"',
+            f'set index-active-bg "{palette[accent]}"',
+            f'set index-active-fg "{palette[fg]}"',
+            f'set highlight-active-color "{palette[accent]}80"',
+        ),
         "gtk3.ini": lambda text: gtk3_theme(text, accent),
         "hyprlock.conf": lambda text: append(
             text,

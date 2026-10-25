@@ -442,3 +442,12 @@ hl.window_rule({
     float  = true,
     center = true,
 })
+
+-- Skyrim SE: open the game window fullscreen. Without ENB it opens tiled, and
+-- resizing it later blacks out Community Shaders' frame generation. MO2 and its
+-- tools share the class, so match the exact title to leave them alone.
+hl.window_rule({
+    name       = "skyrim-fullscreen",
+    match      = { class = "^steam_app_489830$", title = "^Skyrim Special Edition$" },
+    fullscreen = true,
+})

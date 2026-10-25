@@ -33,9 +33,14 @@ return {
                 "zsh",
             })
 
-            -- Start treesitter highlighting for every filetype that has a parser
+            -- Start treesitter highlighting for every filetype that has a parser, except LaTeX:
+            -- vimtex highlights it itself, and its conceal and math text objects need that syntax.
+            -- The latex parser stays installed for snacks.image.
             vim.api.nvim_create_autocmd("FileType", {
-                callback = function(args) pcall(vim.treesitter.start, args.buf) end,
+                callback = function(args)
+                    if args.match == "tex" then return end
+                    pcall(vim.treesitter.start, args.buf)
+                end,
             })
         end,
     },

@@ -489,7 +489,11 @@ experimental.
 ## Git, editing and UI plugins
 
 - **gitsigns** (`git.lua`): the keys are set in `on_attach`, so they exist only in buffers that are
-  in a git repo. `]c`/`[c` fall back to Vim's own `]c`/`[c` in diff mode.
+  in a git repo. `]c`/`[c` fall back to Vim's own `]c`/`[c` in diff mode. Neovim checks a buffer's
+  mappings newest first, so when gitsigns attaches after which-key has added its `<leader>` trigger
+  to the buffer (it does in `.tex` files), the `<leader>h…` maps would make `<leader>` wait
+  `'timeoutlen'` (1s) before the menu opens. `on_attach` re-creates the trigger with `mapset()` so
+  it stays the newest.
 - **mini.ai / mini.surround** (`editor.lua`): defaults. mini.surround is loaded by its `keys`
   entries, which also give which-key their descriptions.
 - **smart-splits** (`editor.lua`): with the separate `backend-tmux` plugin, `<C-h/j/k/l>` and

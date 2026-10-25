@@ -17,6 +17,7 @@ return {
                 "gitcommit",
                 "html",
                 "json",
+                "latex",
                 "lua",
                 "markdown",
                 "markdown_inline",

@@ -1,4 +1,5 @@
 {
+  "SchemaStore.nvim": { "branch": "main", "commit": "98c0d97389a1d46d7ee442161e05e4175d3763ec" },
   "backend-tmux": { "branch": "master", "commit": "9e9e6aa9b3eb7a8d3896a993611622ac97abff52" },
   "blink.cmp": { "branch": "main", "commit": "78336bc89ee5365633bcf754d93df01678b5c08f" },
   "catppuccin": { "branch": "main", "commit": "edefef779ab08ce1a4a404713e3012b0d202bd35" },

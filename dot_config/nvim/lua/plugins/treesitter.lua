@@ -10,6 +10,7 @@ return {
             require("nvim-treesitter").install({
                 "bash",
                 "c",
+                "cmake",
                 "cpp",
                 "cuda",
                 "diff",

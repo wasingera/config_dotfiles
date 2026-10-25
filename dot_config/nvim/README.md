@@ -18,6 +18,9 @@ Neovim 0.12+ with [lazy.nvim](https://github.com/folke/lazy.nvim). It's deployed
 |------|-----|
 | Neovim **0.12** or newer | nvim-treesitter's main branch, `winborder`, the `vim.diagnostic.jump` options |
 | `git`, `curl` | lazy.nvim, Mason, parser downloads |
+| `unzip`, `tar`, `gzip` | unpacking Mason's downloads |
+| Node.js and `npm` | Mason's npm packages (jsonls) |
+| `python3` with `venv` | Mason's Python packages (basedpyright) |
 | `tree-sitter` CLI and a C compiler | building treesitter parsers |
 | kitty, or another terminal with the kitty graphics protocol | images and rendered math |
 | `pdflatex` (or `tectonic`) and ImageMagick (`magick`) | rendered math |

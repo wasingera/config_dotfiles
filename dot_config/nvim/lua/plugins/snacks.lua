@@ -26,6 +26,9 @@ return {
             input = { enabled = true },
             -- Turn off slow features in very large files
             bigfile = { enabled = true },
+            -- Images in the terminal (kitty graphics, also through tmux): LaTeX math and images in
+            -- markdown and .tex buffers render inline, and image files open as images
+            image = { enabled = true },
             -- Floating terminal
             terminal = { win = { position = "float" } },
             -- Distraction-free mode: one centred window, the rest hidden, other paragraphs dimmed.

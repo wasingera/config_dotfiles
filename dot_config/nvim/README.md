@@ -19,6 +19,8 @@ Neovim 0.12+ with [lazy.nvim](https://github.com/folke/lazy.nvim). It's deployed
 | Neovim **0.12** or newer | nvim-treesitter's main branch, `winborder`, the `vim.diagnostic.jump` options |
 | `git`, `curl` | lazy.nvim, Mason, parser downloads |
 | `tree-sitter` CLI and a C compiler | building treesitter parsers |
+| kitty, or another terminal with the kitty graphics protocol | images and rendered math |
+| `pdflatex` (or `tectonic`) and ImageMagick (`magick`) | rendered math |
 | `rg` (ripgrep), `fd` | the snacks grep and file pickers |
 | A Nerd Font in the terminal | icons in the picker, explorer, statusline and completion menu |
 | `lazygit` (optional) | `<leader>gg` |
@@ -161,6 +163,10 @@ Commands from vim-eunuch: `:Rename`, `:Move`, `:Delete`, `:Chmod`, `:Mkdir`, `:S
 Markdown buffers are rendered in place: headings, bullets, checkboxes, tables, code blocks and
 callouts. The raw text shows on the cursor line. `<leader>um` toggles rendering for the buffer.
 
+LaTeX math (`$...$`, `$$...$$`) is rendered as an image in place, in markdown and `.tex` files, and
+so are images the file links to. Moving the cursor onto an equation shows its source. Image files
+(PNG, JPEG, PDF, ...) open as images.
+
 ### Writing
 
 `<leader>uz` toggles zen mode: the current buffer in one centred window, 90 columns wide, with the
@@ -233,8 +239,8 @@ To undo an update, check out the old lockfile from git and run `:Lazy restore`.
 | Icons show as boxes | The terminal font isn't a Nerd Font |
 | Something else | `:checkhealth`, `:Lazy` (errors are shown per plugin), `:messages` |
 
-`:checkhealth snacks` also reports errors for snacks modules this config doesn't use (image,
-notifier, and so on), and for lazygit where it isn't installed. Those are expected.
+`:checkhealth snacks` also reports errors for snacks modules this config doesn't use (notifier,
+and so on), and for lazygit where it isn't installed. Those are expected.
 
 ---
 
@@ -259,7 +265,7 @@ dot_config/nvim/
 │   │   ├── git.lua              gitsigns
 │   │   ├── lsp.lua              mason, mason-lspconfig, nvim-lspconfig, LSP keymaps, SchemaStore, lazydev
 │   │   ├── markdown.lua         render-markdown
-│   │   ├── snacks.lua           picker, explorer, terminal, lazygit, indent guides, input, bigfile, zen
+│   │   ├── snacks.lua           picker, explorer, terminal, lazygit, indent guides, input, bigfile, zen, image
 │   │   ├── treesitter.lua       nvim-treesitter
 │   │   └── ui.lua               lualine
 │   ├── utils.lua                reads and watches the light/dark mode file
@@ -346,7 +352,7 @@ temporary directory and write `light` or `dark` into `colorscheme/mode` there.
 ## snacks.nvim (`snacks.lua`)
 
 One plugin provides the picker, explorer, floating terminal, lazygit window, indent guides, `vim.ui.input`,
-large-file handling (`bigfile`) and zen mode. It's loaded at startup with high priority because other specs call
+large-file handling (`bigfile`), zen mode and images. It's loaded at startup with high priority because other specs call
 the `Snacks` global.
 
 - **Picker:** with `picker.enabled`, snacks also replaces `vim.ui.select`, so code actions and
@@ -375,6 +381,13 @@ the `Snacks` global.
   `zen.win.wo.winhighlight` maps `FloatBorder` to `LineNr` (catppuccin's `surface1`), a quiet
   grey in both flavours instead of the usual blue. It replaces snacks' default `winhighlight` for
   zen, so it repeats that default's `NormalFloat:Normal`.
+- **Images:** `image.enabled` draws images with the kitty graphics protocol. Inside tmux snacks
+  wraps them in passthrough sequences, which needs `allow-passthrough` (set in `tmux.conf`). Math
+  is found with the `latex` treesitter parser (also injected into markdown), compiled with
+  `pdflatex` and cropped with `magick`; the images are cached in `stdpath("cache")/snacks/image`.
+  The text colour comes from the `@markup.math.latex` highlight when an equation is first
+  rendered, so after a light/dark switch cached equations keep the old colour until the buffer
+  is reopened. render-markdown's own LaTeX support stays off (`markdown.lua`).
 
 ## LSP (`lsp.lua`)
 
@@ -461,8 +474,8 @@ experimental.
   must not be lazy-loaded. Outside tmux it only moves between splits, without a warning.
 - **which-key** (`editor.lua`): the `spec` only names the leader groups. Every mapping's `desc` is
   what it displays, so give new mappings a `desc`.
-- **render-markdown** (`markdown.lua`): defaults with LaTeX disabled, since that needs the latex
-  parser plus `utftex` or `latex2text`. It uses the `markdown`, `markdown_inline`, `html` and
+- **render-markdown** (`markdown.lua`): defaults with LaTeX disabled, since snacks.image renders
+  math as images instead. It uses the `markdown`, `markdown_inline`, `html` and
   `yaml` parsers.
 - **lualine** (`ui.lua`): defaults. It picks up catppuccin's colours by itself.
 - **Commenting**: there's no plugin; Neovim 0.10+ has `gc` built in, using `'commentstring'` and

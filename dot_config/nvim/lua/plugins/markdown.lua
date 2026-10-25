@@ -6,7 +6,7 @@ return {
         ---@module 'render-markdown'
         ---@type render.md.UserConfig
         opts = {
-            -- Needs the latex parser plus utftex or latex2text, which aren't installed
+            -- Off: snacks.image renders math as real images instead (snacks.lua)
             latex = { enabled = false },
         },
         keys = {

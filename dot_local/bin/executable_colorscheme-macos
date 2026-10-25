@@ -1,0 +1,36 @@
+#!/usr/bin/swift
+// Keeps ~/.local/state/colorscheme/mode in step with macOS's light/dark
+// appearance, so nvim follows it like it does on the desktop. Writes the
+// mode once at start, then again on every appearance change. Runs as a
+// LaunchAgent (~/Library/LaunchAgents/local.colorscheme-macos.plist).
+
+import Foundation
+
+let stateHome = ProcessInfo.processInfo.environment["XDG_STATE_HOME"]
+    ?? NSHomeDirectory() + "/.local/state"
+let dir = URL(fileURLWithPath: stateHome + "/colorscheme")
+let file = dir.appendingPathComponent("mode")
+
+func currentMode() -> String {
+    // "Dark" while dark mode is on (also in Auto); absent in light mode.
+    CFPreferencesAppSynchronize(kCFPreferencesAnyApplication)
+    let style = CFPreferencesCopyAppValue("AppleInterfaceStyle" as CFString,
+                                          kCFPreferencesAnyApplication) as? String
+    return style == "Dark" ? "dark" : "light"
+}
+
+func update() {
+    let mode = currentMode()
+    // Write only on a change, so watchers don't reload for nothing
+    if (try? String(contentsOf: file, encoding: .utf8))?
+        .trimmingCharacters(in: .whitespacesAndNewlines) == mode { return }
+    try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+    try? (mode + "\n").write(to: file, atomically: true, encoding: .utf8)
+}
+
+update()
+DistributedNotificationCenter.default().addObserver(
+    forName: Notification.Name("AppleInterfaceThemeChangedNotification"),
+    object: nil, queue: nil
+) { _ in update() }
+RunLoop.main.run()

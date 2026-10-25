@@ -28,7 +28,7 @@ Neovim 0.12+ with [lazy.nvim](https://github.com/folke/lazy.nvim). It's deployed
 | `clang-format`, `rustfmt` (optional) | C/C++ and Rust formatting; they come from the system toolchains |
 
 Everything else installs itself: lazy.nvim installs the plugins, and Mason installs the language
-servers (clangd, lua_ls, basedpyright, rust-analyzer, neocmakelsp, jsonls) and formatters (stylua,
+servers (clangd, lua_ls, basedpyright, rust-analyzer, neocmakelsp, jsonls, texlab) and formatters (stylua,
 ruff, shfmt).
 
 ## Setting up a machine
@@ -416,7 +416,8 @@ the `Snacks` global.
   `$PATH` inside Neovim. Its `config` also installs the conform formatters (stylua, ruff, shfmt)
   through `mason-registry`, skipping any that are installed or installing.
 - **mason-lspconfig** `ensure_installed` installs clangd, lua_ls, basedpyright, rust-analyzer,
-  neocmakelsp (CMake) and jsonls (JSON).
+  neocmakelsp (CMake), jsonls (JSON) and texlab (LaTeX). texlab completes commands, environments,
+  `\ref` labels and `\cite` keys; its own build-on-save is off by default, so only vimtex compiles.
   `automatic_enable` calls `vim.lsp.enable()` for every installed server it knows about. That
   includes `ruff`, which runs next to basedpyright for lint diagnostics and fixes. It excludes
   `stylua`, whose Mason package would otherwise also start stylua as a language server.

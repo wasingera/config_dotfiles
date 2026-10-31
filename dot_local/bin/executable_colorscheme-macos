@@ -3,20 +3,24 @@
 // appearance, so nvim follows it like it does on the desktop. Writes the
 // mode once at start, then again on every appearance change. Runs as a
 // LaunchAgent (~/Library/LaunchAgents/local.colorscheme-macos.plist).
+//
+// The appearance comes from AppKit (NSApp.effectiveAppearance), not the
+// AppleInterfaceStyle preference: a long-running process kept reading a
+// stale "Dark" from its preferences cache after Auto mode switched to light.
 
-import Foundation
+import AppKit
 
 let stateHome = ProcessInfo.processInfo.environment["XDG_STATE_HOME"]
     ?? NSHomeDirectory() + "/.local/state"
 let dir = URL(fileURLWithPath: stateHome + "/colorscheme")
 let file = dir.appendingPathComponent("mode")
 
+let app = NSApplication.shared
+app.setActivationPolicy(.prohibited)  // no Dock icon or menu bar
+
 func currentMode() -> String {
-    // "Dark" while dark mode is on (also in Auto); absent in light mode.
-    CFPreferencesAppSynchronize(kCFPreferencesAnyApplication)
-    let style = CFPreferencesCopyAppValue("AppleInterfaceStyle" as CFString,
-                                          kCFPreferencesAnyApplication) as? String
-    return style == "Dark" ? "dark" : "light"
+    app.effectiveAppearance.bestMatch(from: [.darkAqua, .aqua]) == .darkAqua
+        ? "dark" : "light"
 }
 
 func update() {
@@ -28,9 +32,17 @@ func update() {
     try? (mode + "\n").write(to: file, atomically: true, encoding: .utf8)
 }
 
-update()
+// AppKit updates effectiveAppearance itself when the system's changes
+let observer = app.observe(\.effectiveAppearance) { _, _ in update() }
+// Belt and braces: re-check on the theme notification and after a wake,
+// when Auto mode often switches
 DistributedNotificationCenter.default().addObserver(
     forName: Notification.Name("AppleInterfaceThemeChangedNotification"),
-    object: nil, queue: nil
+    object: nil, queue: .main
+) { _ in DispatchQueue.main.async { update() } }
+NSWorkspace.shared.notificationCenter.addObserver(
+    forName: NSWorkspace.didWakeNotification, object: nil, queue: .main
 ) { _ in update() }
-RunLoop.main.run()
+
+update()
+app.run()

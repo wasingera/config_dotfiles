@@ -1,3 +1,20 @@
+-- The terminal a bare <C-Space> toggles: 1 at first, then whichever N<C-Space> chose last
+local last_terminal = 1
+
+local function toggle_terminal()
+    local term = vim.b.snacks_terminal
+    if vim.v.count > 0 then
+        last_terminal = vim.v.count
+    elseif term then
+        -- Inside a terminal, the key hides that one
+        last_terminal = term.id
+    end
+    Snacks.terminal.toggle(nil, {
+        count = last_terminal,
+        win = { title = (" Terminal %d "):format(last_terminal) },
+    })
+end
+
 return {
     { -- Picker, file explorer, terminal, lazygit and indent guides in one plugin
         "folke/snacks.nvim",
@@ -29,8 +46,8 @@ return {
             -- Images in the terminal (kitty graphics, also through tmux): LaTeX math and images in
             -- markdown and .tex buffers render inline, and image files open as images
             image = { enabled = true },
-            -- Floating terminal
-            terminal = { win = { position = "float" } },
+            -- Floating terminal; border = true uses 'winborder' (rounded), like the other floats
+            terminal = { win = { position = "float", border = true } },
             -- Distraction-free mode: one centred window, the rest hidden, other paragraphs dimmed.
             -- 90 columns keeps wrapped prose at a readable line length. border = true uses
             -- 'winborder' (rounded), like the other floats. Zen's own full height ignores the
@@ -82,7 +99,7 @@ return {
         keys = {
             { "<C-p>", function() Snacks.picker.files() end, desc = "Find files" },
             { "<C-n>", function() Snacks.explorer() end, desc = "Toggle file explorer" },
-            { "<C-Space>", function() Snacks.terminal.toggle() end, mode = { "n", "t" }, desc = "Toggle terminal" },
+            { "<C-Space>", toggle_terminal, mode = { "n", "t" }, desc = "Toggle terminal" },
 
             { "<leader><space>", function() Snacks.picker.smart() end, desc = "Smart find files" },
             { "<leader>/", function() Snacks.picker.grep() end, desc = "Grep" },

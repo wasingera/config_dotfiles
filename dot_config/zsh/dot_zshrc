@@ -19,7 +19,9 @@ source $ZDOTDIR/plugins/load-plugins.zsh
 
 ## Completion ##
 # after the plugins, which add to fpath (zsh-completions)
-autoload -U compinit && compinit
+# the dump is a cache, so keep it out of $ZDOTDIR
+[[ -d $HOME/.cache/zsh ]] || mkdir -p "$HOME/.cache/zsh"
+autoload -U compinit && compinit -d "$HOME/.cache/zsh/zcompdump"
 
 ## Prompt Setup ##
 autoload -U promptinit; promptinit

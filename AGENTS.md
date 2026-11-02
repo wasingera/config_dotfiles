@@ -161,6 +161,10 @@ Shell traps:
 
 ### Lock screen (`dot_config/hypr/hyprlock.conf`)
 
+- hyprlock is also the login. tty1 logs in automatically (a getty drop-in in `/etc`, see the
+  README), `.zprofile` `exec`s Hyprland so that quitting it ends the session, and the first
+  `hyprland.start` command runs hyprlock, ending the session if it fails to lock. Keep all three:
+  without any one of them the session can come up unlocked.
 - Positions and sizes are in physical pixels. With `valign = center` a widget's y is its centre's
   distance above the screen's centre.
 - The layout is computed from `$` variables at the top with hyprlang arithmetic: `{{a + b}}`,

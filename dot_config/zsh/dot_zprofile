@@ -3,5 +3,8 @@
 export PATH="$HOME/.local/bin:$PATH"
 
 if [ -z "$DISPLAY" ] && [ "${XDG_VTNR}" -eq 1 ]; then
-    start-hyprland
+    # exec: tty1 logs in automatically and hyprlock is the real login, so when
+    # Hyprland exits or crashes the session must end (getty then logs in and
+    # locks again) rather than fall back to an unlocked shell
+    exec start-hyprland
 fi

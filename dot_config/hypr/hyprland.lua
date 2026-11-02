@@ -55,6 +55,9 @@ end
 -- Or execute your favorite apps at launch like this:
 --
 hl.on("hyprland.start", function () 
+    -- tty1 logs in automatically (a getty drop-in in /etc), so hyprlock is the
+    -- login. If it can't lock, end the session rather than leave it open
+    hl.exec_cmd("hyprlock --no-fade-in --immediate-render || hyprctl dispatch 'hl.dsp.exit()'")
     hl.exec_cmd("${HOME}/.local/bin/eww open top_bar")
     hl.exec_cmd("hyprpaper")
     hl.exec_cmd("dunst")

@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+# Warm the screen in dark mode, through hyprsunset.
+#
+#   colorscheme-nightlight          set the running hyprsunset from the current mode
+#   colorscheme-nightlight --start  start hyprsunset in it (Hyprland does, at login)
+#
+# The mode is the one colorscheme last wrote, so the screen warms at sunset with
+# the rest of the session, and also on a manual `colorscheme dark`.
+
+set -euo pipefail
+
+# Night temperature in kelvin: 6500 is neutral, lower is warmer
+temperature=4000
+
+mode=$(cat "${XDG_STATE_HOME:-$HOME/.local/state}/colorscheme/mode" 2>/dev/null || echo dark)
+
+if [[ ${1:-} == --start ]]; then
+    if [[ $mode == dark ]]; then exec hyprsunset -t "$temperature"; else exec hyprsunset -i; fi
+fi
+
+if [[ $mode == dark ]]; then
+    hyprctl hyprsunset temperature "$temperature" >/dev/null
+else
+    hyprctl hyprsunset identity >/dev/null
+fi

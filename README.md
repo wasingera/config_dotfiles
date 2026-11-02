@@ -74,7 +74,7 @@ On top of the "every machine" list:
 
 | Area | Packages | Used by |
 |------|----------|---------|
-| Session | `hyprland hyprpaper hyprlock xdg-desktop-portal-hyprland xdg-desktop-portal-gtk` | the compositor (started from `.zprofile` on tty1), wallpaper, lock screen, screen sharing and file dialogs |
+| Session | `hyprland hyprpaper hyprlock hyprsunset xdg-desktop-portal-hyprland xdg-desktop-portal-gtk` | the compositor (started from `.zprofile` on tty1), wallpaper, lock screen, night light, screen sharing and file dialogs |
 | Bar | eww, built from source (below), `jq socat curl` | the bar and its listener scripts; `socat` reads Hyprland's event socket, `curl` fetches the weather |
 | Bar menus | `rofi python-gobject at-spi2-core` | the dropdown menus; `bar_anchor.py` finds the clicked button through AT-SPI |
 | Notifications | `dunst libnotify` | notifications and the bell's history (`gdbus` comes with `glib2`) |
@@ -159,7 +159,8 @@ picked by `colorscheme-accents`.
 
 On the desktop the whole session (terminal, nvim, bar, menus, notifications, GTK
 apps, borders, wallpaper, lock screen) switches between light and dark at sunrise
-and sunset:
+and sunset. Dark mode also warms the screen to 4000K with hyprsunset (the
+temperature is at the top of `colorscheme-nightlight`):
 
 ```sh
 colorscheme light        # or dark / toggle; no argument re-applies the current mode

@@ -17,6 +17,9 @@
 {{- /* tmux reads it before ~/.config/tmux/tmux.conf, so it would shadow the config */}}
 .tmux.conf
 
+{{- /* compinit's old dump location; it now writes to ~/.cache/zsh/zcompdump */}}
+.config/zsh/.zcompdump
+
 {{ if .desktop }}
 {{- /* Old bspwm/X11 setup, replaced by Hyprland */}}
 .config/bspwm

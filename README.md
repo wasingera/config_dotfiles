@@ -74,7 +74,7 @@ On top of the "every machine" list:
 
 | Area | Packages | Used by |
 |------|----------|---------|
-| Session | `hyprland hyprpaper hyprlock hyprsunset xdg-desktop-portal-hyprland xdg-desktop-portal-gtk` | the compositor (started from `.zprofile` on tty1), wallpaper, lock screen, night light, screen sharing and file dialogs |
+| Session | `hyprland hyprpaper hyprlock hyprsunset xdg-desktop-portal-hyprland xdg-desktop-portal-gtk` | the compositor (started from `.zprofile` on tty1, which logs in automatically), wallpaper, lock screen, night light, screen sharing and file dialogs |
 | Bar | eww, built from source (below), `jq socat curl` | the bar and its listener scripts; `socat` reads Hyprland's event socket, `curl` fetches the weather |
 | Bar menus | `rofi python-gobject at-spi2-core` | the dropdown menus; `bar_anchor.py` finds the clicked button through AT-SPI |
 | Notifications | `dunst libnotify` | notifications and the bell's history (`gdbus` comes with `glib2`) |
@@ -99,6 +99,22 @@ install -Dm755 target/release/eww ~/.local/bin/eww
 
 After `chezmoi apply` on a new desktop, start the sunrise/sunset switch once with
 `systemctl --user enable --now colorscheme-solar.timer` (see "Colours").
+
+The desktop boots straight to the lock screen: tty1 logs in automatically, `.zprofile` starts
+Hyprland, and Hyprland starts hyprlock before anything else. The autologin is a system file that
+chezmoi can't manage, so add it once (`alex` is the user name):
+
+```sh
+sudo mkdir -p /etc/systemd/system/getty@tty1.service.d
+sudo tee /etc/systemd/system/getty@tty1.service.d/autologin.conf <<'EOF'
+[Service]
+ExecStart=
+ExecStart=-/usr/bin/agetty -o '-p -f -- \\u' --noreset --noclear --autologin alex - ${TERM}
+EOF
+sudo systemctl daemon-reload
+```
+
+The other ttys still ask for a password, so Ctrl+Alt+F2 gets you in if Hyprland or hyprlock breaks.
 
 ## Migrating a machine from the old layout
 

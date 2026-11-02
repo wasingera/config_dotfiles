@@ -25,6 +25,7 @@ CLAUDE.md
 .local/bin/colorscheme
 .local/bin/colorscheme-accents
 .local/bin/colorscheme-solar
+.local/bin/colorscheme-nightlight
 .local/bin/wallpaper
 .config/systemd
 {{ end }}

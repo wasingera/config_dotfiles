@@ -61,6 +61,8 @@ hl.on("hyprland.start", function ()
     -- Tracks which media player was active last, so playerctl (the media
     -- keys, the bar's media widget) controls that one
     hl.exec_cmd("playerctld daemon")
+    -- Warms the screen in dark mode; colorscheme updates it on each switch
+    hl.exec_cmd("${HOME}/.local/bin/colorscheme-nightlight --start")
     -- hl.exec_cmd(terminal)
   -- hl.exec_cmd(terminal)
   -- hl.exec_cmd("nm-applet")

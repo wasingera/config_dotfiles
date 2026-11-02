@@ -58,8 +58,8 @@ What each machine gets:
 - **Desktop only:** `hypr`, `eww`, `rofi` (+ `~/.local/share/rofi`), `dunst`, `kitty`,
   `gtk-3.0`, `gtk-4.0`, `satty`, `zathura`, `chromium-flags.conf`, `zsh/.zprofile` (starts Hyprland on tty1),
   and the light/dark switching: `~/.config/colorscheme/`, `~/.local/bin/colorscheme`,
-  `~/.local/bin/colorscheme-accents`, `~/.local/bin/colorscheme-solar`, `~/.local/bin/wallpaper`
-  and `~/.config/systemd/`.
+  `~/.local/bin/colorscheme-accents`, `~/.local/bin/colorscheme-solar`,
+  `~/.local/bin/colorscheme-nightlight`, `~/.local/bin/wallpaper` and `~/.config/systemd/`.
 - **macOS only:** `~/.local/bin/colorscheme-macos` and its LaunchAgent in `~/Library/LaunchAgents/`,
   which write the mode file from the system appearance (see "Colours").
 
@@ -121,6 +121,7 @@ The desktop is live while you work. Check each change in the real session:
 | any shell script | `bash -n <file>` |
 | nvim | `nvim --headless +qa` prints nothing; `nvim --headless "+checkhealth <plugin>" "+w! out.txt" +qa` |
 | colours | `colorscheme light`, check, `colorscheme dark`; `chezmoi diff` must be empty in both modes |
+| night light | ask the user to look: screenshots don't show hyprsunset's tint, and `hyprctl hyprsunset temperature` prints the last temperature even while it's off (identity) |
 | hyprlock | never the real config (see the trap below): `hyprlock -c test.conf --grace 60 &`, screenshot, then `pkill -USR1 -x hyprlock`; `faillock --user $USER` lists no new failures |
 | visual result | `grim -g "x,y wxh" out.png` (screen scale is 1.5, so the image is in physical px) |
 | bar widget geometry | `~/.config/eww/scripts/bar_anchor.py` prints where a menu would hang from the button under the pointer |
@@ -323,6 +324,7 @@ How it fits together:
    | nvim | `lua/flavours.lua.tmpl` (flavour names) and a watcher on the mode file |
    | satty | `config.toml.tmpl`: annotation colours from the dark flavour, not switched |
    | zathura | `include colors`, a symlink to `current/zathurarc` (`include` doesn't expand `~`); `colorscheme` calls each window's `SourceConfig` over D-Bus |
+   | hyprsunset | not colours but the screen's warmth: `colorscheme-nightlight` sets 4000K in dark mode and none in light, `--start` from Hyprland at login, without `--start` from `colorscheme` |
 
 **To add a tool:**
 

@@ -70,6 +70,7 @@ The leader is **Space**. Press it and wait to see every leader key; which-key do
 | `<leader>sr` | Reopen the last picker where you left it |
 | `<C-n>` | Toggle the file explorer (from inside it too) |
 | `<C-Space>` | Toggle the floating terminal (works from inside it too) |
+| `N<C-Space>` | Toggle terminal N; a bare `<C-Space>` then sticks to N until another count |
 | `<C-h/j/k/l>` | Go to the split on the left/below/above/right, and on into the next tmux pane at the edge; stops at the last one |
 | `<A-h/j/k/l>` | Resize the split (or tmux pane) towards the left/down/up/right |
 | `<Esc>` | Clear search highlighting |
@@ -387,8 +388,11 @@ the `Snacks` global.
 - **`<C-n>` in the explorer:** pickers bind `<C-n>` to "move down" in their own windows, which
   hides the global toggle once the explorer has focus. `picker.sources.explorer.win` rebinds it
   to `close` in the explorer's list and input only.
-- **Terminal:** `terminal.win.position = "float"` makes `Snacks.terminal.toggle()` float. The key
-  is mapped in normal and terminal mode, so the same key hides it again.
+- **Terminal:** `terminal.win.position = "float"` makes `Snacks.terminal.toggle()` float, and
+  `border = true` gives it the rounded `'winborder'`. Snacks keys terminals by count, so
+  `toggle_terminal()` passes one: the last count given (1 at first), or inside a terminal that
+  terminal's own id, so the key hides the one you're in. The float's title shows the number. The
+  key is mapped in normal and terminal mode, so the same key hides it again. Tabs are left to tmux.
 - **`:q` and the explorer:** without help, `:q` in the last editor window leaves the explorer
   sidebar open and Neovim running. The `QuitPre` autocommand in `init` checks whether every other
   non-floating window in the tab is a snacks window. If so, it closes the explorer pickers first.
